@@ -1,0 +1,364 @@
+{
+  "schemaVersion": 1,
+  "year": 2026,
+  "annualTables": {
+    "standard": {
+      "married_filing_jointly": [
+        {
+          "over": 0,
+          "under": 19300,
+          "base": 0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 19300,
+          "under": 44100,
+          "base": 0,
+          "rate": 0.1,
+          "excessOver": 19300
+        },
+        {
+          "over": 44100,
+          "under": 120100,
+          "base": 2480.0,
+          "rate": 0.12,
+          "excessOver": 44100
+        },
+        {
+          "over": 120100,
+          "under": 230700,
+          "base": 11600.0,
+          "rate": 0.22,
+          "excessOver": 120100
+        },
+        {
+          "over": 230700,
+          "under": 422850,
+          "base": 35932.0,
+          "rate": 0.24,
+          "excessOver": 230700
+        },
+        {
+          "over": 422850,
+          "under": 531750,
+          "base": 82048.0,
+          "rate": 0.32,
+          "excessOver": 422850
+        },
+        {
+          "over": 531750,
+          "under": 788000,
+          "base": 116896.0,
+          "rate": 0.35,
+          "excessOver": 531750
+        },
+        {
+          "over": 788000,
+          "under": null,
+          "base": 206583.5,
+          "rate": 0.37,
+          "excessOver": 788000
+        }
+      ],
+      "single_or_mfs": [
+        {
+          "over": 0,
+          "under": 7500,
+          "base": 0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 7500,
+          "under": 19900,
+          "base": 0,
+          "rate": 0.1,
+          "excessOver": 7500
+        },
+        {
+          "over": 19900,
+          "under": 57900,
+          "base": 1240.0,
+          "rate": 0.12,
+          "excessOver": 19900
+        },
+        {
+          "over": 57900,
+          "under": 113200,
+          "base": 5800.0,
+          "rate": 0.22,
+          "excessOver": 57900
+        },
+        {
+          "over": 113200,
+          "under": 209275,
+          "base": 17866.0,
+          "rate": 0.24,
+          "excessOver": 113200
+        },
+        {
+          "over": 209275,
+          "under": 263725,
+          "base": 41024.0,
+          "rate": 0.32,
+          "excessOver": 209275
+        },
+        {
+          "over": 263725,
+          "under": 648100,
+          "base": 58448.0,
+          "rate": 0.35,
+          "excessOver": 263725
+        },
+        {
+          "over": 648100,
+          "under": null,
+          "base": 192979.25,
+          "rate": 0.37,
+          "excessOver": 648100
+        }
+      ],
+      "head_of_household": [
+        {
+          "over": 0,
+          "under": 15550,
+          "base": 0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 15550,
+          "under": 33250,
+          "base": 0,
+          "rate": 0.1,
+          "excessOver": 15550
+        },
+        {
+          "over": 33250,
+          "under": 83000,
+          "base": 1770.0,
+          "rate": 0.12,
+          "excessOver": 33250
+        },
+        {
+          "over": 83000,
+          "under": 121250,
+          "base": 7740.0,
+          "rate": 0.22,
+          "excessOver": 83000
+        },
+        {
+          "over": 121250,
+          "under": 217300,
+          "base": 16155.0,
+          "rate": 0.24,
+          "excessOver": 121250
+        },
+        {
+          "over": 217300,
+          "under": 271750,
+          "base": 39207.0,
+          "rate": 0.32,
+          "excessOver": 217300
+        },
+        {
+          "over": 271750,
+          "under": 656150,
+          "base": 56631.0,
+          "rate": 0.35,
+          "excessOver": 271750
+        },
+        {
+          "over": 656150,
+          "under": null,
+          "base": 191171.0,
+          "rate": 0.37,
+          "excessOver": 656150
+        }
+      ]
+    },
+    "step2_checked": {
+      "married_filing_jointly": [
+        {
+          "over": 0,
+          "under": 16100,
+          "base": 0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 16100,
+          "under": 28500,
+          "base": 0,
+          "rate": 0.1,
+          "excessOver": 16100
+        },
+        {
+          "over": 28500,
+          "under": 66500,
+          "base": 1240.0,
+          "rate": 0.12,
+          "excessOver": 28500
+        },
+        {
+          "over": 66500,
+          "under": 121800,
+          "base": 5800.0,
+          "rate": 0.22,
+          "excessOver": 66500
+        },
+        {
+          "over": 121800,
+          "under": 217875,
+          "base": 17966.0,
+          "rate": 0.24,
+          "excessOver": 121800
+        },
+        {
+          "over": 217875,
+          "under": 272325,
+          "base": 41024.0,
+          "rate": 0.32,
+          "excessOver": 217875
+        },
+        {
+          "over": 272325,
+          "under": 400450,
+          "base": 58448.0,
+          "rate": 0.35,
+          "excessOver": 272325
+        },
+        {
+          "over": 400450,
+          "under": null,
+          "base": 103291.75,
+          "rate": 0.37,
+          "excessOver": 400450
+        }
+      ],
+      "single_or_mfs": [
+        {
+          "over": 0,
+          "under": 8050,
+          "base": 0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 8050,
+          "under": 14250,
+          "base": 0,
+          "rate": 0.1,
+          "excessOver": 8050
+        },
+        {
+          "over": 14250,
+          "under": 33250,
+          "base": 620.0,
+          "rate": 0.12,
+          "excessOver": 14250
+        },
+        {
+          "over": 33250,
+          "under": 60900,
+          "base": 2900.0,
+          "rate": 0.22,
+          "excessOver": 33250
+        },
+        {
+          "over": 60900,
+          "under": 108938,
+          "base": 8993.0,
+          "rate": 0.24,
+          "excessOver": 60900
+        },
+        {
+          "over": 108938,
+          "under": 136163,
+          "base": 20512.0,
+          "rate": 0.32,
+          "excessOver": 108938
+        },
+        {
+          "over": 136163,
+          "under": 328350,
+          "base": 29224.0,
+          "rate": 0.35,
+          "excessOver": 136163
+        },
+        {
+          "over": 328350,
+          "under": null,
+          "base": 96489.63,
+          "rate": 0.37,
+          "excessOver": 328350
+        }
+      ],
+      "head_of_household": [
+        {
+          "over": 0,
+          "under": 12075,
+          "base": 0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 12075,
+          "under": 20925,
+          "base": 0,
+          "rate": 0.1,
+          "excessOver": 12075
+        },
+        {
+          "over": 20925,
+          "under": 45800,
+          "base": 885.0,
+          "rate": 0.12,
+          "excessOver": 20925
+        },
+        {
+          "over": 45800,
+          "under": 64925,
+          "base": 3870.0,
+          "rate": 0.22,
+          "excessOver": 45800
+        },
+        {
+          "over": 64925,
+          "under": 112950,
+          "base": 8077.5,
+          "rate": 0.24,
+          "excessOver": 64925
+        },
+        {
+          "over": 112950,
+          "under": 140175,
+          "base": 19603.5,
+          "rate": 0.32,
+          "excessOver": 112950
+        },
+        {
+          "over": 140175,
+          "under": 332375,
+          "base": 28315.5,
+          "rate": 0.35,
+          "excessOver": 140175
+        },
+        {
+          "over": 332375,
+          "under": null,
+          "base": 95585.5,
+          "rate": 0.37,
+          "excessOver": 332375
+        }
+      ]
+    }
+  },
+  "worksheetConstants": {
+    "line1g": {
+      "mfj": 12900,
+      "other": 8600
+    }
+  }
+}

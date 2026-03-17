@@ -1,0 +1,528 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "name": "Oklahoma Tax Commission OW-2 Withholding Tables",
+    "year": 2026,
+    "method": "percentage"
+  },
+  "rounding": {
+    "type": "nearestWholeDollar",
+    "rule": "dropUnder50Cents_raise50to99"
+  },
+  "allowanceAmounts": {
+    "weekly": 19.23,
+    "biweekly": 38.46,
+    "semimonthly": 41.67,
+    "monthly": 83.33,
+    "quarterly": 250.0,
+    "semiannual": 500.0,
+    "annual": 1000.0,
+    "daily": 3.85
+  },
+  "tables": [
+    {
+      "frequency": "weekly",
+      "single": [
+        {
+          "over": 0,
+          "under": 194,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 194,
+          "under": 216,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 194
+        },
+        {
+          "over": 216,
+          "under": 261,
+          "base": 0.55,
+          "rate": 0.035,
+          "excessOver": 216
+        },
+        {
+          "over": 261,
+          "under": null,
+          "base": 2.1,
+          "rate": 0.045,
+          "excessOver": 261
+        }
+      ],
+      "married": [
+        {
+          "over": 0,
+          "under": 388,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 388,
+          "under": 433,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 388
+        },
+        {
+          "over": 433,
+          "under": 521,
+          "base": 1.11,
+          "rate": 0.035,
+          "excessOver": 433
+        },
+        {
+          "over": 521,
+          "under": null,
+          "base": 4.2,
+          "rate": 0.045,
+          "excessOver": 521
+        }
+      ]
+    },
+    {
+      "frequency": "biweekly",
+      "single": [
+        {
+          "over": 0,
+          "under": 388,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 388,
+          "under": 433,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 388
+        },
+        {
+          "over": 433,
+          "under": 521,
+          "base": 1.11,
+          "rate": 0.035,
+          "excessOver": 433
+        },
+        {
+          "over": 521,
+          "under": null,
+          "base": 4.2,
+          "rate": 0.045,
+          "excessOver": 521
+        }
+      ],
+      "married": [
+        {
+          "over": 0,
+          "under": 777,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 777,
+          "under": 865,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 777
+        },
+        {
+          "over": 865,
+          "under": 1042,
+          "base": 2.21,
+          "rate": 0.035,
+          "excessOver": 865
+        },
+        {
+          "over": 1042,
+          "under": null,
+          "base": 8.4,
+          "rate": 0.045,
+          "excessOver": 1042
+        }
+      ]
+    },
+    {
+      "frequency": "semimonthly",
+      "single": [
+        {
+          "over": 0,
+          "under": 421,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 421,
+          "under": 469,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 421
+        },
+        {
+          "over": 469,
+          "under": 565,
+          "base": 1.2,
+          "rate": 0.035,
+          "excessOver": 469
+        },
+        {
+          "over": 565,
+          "under": null,
+          "base": 4.55,
+          "rate": 0.045,
+          "excessOver": 565
+        }
+      ],
+      "married": [
+        {
+          "over": 0,
+          "under": 842,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 842,
+          "under": 938,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 842
+        },
+        {
+          "over": 938,
+          "under": 1129,
+          "base": 2.4,
+          "rate": 0.035,
+          "excessOver": 938
+        },
+        {
+          "over": 1129,
+          "under": null,
+          "base": 9.1,
+          "rate": 0.045,
+          "excessOver": 1129
+        }
+      ]
+    },
+    {
+      "frequency": "monthly",
+      "single": [
+        {
+          "over": 0,
+          "under": 842,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 842,
+          "under": 938,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 842
+        },
+        {
+          "over": 938,
+          "under": 1129,
+          "base": 2.4,
+          "rate": 0.035,
+          "excessOver": 938
+        },
+        {
+          "over": 1129,
+          "under": null,
+          "base": 9.1,
+          "rate": 0.045,
+          "excessOver": 1129
+        }
+      ],
+      "married": [
+        {
+          "over": 0,
+          "under": 1683,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 1683,
+          "under": 1875,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 1683
+        },
+        {
+          "over": 1875,
+          "under": 2258,
+          "base": 4.79,
+          "rate": 0.035,
+          "excessOver": 1875
+        },
+        {
+          "over": 2258,
+          "under": null,
+          "base": 18.21,
+          "rate": 0.045,
+          "excessOver": 2258
+        }
+      ]
+    },
+    {
+      "frequency": "quarterly",
+      "single": [
+        {
+          "over": 0,
+          "under": 2525,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 2525,
+          "under": 2813,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 2525
+        },
+        {
+          "over": 2813,
+          "under": 3388,
+          "base": 7.19,
+          "rate": 0.035,
+          "excessOver": 2813
+        },
+        {
+          "over": 3388,
+          "under": null,
+          "base": 27.31,
+          "rate": 0.045,
+          "excessOver": 3388
+        }
+      ],
+      "married": [
+        {
+          "over": 0,
+          "under": 5050,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 5050,
+          "under": 5625,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 5050
+        },
+        {
+          "over": 5625,
+          "under": 6775,
+          "base": 14.38,
+          "rate": 0.035,
+          "excessOver": 5625
+        },
+        {
+          "over": 6775,
+          "under": null,
+          "base": 54.63,
+          "rate": 0.045,
+          "excessOver": 6775
+        }
+      ]
+    },
+    {
+      "frequency": "semiannual",
+      "single": [
+        {
+          "over": 0,
+          "under": 5050,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 5050,
+          "under": 5625,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 5050
+        },
+        {
+          "over": 5625,
+          "under": 6775,
+          "base": 14.38,
+          "rate": 0.035,
+          "excessOver": 5625
+        },
+        {
+          "over": 6775,
+          "under": null,
+          "base": 54.63,
+          "rate": 0.045,
+          "excessOver": 6775
+        }
+      ],
+      "married": [
+        {
+          "over": 0,
+          "under": 10100,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 10100,
+          "under": 11250,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 10100
+        },
+        {
+          "over": 11250,
+          "under": 13550,
+          "base": 28.75,
+          "rate": 0.035,
+          "excessOver": 11250
+        },
+        {
+          "over": 13550,
+          "under": null,
+          "base": 109.25,
+          "rate": 0.045,
+          "excessOver": 13550
+        }
+      ]
+    },
+    {
+      "frequency": "annual",
+      "single": [
+        {
+          "over": 0,
+          "under": 10100,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 10100,
+          "under": 11250,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 10100
+        },
+        {
+          "over": 11250,
+          "under": 13550,
+          "base": 28.75,
+          "rate": 0.035,
+          "excessOver": 11250
+        },
+        {
+          "over": 13550,
+          "under": null,
+          "base": 109.25,
+          "rate": 0.045,
+          "excessOver": 13550
+        }
+      ],
+      "married": [
+        {
+          "over": 0,
+          "under": 20200,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 20200,
+          "under": 22500,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 20200
+        },
+        {
+          "over": 22500,
+          "under": 27100,
+          "base": 57.5,
+          "rate": 0.035,
+          "excessOver": 22500
+        },
+        {
+          "over": 27100,
+          "under": null,
+          "base": 218.5,
+          "rate": 0.045,
+          "excessOver": 27100
+        }
+      ]
+    },
+    {
+      "frequency": "daily",
+      "single": [
+        {
+          "over": 0,
+          "under": 39,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 39,
+          "under": 43,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 39
+        },
+        {
+          "over": 43,
+          "under": 52,
+          "base": 0.11,
+          "rate": 0.035,
+          "excessOver": 43
+        },
+        {
+          "over": 52,
+          "under": null,
+          "base": 0.42,
+          "rate": 0.045,
+          "excessOver": 52
+        }
+      ],
+      "married": [
+        {
+          "over": 0,
+          "under": 78,
+          "base": 0.0,
+          "rate": 0.0,
+          "excessOver": 0
+        },
+        {
+          "over": 78,
+          "under": 87,
+          "base": 0.0,
+          "rate": 0.025,
+          "excessOver": 78
+        },
+        {
+          "over": 87,
+          "under": 104,
+          "base": 0.22,
+          "rate": 0.035,
+          "excessOver": 87
+        },
+        {
+          "over": 104,
+          "under": null,
+          "base": 0.84,
+          "rate": 0.045,
+          "excessOver": 104
+        }
+      ]
+    }
+  ]
+}
