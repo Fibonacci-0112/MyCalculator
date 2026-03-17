@@ -67,7 +67,8 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<PayCalculator>();
         builder.Services.AddSingleton<CalculatorViewModel>();
-        builder.Services.AddSingleton<CalculatorPage>();
+        builder.Services.AddSingleton<InputsPage>();
+        builder.Services.AddSingleton<ResultsPage>();
         builder.Services.AddSingleton<AppShell>();
 
         return builder.Build();

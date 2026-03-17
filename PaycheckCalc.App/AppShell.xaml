@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:views="clr-namespace:PaycheckCalc.App.Views" x:Class="PaycheckCalc.App.AppShell">
-  <ShellContent Title="Calculator" ContentTemplate="{DataTemplate views:CalculatorPage}" />
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:PaycheckCalc.App.Views"
+       x:Class="PaycheckCalc.App.AppShell">
+    <TabBar>
+        <Tab Title="Inputs">
+            <ShellContent ContentTemplate="{DataTemplate views:InputsPage}" />
+        </Tab>
+        <Tab Title="Results">
+            <ShellContent ContentTemplate="{DataTemplate views:ResultsPage}" />
+        </Tab>
+    </TabBar>
 </Shell>

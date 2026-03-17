@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PaycheckCalc.App.Views.ResultsPage"
+             Title="Results">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="8">
+            <Label Text="Results" FontAttributes="Bold" FontSize="18" />
+            <Label Text="{Binding Result.GrossPay, StringFormat='Gross Pay: {0:C}'}" />
+            <Label Text="{Binding Result.FederalWithholding, StringFormat='Federal Tax: {0:C}'}" />
+            <Label Text="{Binding Result.StateTaxableWages, StringFormat='State Taxable Wages: {0:C}'}" />
+            <Label Text="{Binding Result.StateWithholding, StringFormat='State Withholding: {0:C}'}" />
+            <Label Text="{Binding Result.SocialSecurityWithholding, StringFormat='Social Security Tax: {0:C}'}" />
+            <Label Text="{Binding Result.MedicareWithholding, StringFormat='Medicare Tax: {0:C}'}" />
+            <Label Text="{Binding Result.AdditionalMedicareWithholding, StringFormat='Additional Medicare Tax: {0:C}'}" />
+            <Label Text="{Binding Result.NetPay, StringFormat='Net Pay: {0:C}'}" FontAttributes="Bold" />
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

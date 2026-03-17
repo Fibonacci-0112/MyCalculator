@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="clr-namespace:PaycheckCalc.App.Behaviors"
+             x:Class="PaycheckCalc.App.Views.InputsPage"
+             Title="Inputs">
+
+    <VerticalStackLayout>
+
+        <!-- Tab Bar -->
+        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="0">
+            <Button Text="Pay &amp; Hours" Command="{Binding SelectTabCommand}" CommandParameter="0"
+                    Grid.Column="0" FontSize="12" Padding="4,8">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsTab0Visible}" Value="True">
+                        <Setter Property="BackgroundColor" Value="#1565C0" />
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Text="Federal" Command="{Binding SelectTabCommand}" CommandParameter="1"
+                    Grid.Column="1" FontSize="12" Padding="4,8">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsTab1Visible}" Value="True">
+                        <Setter Property="BackgroundColor" Value="#1565C0" />
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Text="State" Command="{Binding SelectTabCommand}" CommandParameter="2"
+                    Grid.Column="2" FontSize="12" Padding="4,8">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsTab2Visible}" Value="True">
+                        <Setter Property="BackgroundColor" Value="#1565C0" />
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Text="Deductions" Command="{Binding SelectTabCommand}" CommandParameter="3"
+                    Grid.Column="3" FontSize="12" Padding="4,8">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsTab3Visible}" Value="True">
+                        <Setter Property="BackgroundColor" Value="#1565C0" />
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+        </Grid>
+
+        <!-- Tab Content -->
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="10">
+
+                <!-- Pay Rate &amp; Hours Tab -->
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                      ColumnSpacing="12" RowSpacing="8" IsVisible="{Binding IsTab0Visible}">
+                    <Label Text="Pay Frequency" Grid.Row="0" Grid.Column="0" />
+                    <Picker ItemsSource="{Binding Frequencies}" SelectedItem="{Binding Frequency}"
+                            Grid.Row="0" Grid.Column="1" />
+                    <Label Text="Hourly Rate" Grid.Row="1" Grid.Column="0" />
+                    <Entry Text="{Binding HourlyRate}" Keyboard="Numeric" Grid.Row="1" Grid.Column="1">
+                        <Entry.Behaviors>
+                            <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                        </Entry.Behaviors>
+                    </Entry>
+                    <Label Text="Regular Hours" Grid.Row="2" Grid.Column="0" />
+                    <Entry Text="{Binding RegularHours}" Keyboard="Numeric" Grid.Row="2" Grid.Column="1">
+                        <Entry.Behaviors>
+                            <behaviors:DecimalFormatBehavior />
+                        </Entry.Behaviors>
+                    </Entry>
+                    <Label Text="Overtime Hours" Grid.Row="3" Grid.Column="0" />
+                    <Entry Text="{Binding OvertimeHours}" Keyboard="Numeric" Grid.Row="3" Grid.Column="1">
+                        <Entry.Behaviors>
+                            <behaviors:DecimalFormatBehavior />
+                        </Entry.Behaviors>
+                    </Entry>
+                    <Label Text="OT Multiplier" Grid.Row="4" Grid.Column="0" />
+                    <Entry Text="{Binding OvertimeMultiplier}" Keyboard="Numeric" Grid.Row="4" Grid.Column="1">
+                        <Entry.Behaviors>
+                            <behaviors:DecimalFormatBehavior />
+                        </Entry.Behaviors>
+                    </Entry>
+                </Grid>
+
+                <!-- Federal Withholding Tab -->
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                      ColumnSpacing="12" RowSpacing="8" IsVisible="{Binding IsTab1Visible}">
+                    <Label Text="Filing Status" Grid.Row="0" Grid.Column="0" />
+                    <Picker ItemsSource="{Binding FederalStatuses}" SelectedItem="{Binding SelectedFederalPickerItem}"
+                            Grid.Row="0" Grid.Column="1" />
+                    <Label Text="Step 2 checked?" Grid.Row="1" Grid.Column="0" />
+                    <Switch IsToggled="{Binding FederalStep2Checked}" Grid.Row="1" Grid.Column="1" />
+                    <Label Text="Step 3 credits (annual)" Grid.Row="2" Grid.Column="0" />
+                    <Entry Text="{Binding FederalStep3Credits}" Keyboard="Numeric" Grid.Row="2" Grid.Column="1">
+                        <Entry.Behaviors>
+                            <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                        </Entry.Behaviors>
+                    </Entry>
+                    <Label Text="Step 4(a) other income (annual)" Grid.Row="3" Grid.Column="0" />
+                    <Entry Text="{Binding FederalStep4aOtherIncome}" Keyboard="Numeric" Grid.Row="3" Grid.Column="1">
+                        <Entry.Behaviors>
+                            <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                        </Entry.Behaviors>
+                    </Entry>
+                    <Label Text="Step 4(b) deductions (annual)" Grid.Row="4" Grid.Column="0" />
+                    <Entry Text="{Binding FederalStep4bDeductions}" Keyboard="Numeric" Grid.Row="4" Grid.Column="1">
+                        <Entry.Behaviors>
+                            <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                        </Entry.Behaviors>
+                    </Entry>
+                    <Label Text="Step 4(c) extra per pay" Grid.Row="5" Grid.Column="0" />
+                    <Entry Text="{Binding FederalStep4cExtraWithholding}" Keyboard="Numeric" Grid.Row="5" Grid.Column="1">
+                        <Entry.Behaviors>
+                            <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                        </Entry.Behaviors>
+                    </Entry>
+                </Grid>
+
+                <!-- State Withholding Tab -->
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto"
+                      ColumnSpacing="12" RowSpacing="8" IsVisible="{Binding IsTab2Visible}">
+                    <Label Text="State" Grid.Row="0" Grid.Column="0" />
+                    <Picker ItemsSource="{Binding SupportedStates}" SelectedItem="{Binding SelectedState}"
+                            Grid.Row="0" Grid.Column="1" />
+                    <Label Text="Filing Status" Grid.Row="1" Grid.Column="0" />
+                    <Picker ItemsSource="{Binding Statuses}" SelectedItem="{Binding FilingStatus}"
+                            Grid.Row="1" Grid.Column="1" />
+                    <Label Text="State Allowances" Grid.Row="2" Grid.Column="0" />
+                    <Entry Text="{Binding StateAllowances}" Keyboard="Numeric" Grid.Row="2" Grid.Column="1" />
+                    <Label Text="Extra State Withholding" Grid.Row="3" Grid.Column="0" />
+                    <Entry Text="{Binding StateAdditionalWithholding}" Keyboard="Numeric" Grid.Row="3" Grid.Column="1">
+                        <Entry.Behaviors>
+                            <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                        </Entry.Behaviors>
+                    </Entry>
+                </Grid>
+
+                <!-- Deductions Tab -->
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"
+                      ColumnSpacing="12" RowSpacing="8" IsVisible="{Binding IsTab3Visible}">
+                    <Label Text="Pre-tax Deductions" Grid.Row="0" Grid.Column="0" />
+                    <Entry Text="{Binding PretaxDeductions}" Keyboard="Numeric" Grid.Row="0" Grid.Column="1">
+                        <Entry.Behaviors>
+                            <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                        </Entry.Behaviors>
+                    </Entry>
+                    <Label Text="Post-tax Deductions" Grid.Row="1" Grid.Column="0" />
+                    <Entry Text="{Binding PosttaxDeductions}" Keyboard="Numeric" Grid.Row="1" Grid.Column="1">
+                        <Entry.Behaviors>
+                            <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                        </Entry.Behaviors>
+                    </Entry>
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </VerticalStackLayout>
+</ContentPage>

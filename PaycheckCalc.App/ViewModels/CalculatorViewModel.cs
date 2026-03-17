@@ -27,7 +27,33 @@ public partial class CalculatorViewModel : ObservableObject
         OvertimeMultiplier = 1.5m;
         SelectedState = UsState.OK;
         SelectedFederalPickerItem = FederalStatuses[0];
+
+        // Auto-recalculate whenever any input property changes
+        PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName != nameof(Result) && e.PropertyName != nameof(SelectedInputTab)
+                && !e.PropertyName!.StartsWith("IsTab"))
+                Calculate();
+        };
     }
+
+    [ObservableProperty] public partial int SelectedInputTab { get; set; } = 0;
+
+    public bool IsTab0Visible => SelectedInputTab == 0;
+    public bool IsTab1Visible => SelectedInputTab == 1;
+    public bool IsTab2Visible => SelectedInputTab == 2;
+    public bool IsTab3Visible => SelectedInputTab == 3;
+
+    partial void OnSelectedInputTabChanged(int value)
+    {
+        OnPropertyChanged(nameof(IsTab0Visible));
+        OnPropertyChanged(nameof(IsTab1Visible));
+        OnPropertyChanged(nameof(IsTab2Visible));
+        OnPropertyChanged(nameof(IsTab3Visible));
+    }
+
+    [RelayCommand]
+    private void SelectTab(string tab) => SelectedInputTab = int.Parse(tab);
 
     public ObservableCollection<PickerItem<FederalFilingStatus>> FederalStatuses { get; } = new(
         Enum.GetValues<FederalFilingStatus>()
