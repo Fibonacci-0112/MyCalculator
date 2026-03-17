@@ -2,9 +2,9 @@ using PaycheckCalc.App.ViewModels;
 
 namespace PaycheckCalc.App.Views;
 
-public partial class CalculatorPage : ContentPage
+public partial class ResultsPage : ContentPage
 {
-    public CalculatorPage(CalculatorViewModel vm)
+    public ResultsPage(CalculatorViewModel vm)
     {
         InitializeComponent();
         BindingContext = vm;
