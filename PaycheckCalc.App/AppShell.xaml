@@ -2,7 +2,14 @@
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:views="clr-namespace:PaycheckCalc.App.Views"
-       x:Class="PaycheckCalc.App.AppShell">
+       x:Class="PaycheckCalc.App.AppShell"
+       Shell.TabBarBackgroundColor="#1565C0"
+       Shell.TabBarForegroundColor="White"
+       Shell.TabBarUnselectedColor="#90CAF9"
+       Shell.TabBarTitleColor="White"
+       Shell.NavBarHasShadow="False"
+       Shell.BackgroundColor="#1565C0"
+       Shell.TitleColor="White">
     <TabBar>
         <Tab Title="Inputs">
             <ShellContent ContentTemplate="{DataTemplate views:InputsPage}" />

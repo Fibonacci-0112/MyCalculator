@@ -2,65 +2,118 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PaycheckCalc.App.Views.ResultsPage"
-             Title="Results">
+             Title="Results"
+             BackgroundColor="#F0F4FF">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="8">
-            <Label Text="Results" FontAttributes="Bold" FontSize="18" />
+    <Grid RowDefinitions="Auto,*">
 
-            <!-- Net Pay: prominent green button-like display -->
-            <Frame BackgroundColor="#4CAF50" CornerRadius="10" Padding="16" Margin="0,4,0,8"
-                   BorderColor="Transparent">
-                <Label Text="{Binding Result.NetPay, StringFormat='Net Pay: {0:C}'}"
-                       TextColor="White" FontAttributes="Bold" FontSize="22"
-                       HorizontalTextAlignment="Center" />
-            </Frame>
+        <!-- Page Header -->
+        <Grid Grid.Row="0" BackgroundColor="#1565C0" Padding="16,20,16,20">
+            <Label Text="Your Paycheck Summary"
+                   TextColor="White"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center" />
+        </Grid>
 
-            <Label Text="{Binding Result.GrossPay, StringFormat='Gross Pay: {0:C}'}" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
 
-            <!-- Tax withholdings: amounts displayed in red -->
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="Federal Tax: " />
-                        <Span Text="{Binding Result.FederalWithholding, StringFormat='{0:C}'}" TextColor="Red" />
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-            <Label Text="{Binding Result.StateTaxableWages, StringFormat='State Taxable Wages: {0:C}'}" />
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="State Withholding: " />
-                        <Span Text="{Binding Result.StateWithholding, StringFormat='{0:C}'}" TextColor="Red" />
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="Social Security Tax: " />
-                        <Span Text="{Binding Result.SocialSecurityWithholding, StringFormat='{0:C}'}" TextColor="Red" />
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="Medicare Tax: " />
-                        <Span Text="{Binding Result.MedicareWithholding, StringFormat='{0:C}'}" TextColor="Red" />
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="Additional Medicare Tax: " />
-                        <Span Text="{Binding Result.AdditionalMedicareWithholding, StringFormat='{0:C}'}" TextColor="Red" />
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-        </VerticalStackLayout>
-    </ScrollView>
+                <!-- Net Pay: prominent green card -->
+                <Border BackgroundColor="#2E7D32" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 16" Padding="20,18">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="NET PAY" TextColor="#A5D6A7"
+                               FontSize="12" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding Result.NetPay, StringFormat='{0:C}'}"
+                               TextColor="White" FontAttributes="Bold" FontSize="36"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Gross Pay card -->
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="16,12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Gross Pay" TextColor="#37474F"
+                               FontSize="15" VerticalTextAlignment="Center" />
+                        <Label Text="{Binding Result.GrossPay, StringFormat='{0:C}'}"
+                               Grid.Column="1"
+                               TextColor="#1565C0" FontAttributes="Bold"
+                               FontSize="16" VerticalTextAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Taxes Section Header -->
+                <Label Text="TAX WITHHOLDINGS" TextColor="#78909C"
+                       FontSize="11" FontAttributes="Bold"
+                       Margin="4,4,0,0" />
+
+                <!-- Tax rows card -->
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="16,8">
+                    <VerticalStackLayout Spacing="0">
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
+                            <Label Text="Federal Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Result.FederalWithholding, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#C62828" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="#F0F0F0" Margin="0,0,0,0" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
+                            <Label Text="State Taxable Wages" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Result.StateTaxableWages, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#1565C0" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="#F0F0F0" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
+                            <Label Text="State Withholding" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Result.StateWithholding, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#C62828" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="#F0F0F0" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
+                            <Label Text="Social Security Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Result.SocialSecurityWithholding, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#C62828" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="#F0F0F0" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
+                            <Label Text="Medicare Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Result.MedicareWithholding, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#C62828" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="#F0F0F0" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
+                            <Label Text="Additional Medicare Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Result.AdditionalMedicareWithholding, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#C62828" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
 
 </ContentPage>
