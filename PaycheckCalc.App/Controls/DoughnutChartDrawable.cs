@@ -4,6 +4,12 @@ namespace PaycheckCalc.App.Controls;
 
 public sealed class DoughnutChartDrawable : IDrawable
 {
+    private const float ChartWidthRatio = 0.50f;
+    private const float ChartHeightRatio = 0.55f;
+    private const float InnerRadiusRatio = 0.55f;
+    private const int MinArcSegments = 8;
+    private const float DegreesPerSegment = 3f;
+
     public PaycheckResult? Result { get; set; }
 
     private static readonly Color[] SliceColors =
@@ -37,9 +43,9 @@ public sealed class DoughnutChartDrawable : IDrawable
         if (slices.Count == 0) return;
 
         // Layout constants
-        float chartDiameter = Math.Min(dirtyRect.Width * 0.50f, dirtyRect.Height * 0.55f);
+        float chartDiameter = Math.Min(dirtyRect.Width * ChartWidthRatio, dirtyRect.Height * ChartHeightRatio);
         float outerRadius = chartDiameter / 2f;
-        float innerRadius = outerRadius * 0.55f;
+        float innerRadius = outerRadius * InnerRadiusRatio;
         float centerX = dirtyRect.Width / 2f;
         float centerY = outerRadius + 10f;
 
@@ -92,7 +98,7 @@ public sealed class DoughnutChartDrawable : IDrawable
         path.MoveTo(outerStartX, outerStartY);
 
         // Approximate arcs with line segments
-        int segments = Math.Max(8, (int)(sweepAngle / 3f));
+        int segments = Math.Max(MinArcSegments, (int)(sweepAngle / DegreesPerSegment));
         float angleStep = sweepAngle / segments;
 
         // Outer arc

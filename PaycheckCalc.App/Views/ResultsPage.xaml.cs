@@ -1,5 +1,6 @@
 using PaycheckCalc.App.Controls;
 using PaycheckCalc.App.ViewModels;
+using System.ComponentModel;
 
 namespace PaycheckCalc.App.Views;
 
@@ -15,18 +16,25 @@ public partial class ResultsPage : ContentPage
         _vm = vm;
 
         DoughnutChart.Drawable = _chartDrawable;
-
-        _vm.PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName == nameof(CalculatorViewModel.Result))
-                UpdateChart();
-        };
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
+        _vm.PropertyChanged += OnViewModelPropertyChanged;
         UpdateChart();
+    }
+
+    protected override void OnDisappearing()
+    {
+        _vm.PropertyChanged -= OnViewModelPropertyChanged;
+        base.OnDisappearing();
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(CalculatorViewModel.Result))
+            UpdateChart();
     }
 
     private void UpdateChart()
