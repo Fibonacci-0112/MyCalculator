@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:PaycheckCalc.App.Controls"
              x:Class="PaycheckCalc.App.Views.ResultsPage"
              Title="Results"
              BackgroundColor="#F0F4FF">
@@ -19,30 +20,38 @@
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="16" Spacing="12">
 
-                <!-- Net Pay: prominent green card -->
-                <Border BackgroundColor="#2E7D32" StrokeThickness="0"
-                        StrokeShape="RoundRectangle 16" Padding="20,18">
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="NET PAY" TextColor="#A5D6A7"
-                               FontSize="12" FontAttributes="Bold"
-                               HorizontalTextAlignment="Center" />
-                        <Label Text="{Binding Result.NetPay, StringFormat='{0:C}'}"
-                               TextColor="White" FontAttributes="Bold" FontSize="36"
-                               HorizontalTextAlignment="Center" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- Gross Pay card -->
+                <!-- Income card: Gross Pay, Federal Taxable Income, State Taxable Income -->
                 <Border BackgroundColor="White" StrokeThickness="0"
-                        StrokeShape="RoundRectangle 12" Padding="16,12">
-                    <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Gross Pay" TextColor="#37474F"
-                               FontSize="15" VerticalTextAlignment="Center" />
-                        <Label Text="{Binding Result.GrossPay, StringFormat='{0:C}'}"
-                               Grid.Column="1"
-                               TextColor="#1565C0" FontAttributes="Bold"
-                               FontSize="16" VerticalTextAlignment="Center" />
-                    </Grid>
+                        StrokeShape="RoundRectangle 12" Padding="16,8">
+                    <VerticalStackLayout Spacing="0">
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
+                            <Label Text="Gross Pay" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Result.GrossPay, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#37474F" FontAttributes="Bold"
+                                   FontSize="16" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="#F0F0F0" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
+                            <Label Text="Federal Taxable Income" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Result.FederalTaxableIncome, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#37474F" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="#F0F0F0" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
+                            <Label Text="State Taxable Income" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Result.StateTaxableWages, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#37474F" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+
+                    </VerticalStackLayout>
                 </Border>
 
                 <!-- Taxes Section Header -->
@@ -50,7 +59,7 @@
                        FontSize="11" FontAttributes="Bold"
                        Margin="4,4,0,0" />
 
-                <!-- Tax rows card -->
+                <!-- Tax rows card: Federal Tax, Social Security Tax, Medicare Tax, State Tax -->
                 <Border BackgroundColor="White" StrokeThickness="0"
                         StrokeShape="RoundRectangle 12" Padding="16,8">
                     <VerticalStackLayout Spacing="0">
@@ -58,24 +67,6 @@
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
                             <Label Text="Federal Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
                             <Label Text="{Binding Result.FederalWithholding, StringFormat='{0:C}'}"
-                                   Grid.Column="1"
-                                   TextColor="#C62828" FontAttributes="Bold"
-                                   FontSize="15" VerticalTextAlignment="Center" />
-                        </Grid>
-                        <BoxView HeightRequest="1" Color="#F0F0F0" Margin="0,0,0,0" />
-
-                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
-                            <Label Text="State Taxable Wages" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
-                            <Label Text="{Binding Result.StateTaxableWages, StringFormat='{0:C}'}"
-                                   Grid.Column="1"
-                                   TextColor="#1565C0" FontAttributes="Bold"
-                                   FontSize="15" VerticalTextAlignment="Center" />
-                        </Grid>
-                        <BoxView HeightRequest="1" Color="#F0F0F0" />
-
-                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
-                            <Label Text="State Withholding" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
-                            <Label Text="{Binding Result.StateWithholding, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#C62828" FontAttributes="Bold"
                                    FontSize="15" VerticalTextAlignment="Center" />
@@ -101,14 +92,35 @@
                         <BoxView HeightRequest="1" Color="#F0F0F0" />
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
-                            <Label Text="Additional Medicare Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
-                            <Label Text="{Binding Result.AdditionalMedicareWithholding, StringFormat='{0:C}'}"
+                            <Label Text="State Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Result.StateWithholding, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#C62828" FontAttributes="Bold"
                                    FontSize="15" VerticalTextAlignment="Center" />
                         </Grid>
 
                     </VerticalStackLayout>
+                </Border>
+
+                <!-- Net Pay card -->
+                <Border BackgroundColor="#2E7D32" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 16" Padding="20,18">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="NET PAY" TextColor="#A5D6A7"
+                               FontSize="12" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding Result.NetPay, StringFormat='{0:C}'}"
+                               TextColor="White" FontAttributes="Bold" FontSize="36"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Doughnut Chart -->
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="12">
+                    <GraphicsView x:Name="DoughnutChart"
+                                  HeightRequest="380"
+                                  HorizontalOptions="FillAndExpand" />
                 </Border>
 
             </VerticalStackLayout>

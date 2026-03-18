@@ -58,6 +58,7 @@ public sealed class PayCalculator
             SocialSecurityWithholding = RoundMoney(ss),
             MedicareWithholding = RoundMoney(medicare),
             AdditionalMedicareWithholding = RoundMoney(addl),
+            FederalTaxableIncome = RoundMoney(fedTaxable),
             FederalWithholding = RoundMoney(federal),
             NetPay = RoundMoney(net)
         };

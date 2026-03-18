@@ -139,11 +139,11 @@
                         <Label Text="Pay Frequency" Grid.Row="0" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Picker ItemsSource="{Binding Frequencies}" SelectedItem="{Binding Frequency}"
-                                Grid.Row="0" Grid.Column="1" TextColor="#1565C0" />
+                                Grid.Row="0" Grid.Column="1" TextColor="Black" />
                         <Label Text="Hourly Rate" Grid.Row="1" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding HourlyRate}" Keyboard="Numeric" Grid.Row="1" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF">
+                               TextColor="Black" BackgroundColor="#EEF2FF">
                             <Entry.Behaviors>
                                 <behaviors:DecimalFormatBehavior IsCurrency="True" />
                             </Entry.Behaviors>
@@ -151,7 +151,7 @@
                         <Label Text="Regular Hours" Grid.Row="2" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding RegularHours}" Keyboard="Numeric" Grid.Row="2" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF">
+                               TextColor="Black" BackgroundColor="#EEF2FF">
                             <Entry.Behaviors>
                                 <behaviors:DecimalFormatBehavior />
                             </Entry.Behaviors>
@@ -159,7 +159,7 @@
                         <Label Text="Overtime Hours" Grid.Row="3" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding OvertimeHours}" Keyboard="Numeric" Grid.Row="3" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF">
+                               TextColor="Black" BackgroundColor="#EEF2FF">
                             <Entry.Behaviors>
                                 <behaviors:DecimalFormatBehavior />
                             </Entry.Behaviors>
@@ -167,7 +167,7 @@
                         <Label Text="OT Multiplier" Grid.Row="4" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding OvertimeMultiplier}" Keyboard="Numeric" Grid.Row="4" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF">
+                               TextColor="Black" BackgroundColor="#EEF2FF">
                             <Entry.Behaviors>
                                 <behaviors:DecimalFormatBehavior />
                             </Entry.Behaviors>
@@ -184,7 +184,7 @@
                         <Label Text="Filing Status" Grid.Row="0" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Picker ItemsSource="{Binding FederalStatuses}" SelectedItem="{Binding SelectedFederalPickerItem}"
-                                Grid.Row="0" Grid.Column="1" TextColor="#1565C0" />
+                                Grid.Row="0" Grid.Column="1" TextColor="Black" />
                         <Label Text="Step 2 checked?" Grid.Row="1" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Switch IsToggled="{Binding FederalStep2Checked}" Grid.Row="1" Grid.Column="1"
@@ -192,7 +192,7 @@
                         <Label Text="Step 3 credits (annual)" Grid.Row="2" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding FederalStep3Credits}" Keyboard="Numeric" Grid.Row="2" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF">
+                               TextColor="Black" BackgroundColor="#EEF2FF">
                             <Entry.Behaviors>
                                 <behaviors:DecimalFormatBehavior IsCurrency="True" />
                             </Entry.Behaviors>
@@ -200,7 +200,7 @@
                         <Label Text="Step 4(a) other income (annual)" Grid.Row="3" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding FederalStep4aOtherIncome}" Keyboard="Numeric" Grid.Row="3" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF">
+                               TextColor="Black" BackgroundColor="#EEF2FF">
                             <Entry.Behaviors>
                                 <behaviors:DecimalFormatBehavior IsCurrency="True" />
                             </Entry.Behaviors>
@@ -208,7 +208,7 @@
                         <Label Text="Step 4(b) deductions (annual)" Grid.Row="4" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding FederalStep4bDeductions}" Keyboard="Numeric" Grid.Row="4" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF">
+                               TextColor="Black" BackgroundColor="#EEF2FF">
                             <Entry.Behaviors>
                                 <behaviors:DecimalFormatBehavior IsCurrency="True" />
                             </Entry.Behaviors>
@@ -216,7 +216,7 @@
                         <Label Text="Step 4(c) extra per pay" Grid.Row="5" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding FederalStep4cExtraWithholding}" Keyboard="Numeric" Grid.Row="5" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF">
+                               TextColor="Black" BackgroundColor="#EEF2FF">
                             <Entry.Behaviors>
                                 <behaviors:DecimalFormatBehavior IsCurrency="True" />
                             </Entry.Behaviors>
@@ -233,19 +233,19 @@
                         <Label Text="State" Grid.Row="0" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Picker ItemsSource="{Binding SupportedStates}" SelectedItem="{Binding SelectedState}"
-                                Grid.Row="0" Grid.Column="1" TextColor="#1565C0" />
+                                Grid.Row="0" Grid.Column="1" TextColor="Black" />
                         <Label Text="Filing Status" Grid.Row="1" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Picker ItemsSource="{Binding Statuses}" SelectedItem="{Binding FilingStatus}"
-                                Grid.Row="1" Grid.Column="1" TextColor="#1565C0" />
+                                Grid.Row="1" Grid.Column="1" TextColor="Black" />
                         <Label Text="State Allowances" Grid.Row="2" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding StateAllowances}" Keyboard="Numeric" Grid.Row="2" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF" />
+                               TextColor="Black" BackgroundColor="#EEF2FF" />
                         <Label Text="Extra State Withholding" Grid.Row="3" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding StateAdditionalWithholding}" Keyboard="Numeric" Grid.Row="3" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF">
+                               TextColor="Black" BackgroundColor="#EEF2FF">
                             <Entry.Behaviors>
                                 <behaviors:DecimalFormatBehavior IsCurrency="True" />
                             </Entry.Behaviors>
@@ -262,7 +262,7 @@
                         <Label Text="Pre-tax Deductions" Grid.Row="0" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding PretaxDeductions}" Keyboard="Numeric" Grid.Row="0" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF">
+                               TextColor="Black" BackgroundColor="#EEF2FF">
                             <Entry.Behaviors>
                                 <behaviors:DecimalFormatBehavior IsCurrency="True" />
                             </Entry.Behaviors>
@@ -270,7 +270,7 @@
                         <Label Text="Post-tax Deductions" Grid.Row="1" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding PosttaxDeductions}" Keyboard="Numeric" Grid.Row="1" Grid.Column="1"
-                               TextColor="#1565C0" BackgroundColor="#EEF2FF">
+                               TextColor="Black" BackgroundColor="#EEF2FF">
                             <Entry.Behaviors>
                                 <behaviors:DecimalFormatBehavior IsCurrency="True" />
                             </Entry.Behaviors>

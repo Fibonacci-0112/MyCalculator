@@ -14,6 +14,7 @@ public sealed class PaycheckResult
     public decimal MedicareWithholding { get; init; }
     public decimal AdditionalMedicareWithholding { get; init; }
 
+    public decimal FederalTaxableIncome { get; init; }
     public decimal FederalWithholding { get; init; }
 
     public decimal TotalTaxes => StateWithholding + SocialSecurityWithholding + MedicareWithholding + AdditionalMedicareWithholding + FederalWithholding;
