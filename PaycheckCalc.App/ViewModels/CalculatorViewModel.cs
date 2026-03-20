@@ -32,7 +32,11 @@ public partial class CalculatorViewModel : ObservableObject
         PropertyChanged += (s, e) =>
         {
             if (e.PropertyName != nameof(Result) && e.PropertyName != nameof(SelectedInputTab)
-                && !e.PropertyName!.StartsWith("IsTab"))
+                && !e.PropertyName!.StartsWith("IsTab")
+                && e.PropertyName != nameof(SavedComparison)
+                && e.PropertyName != nameof(HasSavedComparison)
+                && e.PropertyName != nameof(HasNoSavedComparison)
+                && e.PropertyName != nameof(NetPayDifference))
                 Calculate();
         };
     }
@@ -94,6 +98,44 @@ public partial class CalculatorViewModel : ObservableObject
     [ObservableProperty] public partial decimal FederalStep4bDeductions { get; set; }
     [ObservableProperty] public partial decimal FederalStep4cExtraWithholding { get; set; }
     [ObservableProperty] public partial PaycheckCalc.Core.Models.PaycheckResult? Result { get; set; }
+
+    partial void OnResultChanged(PaycheckCalc.Core.Models.PaycheckResult? value)
+    {
+        OnPropertyChanged(nameof(NetPayDifference));
+    }
+
+    [ObservableProperty] public partial ComparisonSnapshot? SavedComparison { get; set; }
+
+    public bool HasSavedComparison => SavedComparison is not null;
+    public bool HasNoSavedComparison => SavedComparison is null;
+
+    public decimal NetPayDifference =>
+        (Result?.NetPay ?? 0m) - (SavedComparison?.Result?.NetPay ?? 0m);
+
+    partial void OnSavedComparisonChanged(ComparisonSnapshot? value)
+    {
+        OnPropertyChanged(nameof(HasSavedComparison));
+        OnPropertyChanged(nameof(HasNoSavedComparison));
+        OnPropertyChanged(nameof(NetPayDifference));
+    }
+
+    [RelayCommand]
+    private void SaveForCompare()
+    {
+        SavedComparison = new ComparisonSnapshot
+        {
+            Frequency = Frequency,
+            HourlyRate = HourlyRate,
+            RegularHours = RegularHours,
+            OvertimeHours = OvertimeHours,
+            OvertimeMultiplier = OvertimeMultiplier,
+            FilingStatus = FilingStatus,
+            State = SelectedState,
+            PretaxDeductions = PretaxDeductions,
+            PosttaxDeductions = PosttaxDeductions,
+            Result = Result
+        };
+    }
 
     public IReadOnlyList<PayFrequency> Frequencies { get; } = Enum.GetValues(typeof(PayFrequency)).Cast<PayFrequency>().ToList();
     public IReadOnlyList<FilingStatus> Statuses { get; } = Enum.GetValues(typeof(FilingStatus)).Cast<FilingStatus>().ToList();

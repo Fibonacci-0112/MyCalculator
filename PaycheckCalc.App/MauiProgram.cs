@@ -69,6 +69,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<CalculatorViewModel>();
         builder.Services.AddSingleton<InputsPage>();
         builder.Services.AddSingleton<ResultsPage>();
+        builder.Services.AddSingleton<ComparePage>();
         builder.Services.AddSingleton<AppShell>();
 
         return builder.Build();

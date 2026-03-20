@@ -17,5 +17,8 @@
         <Tab Title="Results">
             <ShellContent ContentTemplate="{DataTemplate views:ResultsPage}" />
         </Tab>
+        <Tab Title="Compare">
+            <ShellContent ContentTemplate="{DataTemplate views:ComparePage}" />
+        </Tab>
     </TabBar>
 </Shell>
