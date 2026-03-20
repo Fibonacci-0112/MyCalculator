@@ -115,6 +115,16 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- Save to Compare button -->
+                <Button Text="Save to Compare"
+                        Command="{Binding SaveForCompareCommand}"
+                        BackgroundColor="#1565C0"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="12"
+                        Padding="16,12"
+                        HorizontalOptions="FillAndExpand" />
+
                 <!-- Doughnut Chart -->
                 <Border BackgroundColor="White" StrokeThickness="0"
                         StrokeShape="RoundRectangle 12" Padding="12">
