@@ -62,6 +62,10 @@ public static class MauiProgram
             foreach (var state in noTaxStates)
                 factory.Register(new NoIncomeTaxCalculator(state));
 
+            // All remaining states via the annualized percentage method
+            foreach (var (state, config) in StateTaxConfigs2026.Configs)
+                factory.Register(new PercentageMethodStateTaxCalculator(state, config));
+
             return factory;
         });
 
