@@ -29,7 +29,14 @@ internal sealed class AllowanceLookup
     public bool MultiplyOneAllowanceAmountWhenGreaterThanMax { get; set; }
 
     [JsonPropertyName("oneAllowanceAmountByPayrollPeriod")]
-    public Dictionary<string, decimal> OneAllowanceAmountByPayrollPeriod { get; set; } = new();
+    public Dictionary<string, decimal>? OneAllowanceAmountByPayrollPeriod { get; set; }
+
+    [JsonPropertyName("oneAllowanceCreditByPayrollPeriod")]
+    public Dictionary<string, decimal>? OneAllowanceCreditByPayrollPeriod { get; set; }
+
+    [JsonIgnore]
+    private Dictionary<string, decimal> OneAllowanceByPeriod =>
+        OneAllowanceAmountByPayrollPeriod ?? OneAllowanceCreditByPayrollPeriod ?? new();
 
     [JsonPropertyName("amountsByPayrollPeriod")]
     public Dictionary<string, List<decimal>> AmountsByPayrollPeriod { get; set; } = new();
@@ -43,7 +50,7 @@ internal sealed class AllowanceLookup
             return amounts[allowanceCount];
 
         if (MultiplyOneAllowanceAmountWhenGreaterThanMax)
-            return allowanceCount * OneAllowanceAmountByPayrollPeriod[periodKey];
+            return allowanceCount * OneAllowanceByPeriod[periodKey];
 
         return amounts[^1];
     }
