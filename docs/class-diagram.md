@@ -127,10 +127,52 @@ classDiagram
     %% State Tax – Interface & Implementations
     %% ───────────────────────────────────────
 
-    class IStateTaxCalculator {
+    class IStateWithholdingCalculator {
         <<interface>>
         +UsState State
-        +CalculateWithholding(StateTaxInput input) StateTaxResult
+        +GetInputSchema() IReadOnlyList~StateFieldDefinition~
+        +Validate(StateInputValues values) IReadOnlyList~string~
+        +Calculate(CommonWithholdingContext context, StateInputValues values) StateWithholdingResult
+    }
+
+    class CommonWithholdingContext {
+        <<sealed record>>
+        +UsState State
+        +decimal GrossWages
+        +PayFrequency PayPeriod
+        +int Year
+        +decimal PreTaxDeductionsReducingStateWages
+    }
+
+    class StateInputValues {
+        <<sealed>>
+        +GetValueOrDefault~T~(string key, T fallback) T
+    }
+
+    class StateFieldDefinition {
+        <<sealed>>
+        +string Key
+        +string Label
+        +StateFieldType FieldType
+        +bool IsRequired
+        +object DefaultValue
+        +IReadOnlyList~string~ Options
+    }
+
+    class StateFieldType {
+        <<enumeration>>
+        Text
+        Integer
+        Decimal
+        Toggle
+        Picker
+    }
+
+    class StateWithholdingResult {
+        <<sealed>>
+        +decimal TaxableWages
+        +decimal Withholding
+        +string Description
     }
 
     class StateTaxInput {
@@ -149,21 +191,23 @@ classDiagram
         +decimal Withholding
     }
 
-    class StateTaxCalculatorFactory {
+    class StateCalculatorRegistry {
         <<sealed>>
-        -Dictionary~UsState, IStateTaxCalculator~ _calculators
+        -Dictionary~UsState, IStateWithholdingCalculator~ _calculators
         -IReadOnlyList~UsState~ _sortedStates
         +IReadOnlyList~UsState~ SupportedStates
-        +Register(IStateTaxCalculator calculator) void
+        +Register(IStateWithholdingCalculator calculator) void
         +IsSupported(UsState state) bool
-        +GetCalculator(UsState state) IStateTaxCalculator
+        +GetCalculator(UsState state) IStateWithholdingCalculator
     }
 
-    class NoIncomeTaxCalculator {
+    class NoIncomeTaxWithholdingAdapter {
         <<sealed>>
         +UsState State
-        +NoIncomeTaxCalculator(UsState state)
-        +CalculateWithholding(StateTaxInput input) StateTaxResult
+        +NoIncomeTaxWithholdingAdapter(UsState state)
+        +GetInputSchema() IReadOnlyList~StateFieldDefinition~
+        +Validate(StateInputValues values) IReadOnlyList~string~
+        +Calculate(CommonWithholdingContext context, StateInputValues values) StateWithholdingResult
     }
 
     class PercentageMethodStateTaxCalculator {
@@ -174,6 +218,15 @@ classDiagram
         +CalculateWithholding(StateTaxInput input) StateTaxResult
         -CalculateFromBrackets(decimal income, TaxBracket[] brackets)$ decimal
         -GetPayPeriods(PayFrequency frequency)$ int
+    }
+
+    class PercentageMethodWithholdingAdapter {
+        <<sealed>>
+        -PercentageMethodStateTaxCalculator _inner
+        +UsState State
+        +GetInputSchema() IReadOnlyList~StateFieldDefinition~
+        +Validate(StateInputValues values) IReadOnlyList~string~
+        +Calculate(CommonWithholdingContext context, StateInputValues values) StateWithholdingResult
     }
 
     class PercentageMethodConfig {
@@ -198,42 +251,51 @@ classDiagram
         +IReadOnlyDictionary~UsState, PercentageMethodConfig~ Configs$
     }
 
-    IStateTaxCalculator --> StateTaxInput
-    IStateTaxCalculator --> StateTaxResult
-    StateTaxInput --> PayFrequency
-    StateTaxInput --> FilingStatus
+    IStateWithholdingCalculator --> CommonWithholdingContext
+    IStateWithholdingCalculator --> StateInputValues
+    IStateWithholdingCalculator --> StateWithholdingResult
+    IStateWithholdingCalculator --> StateFieldDefinition
+    StateFieldDefinition --> StateFieldType
+    CommonWithholdingContext --> PayFrequency
 
-    NoIncomeTaxCalculator ..|> IStateTaxCalculator
-    PercentageMethodStateTaxCalculator ..|> IStateTaxCalculator
+    NoIncomeTaxWithholdingAdapter ..|> IStateWithholdingCalculator
+    PercentageMethodWithholdingAdapter ..|> IStateWithholdingCalculator
+    PercentageMethodWithholdingAdapter *-- PercentageMethodStateTaxCalculator
     PercentageMethodStateTaxCalculator *-- PercentageMethodConfig
+    PercentageMethodStateTaxCalculator --> StateTaxInput
+    PercentageMethodStateTaxCalculator --> StateTaxResult
     PercentageMethodConfig *-- "0..*" TaxBracket
 
-    StateTaxCalculatorFactory o-- "0..*" IStateTaxCalculator
+    StateCalculatorRegistry o-- "0..*" IStateWithholdingCalculator
     StateTaxConfigs2026 ..> PercentageMethodConfig : provides
 
     %% ───────────────────────────────────────
     %% Pennsylvania State Tax
     %% ───────────────────────────────────────
 
-    class PennsylvaniaStateTaxCalculator {
+    class PennsylvaniaWithholdingCalculator {
         <<sealed>>
         -decimal FlatRate$
         +UsState State
-        +CalculateWithholding(StateTaxInput input) StateTaxResult
+        +GetInputSchema() IReadOnlyList~StateFieldDefinition~
+        +Validate(StateInputValues values) IReadOnlyList~string~
+        +Calculate(CommonWithholdingContext context, StateInputValues values) StateWithholdingResult
     }
 
-    PennsylvaniaStateTaxCalculator ..|> IStateTaxCalculator
+    PennsylvaniaWithholdingCalculator ..|> IStateWithholdingCalculator
 
     %% ───────────────────────────────────────
     %% Oklahoma State Tax
     %% ───────────────────────────────────────
 
-    class OklahomaStateTaxCalculator {
+    class OklahomaWithholdingCalculator {
         <<sealed>>
         -OklahomaOw2PercentageCalculator _inner
         +UsState State
-        +OklahomaStateTaxCalculator(OklahomaOw2PercentageCalculator inner)
-        +CalculateWithholding(StateTaxInput input) StateTaxResult
+        +OklahomaWithholdingCalculator(OklahomaOw2PercentageCalculator inner)
+        +GetInputSchema() IReadOnlyList~StateFieldDefinition~
+        +Validate(StateInputValues values) IReadOnlyList~string~
+        +Calculate(CommonWithholdingContext context, StateInputValues values) StateWithholdingResult
     }
 
     class OklahomaOw2PercentageCalculator {
@@ -269,8 +331,8 @@ classDiagram
         +decimal ExcessOver
     }
 
-    OklahomaStateTaxCalculator ..|> IStateTaxCalculator
-    OklahomaStateTaxCalculator *-- OklahomaOw2PercentageCalculator
+    OklahomaWithholdingCalculator ..|> IStateWithholdingCalculator
+    OklahomaWithholdingCalculator *-- OklahomaOw2PercentageCalculator
     OklahomaOw2PercentageCalculator *-- Ow2Root
     Ow2Root *-- "0..*" Ow2Table
     Ow2Table *-- "0..*" Ow2Bracket
@@ -279,12 +341,12 @@ classDiagram
     %% Alabama State Tax
     %% ───────────────────────────────────────
 
-    class AlabamaStateTaxCalculator {
+    class AlabamaWithholdingCalculator {
         <<sealed>>
-        -AlabamaFormulaCalculator _inner
         +UsState State
-        +AlabamaStateTaxCalculator(AlabamaFormulaCalculator inner)
-        +CalculateWithholding(StateTaxInput input) StateTaxResult
+        +GetInputSchema() IReadOnlyList~StateFieldDefinition~
+        +Validate(StateInputValues values) IReadOnlyList~string~
+        +Calculate(CommonWithholdingContext context, StateInputValues values) StateWithholdingResult
     }
 
     class AlabamaFormulaCalculator {
@@ -294,8 +356,8 @@ classDiagram
         -CalculateAnnualTax(decimal taxableIncome, AlabamaFilingStatus filingStatus)$ decimal
     }
 
-    AlabamaStateTaxCalculator ..|> IStateTaxCalculator
-    AlabamaStateTaxCalculator *-- AlabamaFormulaCalculator
+    AlabamaWithholdingCalculator ..|> IStateWithholdingCalculator
+    AlabamaWithholdingCalculator ..> AlabamaFormulaCalculator
     AlabamaFormulaCalculator --> AlabamaFilingStatus
 
     %% ───────────────────────────────────────
@@ -381,15 +443,15 @@ classDiagram
 
     class PayCalculator {
         <<sealed>>
-        -StateTaxCalculatorFactory _stateFactory
+        -StateCalculatorRegistry _stateRegistry
         -FicaCalculator _fica
         -Irs15TPercentageCalculator _fed
-        +PayCalculator(StateTaxCalculatorFactory stateFactory, FicaCalculator fica, Irs15TPercentageCalculator fed)
+        +PayCalculator(StateCalculatorRegistry stateRegistry, FicaCalculator fica, Irs15TPercentageCalculator fed)
         +Calculate(PaycheckInput input) PaycheckResult
         -RoundMoney(decimal v)$ decimal
     }
 
-    PayCalculator *-- StateTaxCalculatorFactory
+    PayCalculator *-- StateCalculatorRegistry
     PayCalculator *-- FicaCalculator
     PayCalculator *-- Irs15TPercentageCalculator
     PayCalculator ..> PaycheckInput : uses
@@ -408,18 +470,16 @@ classDiagram
 
     class CalculatorViewModel {
         -PayCalculator _calc
-        -StateTaxCalculatorFactory _stateFactory
+        -StateCalculatorRegistry _stateRegistry
         +int SelectedInputTab
         +PickerItem~FederalFilingStatus~ SelectedFederalPickerItem
         +PayFrequency Frequency
-        +FilingStatus FilingStatus
         +decimal HourlyRate
         +decimal RegularHours
         +decimal OvertimeHours
         +decimal OvertimeMultiplier
         +UsState SelectedState
-        +int StateAllowances
-        +decimal StateAdditionalWithholding
+        +ObservableCollection~StateFieldViewModel~ StateFields
         +decimal PretaxDeductions
         +decimal PosttaxDeductions
         +FederalFilingStatus FederalFilingStatus
@@ -439,7 +499,6 @@ classDiagram
         +decimal NetPayDifference
         +ObservableCollection~PickerItem~ FederalStatuses
         +IReadOnlyList~PayFrequency~ Frequencies
-        +IReadOnlyList~FilingStatus~ Statuses
         +IReadOnlyList~UsState~ SupportedStates
         +IRelayCommand SelectTabCommand
         +IRelayCommand CalculateCommand
@@ -452,7 +511,7 @@ classDiagram
 
     CalculatorViewModel --|> ObservableObject
     CalculatorViewModel *-- PayCalculator
-    CalculatorViewModel *-- StateTaxCalculatorFactory
+    CalculatorViewModel *-- StateCalculatorRegistry
     CalculatorViewModel --> PaycheckResult
     CalculatorViewModel --> ComparisonSnapshot
 
@@ -463,7 +522,6 @@ classDiagram
         +decimal RegularHours
         +decimal OvertimeHours
         +decimal OvertimeMultiplier
-        +FilingStatus FilingStatus
         +UsState State
         +decimal PretaxDeductions
         +decimal PosttaxDeductions
@@ -586,7 +644,7 @@ classDiagram
 
     MauiProgram ..> PayCalculator : registers
     MauiProgram ..> CalculatorViewModel : registers
-    MauiProgram ..> StateTaxCalculatorFactory : registers
+    MauiProgram ..> StateCalculatorRegistry : registers
     MauiProgram ..> FicaCalculator : registers
     MauiProgram ..> Irs15TPercentageCalculator : registers
     MauiProgram ..> OklahomaOw2PercentageCalculator : registers

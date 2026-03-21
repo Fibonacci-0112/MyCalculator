@@ -16,17 +16,14 @@ public record PickerItem<T>(T Value, string Text)
 public partial class CalculatorViewModel : ObservableObject
 {
     private readonly PayCalculator _calc;
-    private readonly StateTaxCalculatorFactory _stateFactory;
     private readonly StateCalculatorRegistry _stateRegistry;
     private bool _isRebuildingFields;
 
-    public CalculatorViewModel(PayCalculator calc, StateTaxCalculatorFactory stateFactory, StateCalculatorRegistry stateRegistry)
+    public CalculatorViewModel(PayCalculator calc, StateCalculatorRegistry stateRegistry)
     {
         _calc = calc;
-        _stateFactory = stateFactory;
         _stateRegistry = stateRegistry;
         Frequency = PayFrequency.Biweekly;
-        FilingStatus = FilingStatus.Single;
         OvertimeMultiplier = 1.5m;
         SelectedState = UsState.OK;
         SelectedFederalPickerItem = FederalStatuses[0];
@@ -80,7 +77,6 @@ public partial class CalculatorViewModel : ObservableObject
     }
 
     [ObservableProperty] public partial PayFrequency Frequency { get; set; }
-    [ObservableProperty] public partial FilingStatus FilingStatus { get; set; }
 
     [ObservableProperty] public partial decimal HourlyRate { get; set; }
     [ObservableProperty] public partial decimal RegularHours { get; set; }
@@ -88,8 +84,6 @@ public partial class CalculatorViewModel : ObservableObject
     [ObservableProperty] public partial decimal OvertimeMultiplier { get; set; }
 
     [ObservableProperty] public partial UsState SelectedState { get; set; }
-    [ObservableProperty] public partial int StateAllowances { get; set; }
-    [ObservableProperty] public partial decimal StateAdditionalWithholding { get; set; }
 
     /// <summary>
     /// Dynamic state input fields driven by the selected state's schema.
@@ -167,7 +161,6 @@ public partial class CalculatorViewModel : ObservableObject
             RegularHours = RegularHours,
             OvertimeHours = OvertimeHours,
             OvertimeMultiplier = OvertimeMultiplier,
-            FilingStatus = FilingStatus,
             State = SelectedState,
             PretaxDeductions = PretaxDeductions,
             PosttaxDeductions = PosttaxDeductions,
@@ -176,7 +169,6 @@ public partial class CalculatorViewModel : ObservableObject
     }
 
     public IReadOnlyList<PayFrequency> Frequencies { get; } = Enum.GetValues(typeof(PayFrequency)).Cast<PayFrequency>().ToList();
-    public IReadOnlyList<FilingStatus> Statuses { get; } = Enum.GetValues(typeof(FilingStatus)).Cast<FilingStatus>().ToList();
     public IReadOnlyList<UsState> SupportedStates => _stateRegistry.SupportedStates;
 
     [RelayCommand]
@@ -190,14 +182,11 @@ public partial class CalculatorViewModel : ObservableObject
         var input = new PaycheckInput
         {
             Frequency = Frequency,
-            FilingStatus = FilingStatus,
             HourlyRate = HourlyRate,
             RegularHours = RegularHours,
             OvertimeHours = OvertimeHours,
             OvertimeMultiplier = OvertimeMultiplier,
             State = SelectedState,
-            StateAllowances = StateAllowances,
-            StateAdditionalWithholding = StateAdditionalWithholding,
             StateInputValues = stateValues,
             FederalW4 = new FederalW4Input
             {

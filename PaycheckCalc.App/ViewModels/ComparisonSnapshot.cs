@@ -12,7 +12,6 @@ public sealed class ComparisonSnapshot
     public decimal RegularHours { get; init; }
     public decimal OvertimeHours { get; init; }
     public decimal OvertimeMultiplier { get; init; }
-    public FilingStatus FilingStatus { get; init; }
     public UsState State { get; init; }
     public decimal PretaxDeductions { get; init; }
     public decimal PosttaxDeductions { get; init; }

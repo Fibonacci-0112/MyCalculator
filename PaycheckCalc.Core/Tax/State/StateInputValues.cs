@@ -4,9 +4,8 @@ namespace PaycheckCalc.Core.Tax.State;
 /// A flexible bag of state-specific input values keyed by the
 /// <see cref="StateFieldDefinition.Key"/> strings from the calculator's schema.
 /// <para>
-/// This replaces the fixed-field approach where every state had to fit into
-/// a single <see cref="StateTaxInput"/> record. Now each state defines its own
-/// fields and the UI populates this dictionary dynamically.
+/// Each state defines its own fields and the UI populates this dictionary
+/// dynamically based on the calculator's input schema.
 /// </para>
 /// </summary>
 public sealed class StateInputValues : Dictionary<string, object?>

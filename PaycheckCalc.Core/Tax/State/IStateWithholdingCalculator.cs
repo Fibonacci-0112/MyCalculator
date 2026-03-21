@@ -11,10 +11,9 @@ namespace PaycheckCalc.Core.Tax.State;
 ///   <item>How do I calculate withholding? → <see cref="Calculate"/></item>
 /// </list>
 /// <para>
-/// Unlike the original <see cref="IStateTaxCalculator"/> which used a fixed
-/// <see cref="StateTaxInput"/> record, this interface uses a flexible
-/// <see cref="StateInputValues"/> dictionary so each state can define
-/// whatever fields it needs (e.g., Alabama's 5 filing statuses, dependents).
+/// Each state defines its own fields via a flexible
+/// <see cref="StateInputValues"/> dictionary so it can declare
+/// whatever inputs it needs (e.g., Alabama's 5 filing statuses, dependents).
 /// </para>
 /// </summary>
 public interface IStateWithholdingCalculator

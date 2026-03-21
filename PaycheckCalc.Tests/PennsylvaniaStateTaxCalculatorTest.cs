@@ -3,29 +3,27 @@ using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.State;
 using Xunit;
 
-public class PennsylvaniaStateTaxCalculatorTest
+public class PennsylvaniaWithholdingCalculatorTest
 {
     [Fact]
     public void State_ReturnsPennsylvania()
     {
-        var calc = new PennsylvaniaStateTaxCalculator();
+        var calc = new PennsylvaniaWithholdingCalculator();
         Assert.Equal(UsState.PA, calc.State);
     }
 
     [Fact]
     public void FlatRate_AppliedToGrossWages()
     {
-        var calc = new PennsylvaniaStateTaxCalculator();
+        var calc = new PennsylvaniaWithholdingCalculator();
 
-        var result = calc.CalculateWithholding(new StateTaxInput
-        {
-            GrossWages = 5000m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 0,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+        var context = new CommonWithholdingContext(
+            UsState.PA,
+            GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026);
+
+        var result = calc.Calculate(context, new StateInputValues());
 
         // 5000 * 0.0307 = 153.50
         Assert.Equal(5000m, result.TaxableWages);
@@ -35,17 +33,16 @@ public class PennsylvaniaStateTaxCalculatorTest
     [Fact]
     public void PreTaxDeductions_ReduceTaxableWages()
     {
-        var calc = new PennsylvaniaStateTaxCalculator();
+        var calc = new PennsylvaniaWithholdingCalculator();
 
-        var result = calc.CalculateWithholding(new StateTaxInput
-        {
-            GrossWages = 5000m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 0,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 1000m
-        });
+        var context = new CommonWithholdingContext(
+            UsState.PA,
+            GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026,
+            PreTaxDeductionsReducingStateWages: 1000m);
+
+        var result = calc.Calculate(context, new StateInputValues());
 
         // (5000 - 1000) * 0.0307 = 122.80
         Assert.Equal(4000m, result.TaxableWages);
@@ -55,17 +52,16 @@ public class PennsylvaniaStateTaxCalculatorTest
     [Fact]
     public void AdditionalWithholding_IsAdded()
     {
-        var calc = new PennsylvaniaStateTaxCalculator();
+        var calc = new PennsylvaniaWithholdingCalculator();
 
-        var result = calc.CalculateWithholding(new StateTaxInput
-        {
-            GrossWages = 5000m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 0,
-            AdditionalWithholding = 25m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+        var context = new CommonWithholdingContext(
+            UsState.PA,
+            GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026);
+        var values = new StateInputValues { ["AdditionalWithholding"] = 25m };
+
+        var result = calc.Calculate(context, values);
 
         // 5000 * 0.0307 + 25 = 178.50
         Assert.Equal(178.50m, result.Withholding);
@@ -74,17 +70,15 @@ public class PennsylvaniaStateTaxCalculatorTest
     [Fact]
     public void ZeroGrossWages_ReturnsZeroWithholding()
     {
-        var calc = new PennsylvaniaStateTaxCalculator();
+        var calc = new PennsylvaniaWithholdingCalculator();
 
-        var result = calc.CalculateWithholding(new StateTaxInput
-        {
-            GrossWages = 0m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 0,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+        var context = new CommonWithholdingContext(
+            UsState.PA,
+            GrossWages: 0m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026);
+
+        var result = calc.Calculate(context, new StateInputValues());
 
         Assert.Equal(0m, result.TaxableWages);
         Assert.Equal(0m, result.Withholding);
@@ -93,17 +87,16 @@ public class PennsylvaniaStateTaxCalculatorTest
     [Fact]
     public void DeductionsExceedGross_TaxableWagesFloorAtZero()
     {
-        var calc = new PennsylvaniaStateTaxCalculator();
+        var calc = new PennsylvaniaWithholdingCalculator();
 
-        var result = calc.CalculateWithholding(new StateTaxInput
-        {
-            GrossWages = 1000m,
-            Frequency = PayFrequency.Monthly,
-            FilingStatus = FilingStatus.Married,
-            Allowances = 0,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 2000m
-        });
+        var context = new CommonWithholdingContext(
+            UsState.PA,
+            GrossWages: 1000m,
+            PayPeriod: PayFrequency.Monthly,
+            Year: 2026,
+            PreTaxDeductionsReducingStateWages: 2000m);
+
+        var result = calc.Calculate(context, new StateInputValues());
 
         Assert.Equal(0m, result.TaxableWages);
         Assert.Equal(0m, result.Withholding);

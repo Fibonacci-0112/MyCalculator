@@ -2,7 +2,7 @@ using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Tax.State;
 using Xunit;
 
-public class PercentageMethodStateTaxCalculatorTest
+public class PercentageMethodWithholdingAdapterExtendedTest
 {
     // ── Flat-rate state tests ────────────────────────────────────────
 
@@ -11,15 +11,19 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.AZ);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.AZ,
+            GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 5000m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 0,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Single",
+            ["Allowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         // 5000 * 26 = 130,000 annual, no std ded, 130000 * 2.5% = 3250 annual, / 26 = 125.00
         Assert.Equal(5000m, result.TaxableWages);
@@ -31,15 +35,19 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.IL);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.IL,
+            GrossWages: 4000m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 4000m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 2,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Single",
+            ["Allowances"] = 2,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         // annual = 4000 * 26 = 104,000
         // allowance deduction = 2 * 2775 = 5550
@@ -54,15 +62,19 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.NC);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.NC,
+            GrossWages: 6000m,
+            PayPeriod: PayFrequency.Monthly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 6000m,
-            Frequency = PayFrequency.Monthly,
-            FilingStatus = FilingStatus.Married,
-            Allowances = 0,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Married",
+            ["Allowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         // annual = 6000 * 12 = 72,000
         // std ded married = 25,500
@@ -79,22 +91,26 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.VA);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.VA,
+            GrossWages: 5000m,
+            PayPeriod: PayFrequency.Monthly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 5000m,
-            Frequency = PayFrequency.Monthly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 1,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Single",
+            ["Allowances"] = 1,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         // annual = 5000 * 12 = 60,000
         // std ded single = 8,750
         // allowance deduction = 1 * 930 = 930
         // taxable = 60000 - 8750 - 930 = 50,320
         // brackets: 0-3000@2% = 60, 3000-5000@3% = 60, 5000-17000@5% = 600, 17000-50320@5.75% = 1915.90
-        // total = 60 + 60 + 600 + 1915.90 = 2635.90 (correction: (50320-17000)*0.0575 = 33320*0.0575 = 1915.90)
+        // total = 60 + 60 + 600 + 1915.90 = 2635.90
         // per period = 2635.90 / 12 = 219.6583... rounds to 219.66
         Assert.Equal(219.66m, result.Withholding);
     }
@@ -104,15 +120,19 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.CA);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.CA,
+            GrossWages: 10000m,
+            PayPeriod: PayFrequency.Monthly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 10000m,
-            Frequency = PayFrequency.Monthly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 1,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Single",
+            ["Allowances"] = 1,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         // annual = 10000 * 12 = 120,000
         // std ded single = 5,706
@@ -135,15 +155,19 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.NY);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.NY,
+            GrossWages: 4000m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 4000m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Married,
-            Allowances = 0,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Married",
+            ["Allowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         // annual = 4000 * 26 = 104,000
         // std ded married = 16,050
@@ -164,15 +188,19 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.OH);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.OH,
+            GrossWages: 900m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 900m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 0,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Single",
+            ["Allowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         // annual = 900 * 26 = 23,400
         // no std ded, taxable = 23,400
@@ -186,15 +214,19 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.OH);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.OH,
+            GrossWages: 3000m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 3000m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 0,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Single",
+            ["Allowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         // annual = 3000 * 26 = 78,000
         // 0-26050 @ 0% = 0
@@ -210,15 +242,19 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.DE);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.DE,
+            GrossWages: 4000m,
+            PayPeriod: PayFrequency.Monthly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 4000m,
-            Frequency = PayFrequency.Monthly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 2,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Single",
+            ["Allowances"] = 2,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         // annual = 4000 * 12 = 48,000
         // std ded single = 3,250
@@ -244,15 +280,19 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.AZ);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.AZ,
+            GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 5000m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 0,
-            AdditionalWithholding = 50m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Single",
+            ["Allowances"] = 0,
+            ["AdditionalWithholding"] = 50m
+        };
+
+        var result = calc.Calculate(context, values);
 
         // base = 125.00 + 50 = 175.00
         Assert.Equal(175.00m, result.Withholding);
@@ -265,15 +305,20 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.CO);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.CO,
+            GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026,
+            PreTaxDeductionsReducingStateWages: 1000m);
+        var values = new StateInputValues
         {
-            GrossWages = 5000m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 0,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 1000m
-        });
+            ["FilingStatus"] = "Single",
+            ["Allowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         // taxable wages = 5000 - 1000 = 4000
         // annual = 4000 * 26 = 104,000
@@ -290,15 +335,19 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         var calc = CreateCalculator(UsState.CA);
 
-        var result = calc.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.CA,
+            GrossWages: 0m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 0m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 0,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Single",
+            ["Allowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         Assert.Equal(0m, result.TaxableWages);
         Assert.Equal(0m, result.Withholding);
@@ -325,16 +374,20 @@ public class PercentageMethodStateTaxCalculatorTest
     {
         foreach (var (state, config) in StateTaxConfigs2026.Configs)
         {
-            var calc = new PercentageMethodStateTaxCalculator(state, config);
-            var result = calc.CalculateWithholding(new StateTaxInput
+            var calc = new PercentageMethodWithholdingAdapter(state, config);
+            var context = new CommonWithholdingContext(
+                state,
+                GrossWages: 5000m,
+                PayPeriod: PayFrequency.Biweekly,
+                Year: 2026);
+            var values = new StateInputValues
             {
-                GrossWages = 5000m,
-                Frequency = PayFrequency.Biweekly,
-                FilingStatus = FilingStatus.Single,
-                Allowances = 0,
-                AdditionalWithholding = 0m,
-                PreTaxDeductionsReducingStateWages = 0m
-            });
+                ["FilingStatus"] = "Single",
+                ["Allowances"] = 0,
+                ["AdditionalWithholding"] = 0m
+            };
+
+            var result = calc.Calculate(context, values);
 
             Assert.True(result.TaxableWages >= 0m, $"{state} should have non-negative taxable wages");
             Assert.True(result.Withholding >= 0m, $"{state} should have non-negative withholding");
@@ -362,9 +415,9 @@ public class PercentageMethodStateTaxCalculatorTest
 
     // ── Helper ───────────────────────────────────────────────────────
 
-    private static PercentageMethodStateTaxCalculator CreateCalculator(UsState state)
+    private static PercentageMethodWithholdingAdapter CreateCalculator(UsState state)
     {
         var config = StateTaxConfigs2026.Configs[state];
-        return new PercentageMethodStateTaxCalculator(state, config);
+        return new PercentageMethodWithholdingAdapter(state, config);
     }
 }

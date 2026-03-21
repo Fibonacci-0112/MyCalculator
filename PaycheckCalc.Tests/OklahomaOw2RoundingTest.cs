@@ -25,106 +25,28 @@ public class OklahomaOw2RoundingTest
     }
 
     [Fact]
-    public void OklahomaStateTaxCalculator_ReturnsCorrectResult()
+    public void OklahomaWithholdingCalculator_ReturnsCorrectResult()
     {
         var inner = LoadOkCalculator();
-        var adapter = new OklahomaStateTaxCalculator(inner);
+        var calc = new OklahomaWithholdingCalculator(inner);
 
-        Assert.Equal(UsState.OK, adapter.State);
+        Assert.Equal(UsState.OK, calc.State);
 
-        var result = adapter.CalculateWithholding(new StateTaxInput
+        var context = new CommonWithholdingContext(
+            UsState.OK,
+            GrossWages: 1825.00m,
+            PayPeriod: PayFrequency.Semimonthly,
+            Year: 2026);
+        var values = new StateInputValues
         {
-            GrossWages = 1825.00m,
-            Frequency = PayFrequency.Semimonthly,
-            FilingStatus = FilingStatus.Married,
-            Allowances = 2,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
+            ["FilingStatus"] = "Married",
+            ["Allowances"] = 2,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
 
         Assert.Equal(37m, result.Withholding);
         Assert.True(result.TaxableWages > 0m);
-    }
-}
-
-public class NoIncomeTaxCalculatorTest
-{
-    [Theory]
-    [InlineData(UsState.AK)]
-    [InlineData(UsState.FL)]
-    [InlineData(UsState.NV)]
-    [InlineData(UsState.NH)]
-    [InlineData(UsState.SD)]
-    [InlineData(UsState.TN)]
-    [InlineData(UsState.TX)]
-    [InlineData(UsState.WA)]
-    [InlineData(UsState.WY)]
-    public void NoIncomeTaxStates_ReturnZeroWithholding(UsState state)
-    {
-        var calc = new NoIncomeTaxCalculator(state);
-
-        Assert.Equal(state, calc.State);
-
-        var result = calc.CalculateWithholding(new StateTaxInput
-        {
-            GrossWages = 5000m,
-            Frequency = PayFrequency.Biweekly,
-            FilingStatus = FilingStatus.Single,
-            Allowances = 1,
-            AdditionalWithholding = 0m,
-            PreTaxDeductionsReducingStateWages = 0m
-        });
-
-        Assert.Equal(0m, result.TaxableWages);
-        Assert.Equal(0m, result.Withholding);
-    }
-}
-
-public class StateTaxCalculatorFactoryTest
-{
-    [Fact]
-    public void GetCalculator_RegisteredState_ReturnsCalculator()
-    {
-        var factory = new StateTaxCalculatorFactory();
-        factory.Register(new NoIncomeTaxCalculator(UsState.TX));
-
-        var calc = factory.GetCalculator(UsState.TX);
-
-        Assert.NotNull(calc);
-        Assert.Equal(UsState.TX, calc.State);
-    }
-
-    [Fact]
-    public void GetCalculator_UnregisteredState_ThrowsNotSupportedException()
-    {
-        var factory = new StateTaxCalculatorFactory();
-
-        Assert.Throws<NotSupportedException>(() => factory.GetCalculator(UsState.CA));
-    }
-
-    [Fact]
-    public void IsSupported_ReturnsCorrectValue()
-    {
-        var factory = new StateTaxCalculatorFactory();
-        factory.Register(new NoIncomeTaxCalculator(UsState.FL));
-
-        Assert.True(factory.IsSupported(UsState.FL));
-        Assert.False(factory.IsSupported(UsState.NY));
-    }
-
-    [Fact]
-    public void SupportedStates_ReturnsRegisteredStatesInOrder()
-    {
-        var factory = new StateTaxCalculatorFactory();
-        factory.Register(new NoIncomeTaxCalculator(UsState.TX));
-        factory.Register(new NoIncomeTaxCalculator(UsState.FL));
-        factory.Register(new NoIncomeTaxCalculator(UsState.AK));
-
-        var states = factory.SupportedStates;
-
-        Assert.Equal(3, states.Count);
-        Assert.Equal(UsState.AK, states[0]);
-        Assert.Equal(UsState.FL, states[1]);
-        Assert.Equal(UsState.TX, states[2]);
     }
 }

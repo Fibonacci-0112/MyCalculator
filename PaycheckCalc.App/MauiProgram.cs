@@ -43,34 +43,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton(new FicaCalculator());
 
-        // Legacy factory (preserved for backward compatibility)
-        builder.Services.AddSingleton<StateTaxCalculatorFactory>(sp =>
-        {
-            var factory = new StateTaxCalculatorFactory();
-
-            // Alabama
-            var alCalc = new AlabamaFormulaCalculator();
-            factory.Register(new AlabamaStateTaxCalculator(alCalc));
-            // Oklahoma (OW-2 percentage method)
-            var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
-            factory.Register(new OklahomaStateTaxCalculator(okCalc));
-
-            // Pennsylvania (flat 3.07%)
-            factory.Register(new PennsylvaniaStateTaxCalculator());
-
-            // States with no individual income tax
-            UsState[] noTaxStates = [UsState.AK, UsState.FL, UsState.NV, UsState.NH, UsState.SD, UsState.TN, UsState.TX, UsState.WA, UsState.WY];
-            foreach (var state in noTaxStates)
-                factory.Register(new NoIncomeTaxCalculator(state));
-
-            // All remaining states via the annualized percentage method
-            foreach (var (state, config) in StateTaxConfigs2026.Configs)
-                factory.Register(new PercentageMethodStateTaxCalculator(state, config));
-
-            return factory;
-        });
-
-        // New data-driven state calculator registry (schema + validation + calculation)
+        // Data-driven state calculator registry (schema + validation + calculation)
         builder.Services.AddSingleton<StateCalculatorRegistry>(sp =>
         {
             var registry = new StateCalculatorRegistry();
@@ -99,10 +72,9 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<PayCalculator>(sp =>
             new PayCalculator(
-                sp.GetRequiredService<StateTaxCalculatorFactory>(),
+                sp.GetRequiredService<StateCalculatorRegistry>(),
                 sp.GetRequiredService<FicaCalculator>(),
-                sp.GetRequiredService<Irs15TPercentageCalculator>(),
-                sp.GetRequiredService<StateCalculatorRegistry>()));
+                sp.GetRequiredService<Irs15TPercentageCalculator>()));
 
         builder.Services.AddSingleton<CalculatorViewModel>();
         builder.Services.AddSingleton<InputsPage>();

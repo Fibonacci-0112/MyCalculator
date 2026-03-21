@@ -100,16 +100,6 @@
                         </Grid>
                         <BoxView HeightRequest="1" Color="#F0F0F0" />
 
-                        <!-- Filing Status -->
-                        <Grid ColumnDefinitions="*,*,*" Padding="0,8">
-                            <Label Text="Filing Status" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.FilingStatus}"
-                                   TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="{Binding FilingStatus}"
-                                   TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                        </Grid>
-                        <BoxView HeightRequest="1" Color="#F0F0F0" />
-
                         <!-- State -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="State" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
