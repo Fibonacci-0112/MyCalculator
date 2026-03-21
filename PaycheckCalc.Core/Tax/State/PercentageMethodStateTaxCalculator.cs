@@ -52,7 +52,7 @@ public sealed class PercentageMethodConfig
 /// 8. Add any additional per-period withholding.
 /// </para>
 /// </summary>
-public sealed class PercentageMethodStateTaxCalculator : IStateTaxCalculator
+public sealed class PercentageMethodStateTaxCalculator
 {
     private readonly PercentageMethodConfig _config;
 
