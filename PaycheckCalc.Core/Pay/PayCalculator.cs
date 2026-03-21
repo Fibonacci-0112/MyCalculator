@@ -8,14 +8,19 @@ namespace PaycheckCalc.Core.Pay;
 public sealed class PayCalculator
 {
     private readonly StateTaxCalculatorFactory _stateFactory;
+    private readonly StateCalculatorRegistry? _stateRegistry;
     private readonly FicaCalculator _fica;
     private readonly Irs15TPercentageCalculator _fed;
 
-     public PayCalculator(StateTaxCalculatorFactory stateFactory, FicaCalculator fica, Irs15TPercentageCalculator fed)
+    public PayCalculator(StateTaxCalculatorFactory stateFactory, FicaCalculator fica, Irs15TPercentageCalculator fed)
+        : this(stateFactory, fica, fed, stateRegistry: null) { }
+
+    public PayCalculator(StateTaxCalculatorFactory stateFactory, FicaCalculator fica, Irs15TPercentageCalculator fed, StateCalculatorRegistry? stateRegistry)
     {
         _stateFactory = stateFactory;
         _fica = fica;
         _fed = fed;
+        _stateRegistry = stateRegistry;
     }
 
     public PaycheckResult Calculate(PaycheckInput input)
@@ -28,16 +33,38 @@ public sealed class PayCalculator
 
         var preTaxState = input.Deductions.Where(d => d.Type == DeductionType.PreTax && d.ReducesStateTaxableWages).Sum(d => d.Amount);
 
-        var stateTax = _stateFactory.GetCalculator(input.State);
-        var stateResult = stateTax.CalculateWithholding(new StateTaxInput
+        // Use the new data-driven registry when state input values are provided;
+        // otherwise fall back to the legacy fixed-field factory path.
+        StateTaxResult stateResult;
+        if (_stateRegistry != null && input.StateInputValues != null)
         {
-            GrossWages = gross,
-            Frequency = input.Frequency,
-            FilingStatus = input.FilingStatus,
-            Allowances = input.StateAllowances,
-            AdditionalWithholding = input.StateAdditionalWithholding,
-            PreTaxDeductionsReducingStateWages = preTaxState
-        });
+            var calc = _stateRegistry.GetCalculator(input.State);
+            var context = new CommonWithholdingContext(
+                input.State,
+                gross,
+                input.Frequency,
+                Year: 2026,
+                PreTaxDeductionsReducingStateWages: preTaxState);
+            var result = calc.Calculate(context, input.StateInputValues);
+            stateResult = new StateTaxResult
+            {
+                TaxableWages = result.TaxableWages,
+                Withholding = result.Withholding
+            };
+        }
+        else
+        {
+            var stateTax = _stateFactory.GetCalculator(input.State);
+            stateResult = stateTax.CalculateWithholding(new StateTaxInput
+            {
+                GrossWages = gross,
+                Frequency = input.Frequency,
+                FilingStatus = input.FilingStatus,
+                Allowances = input.StateAllowances,
+                AdditionalWithholding = input.StateAdditionalWithholding,
+                PreTaxDeductionsReducingStateWages = preTaxState
+            });
+        }
 
         var ficaWages = Math.Max(0m, gross - preTax);
         var (ss, medicare, addl) = _fica.Calculate(ficaWages, input.YtdSocialSecurityWages, input.YtdMedicareWages);
@@ -45,7 +72,7 @@ public sealed class PayCalculator
         var fedTaxable = Math.Max(0m, gross - preTax);
         var federal = _fed.CalculateWithholding(fedTaxable, input.Frequency, input.FederalW4);
 
-          var net = gross - preTax - postTax - stateResult.Withholding - ss - medicare - addl - federal;
+        var net = gross - preTax - postTax - stateResult.Withholding - ss - medicare - addl - federal;
 
         return new PaycheckResult
         {

@@ -1,0 +1,21 @@
+namespace PaycheckCalc.Core.Tax.State;
+
+/// <summary>
+/// Normalized result returned by every <see cref="IStateWithholdingCalculator"/>.
+/// Provides consistent output regardless of how different the state's internal
+/// calculation logic may be.
+/// </summary>
+public sealed class StateWithholdingResult
+{
+    /// <summary>Wages subject to state income tax after applicable deductions.</summary>
+    public decimal TaxableWages { get; init; }
+
+    /// <summary>State income tax withholding for the pay period.</summary>
+    public decimal Withholding { get; init; }
+
+    /// <summary>
+    /// Optional human-readable note (e.g., "Exempt — no tax due", 
+    /// "Includes local tax surcharge").
+    /// </summary>
+    public string? Description { get; init; }
+}
