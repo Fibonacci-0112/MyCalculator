@@ -108,8 +108,30 @@ public partial class CalculatorViewModel : ObservableObject
         }
     }
 
-    [ObservableProperty] public partial decimal PretaxDeductions { get; set; }
-    [ObservableProperty] public partial decimal PosttaxDeductions { get; set; }
+    /// <summary>
+    /// Collection of itemized deductions. Users can add, remove, and edit each entry.
+    /// </summary>
+    public ObservableCollection<DeductionItemViewModel> Deductions { get; } = new();
+
+    /// <summary>Pre-tax deduction total for display/comparison.</summary>
+    public decimal TotalPretaxDeductions =>
+        Deductions.Where(d => d.Type == DeductionType.PreTax).Sum(d => d.Amount);
+
+    /// <summary>Post-tax deduction total for display/comparison.</summary>
+    public decimal TotalPosttaxDeductions =>
+        Deductions.Where(d => d.Type == DeductionType.PostTax).Sum(d => d.Amount);
+
+    [RelayCommand]
+    private void AddDeduction()
+    {
+        Deductions.Add(new DeductionItemViewModel());
+    }
+
+    [RelayCommand]
+    private void RemoveDeduction(DeductionItemViewModel item)
+    {
+        Deductions.Remove(item);
+    }
 
     // Federal (IRS 15-T / W-4)
     [ObservableProperty]

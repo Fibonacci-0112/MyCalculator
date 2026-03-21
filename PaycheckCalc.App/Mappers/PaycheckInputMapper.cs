@@ -31,11 +31,7 @@ public static class PaycheckInputMapper
                 Step4bDeductions = vm.FederalStep4bDeductions,
                 Step4cExtraWithholding = vm.FederalStep4cExtraWithholding
             },
-            Deductions = new[]
-            {
-                new Deduction { Name = "Pre-tax", Type = DeductionType.PreTax, Amount = vm.PretaxDeductions, ReducesStateTaxableWages = true },
-                new Deduction { Name = "Post-tax", Type = DeductionType.PostTax, Amount = vm.PosttaxDeductions }
-            }
+            Deductions = vm.Deductions.Select(d => d.ToDeduction()).ToArray()
         };
     }
 }
