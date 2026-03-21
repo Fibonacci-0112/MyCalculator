@@ -31,7 +31,7 @@ public sealed class PayCalculator
         var ficaWages = Math.Max(0m, gross - preTax);
         var (ss, medicare, addl) = _fica.Calculate(ficaWages, input.YtdSocialSecurityWages, input.YtdMedicareWages);
 
-        var fedTaxable = Math.Max(0m, gross - preTax);
+        var fedTaxable = ficaWages;
         var federal = _fed.CalculateWithholding(fedTaxable, input.Frequency, input.FederalW4);
 
         var calc = _stateRegistry.GetCalculator(input.State);
