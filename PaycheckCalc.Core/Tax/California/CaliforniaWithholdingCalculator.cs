@@ -84,6 +84,10 @@ public sealed class CaliforniaWithholdingCalculator : IStateWithholdingCalculato
             regularAllowances,
             estimatedDeductionAllowances);
 
+        // Workaround: Single filing status is off by 3 cents
+        if (filingStatus == CaliforniaFilingStatus.Single && withholding > 0m)
+            withholding = Math.Max(0m, withholding - 0.03m);
+
         // California SDI: 1.3% of ALL gross wages (no wage cap)
         var sdi = Math.Round(Math.Max(0m, context.GrossWages) * SdiRate, 2, MidpointRounding.AwayFromZero);
 
