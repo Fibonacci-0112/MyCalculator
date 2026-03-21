@@ -118,36 +118,11 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void California_GraduatedBrackets_Single()
     {
-        var calc = CreateCalculator(UsState.CA);
-
-        var context = new CommonWithholdingContext(
-            UsState.CA,
-            GrossWages: 10000m,
-            PayPeriod: PayFrequency.Monthly,
-            Year: 2026);
-        var values = new StateInputValues
-        {
-            ["FilingStatus"] = "Single",
-            ["Allowances"] = 1,
-            ["AdditionalWithholding"] = 0m
-        };
-
-        var result = calc.Calculate(context, values);
-
-        // annual = 10000 * 12 = 120,000
-        // std ded single = 5,706
-        // allowance = 1 * 1000 = 1000
-        // taxable = 120000 - 5706 - 1000 = 113,294
-        // Brackets:
-        // 0-11079 @ 1% = 110.79
-        // 11079-26264 @ 2% = 303.70
-        // 26264-41452 @ 4% = 607.52
-        // 41452-57542 @ 6% = 965.40
-        // 57542-72724 @ 8% = 1214.56
-        // 72724-113294 @ 9.3% = 3773.01
-        // total = 110.79 + 303.70 + 607.52 + 965.40 + 1214.56 + 3773.01 = 6974.98
-        // per period = 6974.98 / 12 = 581.2483... rounds to 581.25
-        Assert.Equal(581.25m, result.Withholding);
+        // California now uses a dedicated Method B calculator (CaliforniaPercentageCalculator).
+        // See CaliforniaPercentageCalculatorTest for Method B tests.
+        // This test verifies CA is no longer in the generic percentage method configs.
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.CA),
+            "CA should not be in generic StateTaxConfigs2026 — it uses CaliforniaPercentageCalculator.");
     }
 
     [Fact]
@@ -333,10 +308,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void ZeroGrossWages_ReturnsZeroWithholding()
     {
-        var calc = CreateCalculator(UsState.CA);
+        var calc = CreateCalculator(UsState.CO);
 
         var context = new CommonWithholdingContext(
-            UsState.CA,
+            UsState.CO,
             GrossWages: 0m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026);
@@ -357,7 +332,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
     [Theory]
     [InlineData(UsState.AZ)]
-    [InlineData(UsState.CA)]
+    [InlineData(UsState.CO)]
     [InlineData(UsState.NY)]
     [InlineData(UsState.VA)]
     [InlineData(UsState.OH)]
@@ -399,7 +374,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     {
         UsState[] expectedStates =
         [
-            UsState.AR, UsState.AZ, UsState.CA, UsState.CO, UsState.CT,
+            UsState.AR, UsState.AZ, UsState.CO, UsState.CT,
             UsState.DC, UsState.DE, UsState.GA, UsState.HI, UsState.IA,
             UsState.ID, UsState.IL, UsState.IN, UsState.KS, UsState.KY,
             UsState.LA, UsState.MA, UsState.MD, UsState.ME, UsState.MI,
