@@ -297,7 +297,7 @@
                                 <DataTemplate>
                                     <Border BackgroundColor="#F8FAFF" StrokeThickness="1" Stroke="#E0E0E0"
                                             StrokeShape="RoundRectangle 8" Padding="12">
-                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto"
+                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto"
                                               RowSpacing="8" ColumnSpacing="8">
                                             <!-- Name -->
                                             <Entry Grid.Row="0" Grid.Column="0" Placeholder="Name (e.g. 401k)"
@@ -320,15 +320,22 @@
                                                     </Entry.Behaviors>
                                                 </Entry>
                                             </Grid>
-                                            <!-- Type picker -->
+                                            <!-- Amount Type picker (Dollar or Percentage) -->
                                             <Grid Grid.Row="2" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="8">
+                                                <Label Text="Amount Type" TextColor="#37474F" FontSize="13"
+                                                       VerticalTextAlignment="Center" />
+                                                <Picker Grid.Column="1" ItemsSource="{Binding AmountTypes}"
+                                                        SelectedItem="{Binding AmountType}" TextColor="Black" />
+                                            </Grid>
+                                            <!-- Type picker -->
+                                            <Grid Grid.Row="3" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="8">
                                                 <Label Text="Type" TextColor="#37474F" FontSize="13"
                                                        VerticalTextAlignment="Center" />
                                                 <Picker Grid.Column="1" ItemsSource="{Binding DeductionTypes}"
                                                         SelectedItem="{Binding Type}" TextColor="Black" />
                                             </Grid>
                                             <!-- ReducesStateTaxableWages toggle -->
-                                            <Grid Grid.Row="3" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <Grid Grid.Row="4" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                                 <Label Text="Reduces State Taxable Wages" TextColor="#37474F" FontSize="13"
                                                        VerticalTextAlignment="Center" />
                                                 <Switch Grid.Column="1" IsToggled="{Binding ReducesStateTaxableWages}"

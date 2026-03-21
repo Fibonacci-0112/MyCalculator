@@ -23,10 +23,10 @@ public sealed class PayCalculator
         var gross = (input.RegularHours * input.HourlyRate)
                  + (input.OvertimeHours * input.HourlyRate * input.OvertimeMultiplier);
 
-        var preTax = input.Deductions.Where(d => d.Type == DeductionType.PreTax).Sum(d => d.Amount);
-        var postTax = input.Deductions.Where(d => d.Type == DeductionType.PostTax).Sum(d => d.Amount);
+        var preTax = input.Deductions.Where(d => d.Type == DeductionType.PreTax).Sum(d => d.EffectiveAmount(gross));
+        var postTax = input.Deductions.Where(d => d.Type == DeductionType.PostTax).Sum(d => d.EffectiveAmount(gross));
 
-        var preTaxState = input.Deductions.Where(d => d.Type == DeductionType.PreTax && d.ReducesStateTaxableWages).Sum(d => d.Amount);
+        var preTaxState = input.Deductions.Where(d => d.Type == DeductionType.PreTax && d.ReducesStateTaxableWages).Sum(d => d.EffectiveAmount(gross));
 
         var ficaWages = Math.Max(0m, gross - preTax);
         var (ss, medicare, addl) = _fica.Calculate(ficaWages, input.YtdSocialSecurityWages, input.YtdMedicareWages);
