@@ -19,12 +19,12 @@ public partial class StateFieldViewModel : ObservableObject
 
         // Initialize from the schema default
         if (definition.FieldType == StateFieldType.Picker)
-            _selectedOption = definition.DefaultValue?.ToString()
+            SelectedOption = definition.DefaultValue?.ToString()
                 ?? definition.Options?.FirstOrDefault() ?? "";
         else if (definition.FieldType == StateFieldType.Toggle)
-            _boolValue = definition.DefaultValue is true;
+            BoolValue = definition.DefaultValue is true;
         else
-            _stringValue = definition.DefaultValue?.ToString() ?? "0";
+            StringValue = definition.DefaultValue?.ToString() ?? "0";
     }
 
     public StateFieldDefinition Definition { get; }
