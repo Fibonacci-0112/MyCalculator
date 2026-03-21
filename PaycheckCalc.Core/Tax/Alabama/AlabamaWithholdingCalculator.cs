@@ -33,13 +33,6 @@ public sealed class AlabamaWithholdingCalculator : IStateWithholdingCalculator
         },
         new()
         {
-            Key = "FederalWithholding",
-            Label = "Federal Withholding (per period)",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        },
-        new()
-        {
             Key = "AdditionalWithholding",
             Label = "Extra Withholding",
             FieldType = StateFieldType.Decimal,
@@ -65,7 +58,7 @@ public sealed class AlabamaWithholdingCalculator : IStateWithholdingCalculator
         var filingStatusStr = values.GetValueOrDefault("FilingStatus", "Single");
         var filingStatus = MapFilingStatus(filingStatusStr);
         var dependents = values.GetValueOrDefault("Dependents", 0);
-        var federalWithholding = values.GetValueOrDefault("FederalWithholding", 0m);
+        var federalWithholding = context.FederalWithholdingPerPeriod;
         var additionalWithholding = values.GetValueOrDefault("AdditionalWithholding", 0m);
 
         int periods = GetPayPeriods(context.PayPeriod);

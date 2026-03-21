@@ -28,21 +28,22 @@ public sealed class PayCalculator
 
         var preTaxState = input.Deductions.Where(d => d.Type == DeductionType.PreTax && d.ReducesStateTaxableWages).Sum(d => d.Amount);
 
+        var ficaWages = Math.Max(0m, gross - preTax);
+        var (ss, medicare, addl) = _fica.Calculate(ficaWages, input.YtdSocialSecurityWages, input.YtdMedicareWages);
+
+        var fedTaxable = Math.Max(0m, gross - preTax);
+        var federal = _fed.CalculateWithholding(fedTaxable, input.Frequency, input.FederalW4);
+
         var calc = _stateRegistry.GetCalculator(input.State);
         var context = new CommonWithholdingContext(
             input.State,
             gross,
             input.Frequency,
             Year: 2026,
-            PreTaxDeductionsReducingStateWages: preTaxState);
+            PreTaxDeductionsReducingStateWages: preTaxState,
+            FederalWithholdingPerPeriod: RoundMoney(federal));
         var stateValues = input.StateInputValues ?? new StateInputValues();
         var stateResult = calc.Calculate(context, stateValues);
-
-        var ficaWages = Math.Max(0m, gross - preTax);
-        var (ss, medicare, addl) = _fica.Calculate(ficaWages, input.YtdSocialSecurityWages, input.YtdMedicareWages);
-
-        var fedTaxable = Math.Max(0m, gross - preTax);
-        var federal = _fed.CalculateWithholding(fedTaxable, input.Frequency, input.FederalW4);
 
         var net = gross - preTax - postTax - stateResult.Withholding - ss - medicare - addl - federal;
 
