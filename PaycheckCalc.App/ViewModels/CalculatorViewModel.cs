@@ -101,7 +101,13 @@ public partial class CalculatorViewModel : ObservableObject
     /// </summary>
     public ObservableCollection<StateFieldViewModel> StateFields { get; } = new();
 
-    partial void OnSelectedStateChanged(UsState value) => RebuildStateFields();
+    partial void OnSelectedStateChanged(UsState value)
+    {
+        // Keep the picker item in sync when SelectedState is set programmatically
+        if (SelectedStatePickerItem?.Value != value)
+            SelectedStatePickerItem = StatePickerItems.FirstOrDefault(s => s.Value == value);
+        RebuildStateFields();
+    }
 
     private void RebuildStateFields()
     {
