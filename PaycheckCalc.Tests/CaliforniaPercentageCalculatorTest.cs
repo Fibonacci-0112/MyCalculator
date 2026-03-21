@@ -288,7 +288,7 @@ public class CaliforniaPercentageCalculatorTest
         var result = calc.Calculate(context, values);
 
         Assert.Equal(10000m, result.TaxableWages);
-        Assert.Equal(633.80m, result.Withholding);
+        Assert.Equal(633.77m, result.Withholding);
         Assert.Equal(130.00m, result.DisabilityInsurance);
     }
 
@@ -313,8 +313,8 @@ public class CaliforniaPercentageCalculatorTest
 
         var result = calc.Calculate(context, values);
 
-        // 633.80 + 25 = 658.80
-        Assert.Equal(658.80m, result.Withholding);
+        // (633.80 - 0.03) + 25 = 658.77
+        Assert.Equal(658.77m, result.Withholding);
         Assert.Equal(130.00m, result.DisabilityInsurance);
     }
 
@@ -344,8 +344,8 @@ public class CaliforniaPercentageCalculatorTest
         // Gross for calc = $8,000, std ded = $476, TI = $7,524
         // Per-period brackets (Monthly Single): bracket over $6,060 @10.23%
         // Tax = $293.47 + 0.1023 × ($7,524 - $6,060) = $293.47 + $149.7672 = $443.2372
-        //   Rounded down (floor) to $443.23
-        Assert.Equal(443.23m, result.Withholding);
+        //   Rounded down (floor) to $443.23, minus 0.03 Single workaround = $443.20
+        Assert.Equal(443.20m, result.Withholding);
         // SDI is 1.3% of ALL gross wages ($10,000), not reduced wages
         Assert.Equal(130.00m, result.DisabilityInsurance);
     }
@@ -428,5 +428,73 @@ public class CaliforniaPercentageCalculatorTest
         Assert.Equal(130.00m, result.DisabilityInsurance);
         // Income tax on reduced $7,000 wages
         Assert.Equal(7000m, result.TaxableWages);
+    }
+
+    [Fact]
+    public void WithholdingCalculator_SingleWorkaround_Subtracts3Cents()
+    {
+        var inner = LoadCalculator();
+        var calc = new CaliforniaWithholdingCalculator(inner);
+
+        // Single filing status: withholding should be reduced by $0.03
+        var context = new CommonWithholdingContext(
+            UsState.CA,
+            GrossWages: 10000m,
+            PayPeriod: PayFrequency.Monthly,
+            Year: 2026);
+        var singleValues = new StateInputValues
+        {
+            ["FilingStatus"] = "Single",
+            ["RegularAllowances"] = 1,
+            ["EstimatedDeductionAllowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var singleResult = calc.Calculate(context, singleValues);
+
+        // Core calculator returns $633.80 for this scenario;
+        // Single workaround subtracts $0.03 → $633.77
+        Assert.Equal(633.77m, singleResult.Withholding);
+
+        // Married filing status: withholding should NOT be reduced
+        var marriedValues = new StateInputValues
+        {
+            ["FilingStatus"] = "Married",
+            ["RegularAllowances"] = 1,
+            ["EstimatedDeductionAllowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var marriedResult = calc.Calculate(context, marriedValues);
+
+        // Married withholding is not adjusted
+        var expectedMarried = inner.CalculateWithholding(10000m, PayFrequency.Monthly,
+            CaliforniaFilingStatus.Married, regularAllowances: 1, estimatedDeductionAllowances: 0);
+        Assert.Equal(expectedMarried, marriedResult.Withholding);
+    }
+
+    [Fact]
+    public void WithholdingCalculator_SingleWorkaround_ZeroWithholding_StaysZero()
+    {
+        var inner = LoadCalculator();
+        var calc = new CaliforniaWithholdingCalculator(inner);
+
+        // Zero gross wages → $0 withholding; workaround should not make it negative
+        var context = new CommonWithholdingContext(
+            UsState.CA,
+            GrossWages: 0m,
+            PayPeriod: PayFrequency.Monthly,
+            Year: 2026);
+        var values = new StateInputValues
+        {
+            ["FilingStatus"] = "Single",
+            ["RegularAllowances"] = 0,
+            ["EstimatedDeductionAllowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
+
+        Assert.Equal(0m, result.Withholding);
     }
 }
