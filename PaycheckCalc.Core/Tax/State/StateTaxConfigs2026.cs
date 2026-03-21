@@ -1,0 +1,738 @@
+using PaycheckCalc.Core.Models;
+
+namespace PaycheckCalc.Core.Tax.State;
+
+/// <summary>
+/// 2026 state income tax withholding configurations for states that use the
+/// annualized percentage method.  Data sourced from halfpricesoft.com and
+/// official state revenue department publications.
+/// </summary>
+public static class StateTaxConfigs2026
+{
+    private static TaxBracket B(decimal floor, decimal? ceiling, decimal rate)
+        => new() { Floor = floor, Ceiling = ceiling, Rate = rate };
+
+    public static IReadOnlyDictionary<UsState, PercentageMethodConfig> Configs { get; } =
+        new Dictionary<UsState, PercentageMethodConfig>
+        {
+            // ── Flat-rate states ─────────────────────────────────────────
+
+            [UsState.AZ] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                BracketsSingle = [B(0, null, 0.025m)],
+                BracketsMarried = [B(0, null, 0.025m)]
+            },
+
+            [UsState.CO] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                BracketsSingle = [B(0, null, 0.044m)],
+                BracketsMarried = [B(0, null, 0.044m)]
+            },
+
+            [UsState.GA] = new()
+            {
+                StandardDeductionSingle = 7_100m,
+                StandardDeductionMarried = 24_000m,
+                BracketsSingle = [B(0, null, 0.0529m)],
+                BracketsMarried = [B(0, null, 0.0529m)]
+            },
+
+            [UsState.ID] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                BracketsSingle = [B(0, null, 0.058m)],
+                BracketsMarried = [B(0, null, 0.058m)]
+            },
+
+            [UsState.IL] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                AllowanceAmount = 2_775m,
+                BracketsSingle = [B(0, null, 0.0495m)],
+                BracketsMarried = [B(0, null, 0.0495m)]
+            },
+
+            [UsState.IN] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                AllowanceAmount = 1_000m,
+                BracketsSingle = [B(0, null, 0.0305m)],
+                BracketsMarried = [B(0, null, 0.0305m)]
+            },
+
+            [UsState.IA] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                BracketsSingle = [B(0, null, 0.0365m)],
+                BracketsMarried = [B(0, null, 0.0365m)]
+            },
+
+            [UsState.KY] = new()
+            {
+                StandardDeductionSingle = 3_160m,
+                StandardDeductionMarried = 3_160m,
+                BracketsSingle = [B(0, null, 0.04m)],
+                BracketsMarried = [B(0, null, 0.04m)]
+            },
+
+            [UsState.MA] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                AllowanceAmount = 4_400m,
+                BracketsSingle = [B(0, null, 0.05m)],
+                BracketsMarried = [B(0, null, 0.05m)]
+            },
+
+            [UsState.MI] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                AllowanceAmount = 5_400m,
+                BracketsSingle = [B(0, null, 0.0405m)],
+                BracketsMarried = [B(0, null, 0.0405m)]
+            },
+
+            [UsState.MS] = new()
+            {
+                StandardDeductionSingle = 2_300m,
+                StandardDeductionMarried = 4_600m,
+                AllowanceAmount = 6_000m,
+                BracketsSingle = [B(0, null, 0.05m)],
+                BracketsMarried = [B(0, null, 0.05m)]
+            },
+
+            [UsState.NC] = new()
+            {
+                StandardDeductionSingle = 12_750m,
+                StandardDeductionMarried = 25_500m,
+                BracketsSingle = [B(0, null, 0.045m)],
+                BracketsMarried = [B(0, null, 0.045m)]
+            },
+
+            [UsState.UT] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                BracketsSingle = [B(0, null, 0.0465m)],
+                BracketsMarried = [B(0, null, 0.0465m)]
+            },
+
+            // ── Graduated-bracket states ─────────────────────────────────
+
+            [UsState.AR] = new()
+            {
+                StandardDeductionSingle = 2_470m,
+                StandardDeductionMarried = 2_470m,
+                AllowanceCreditAmount = 29m,
+                BracketsSingle =
+                [
+                    B(0, 5_500m, 0m),
+                    B(5_500m, 10_900m, 0.02m),
+                    B(10_900m, 15_600m, 0.03m),
+                    B(15_600m, 25_700m, 0.034m),
+                    B(25_700m, null, 0.039m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 5_500m, 0m),
+                    B(5_500m, 10_900m, 0.02m),
+                    B(10_900m, 15_600m, 0.03m),
+                    B(15_600m, 25_700m, 0.034m),
+                    B(25_700m, null, 0.039m)
+                ]
+            },
+
+            [UsState.CA] = new()
+            {
+                StandardDeductionSingle = 5_706m,
+                StandardDeductionMarried = 11_412m,
+                AllowanceAmount = 1_000m,
+                BracketsSingle =
+                [
+                    B(0, 11_079m, 0.01m),
+                    B(11_079m, 26_264m, 0.02m),
+                    B(26_264m, 41_452m, 0.04m),
+                    B(41_452m, 57_542m, 0.06m),
+                    B(57_542m, 72_724m, 0.08m),
+                    B(72_724m, 371_479m, 0.093m),
+                    B(371_479m, 445_771m, 0.103m),
+                    B(445_771m, 742_953m, 0.113m),
+                    B(742_953m, 1_000_000m, 0.123m),
+                    B(1_000_000m, null, 0.133m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 22_158m, 0.01m),
+                    B(22_158m, 52_528m, 0.02m),
+                    B(52_528m, 82_904m, 0.04m),
+                    B(82_904m, 115_084m, 0.06m),
+                    B(115_084m, 145_448m, 0.08m),
+                    B(145_448m, 742_958m, 0.093m),
+                    B(742_958m, 891_542m, 0.103m),
+                    B(891_542m, 1_000_000m, 0.113m),
+                    B(1_000_000m, 1_485_906m, 0.123m),
+                    B(1_485_906m, null, 0.133m)
+                ]
+            },
+
+            [UsState.CT] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                BracketsSingle =
+                [
+                    B(0, 10_000m, 0.02m),
+                    B(10_000m, 50_000m, 0.045m),
+                    B(50_000m, 100_000m, 0.055m),
+                    B(100_000m, 200_000m, 0.06m),
+                    B(200_000m, 250_000m, 0.065m),
+                    B(250_000m, 500_000m, 0.069m),
+                    B(500_000m, null, 0.0699m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 20_000m, 0.02m),
+                    B(20_000m, 100_000m, 0.045m),
+                    B(100_000m, 200_000m, 0.055m),
+                    B(200_000m, 400_000m, 0.06m),
+                    B(400_000m, 500_000m, 0.065m),
+                    B(500_000m, 1_000_000m, 0.069m),
+                    B(1_000_000m, null, 0.0699m)
+                ]
+            },
+
+            [UsState.DC] = new()
+            {
+                StandardDeductionSingle = 15_000m,
+                StandardDeductionMarried = 30_000m,
+                AllowanceAmount = 1_675m,
+                BracketsSingle =
+                [
+                    B(0, 10_000m, 0.04m),
+                    B(10_000m, 40_000m, 0.06m),
+                    B(40_000m, 60_000m, 0.065m),
+                    B(60_000m, 250_000m, 0.085m),
+                    B(250_000m, 500_000m, 0.0925m),
+                    B(500_000m, 1_000_000m, 0.0975m),
+                    B(1_000_000m, null, 0.1075m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 10_000m, 0.04m),
+                    B(10_000m, 40_000m, 0.06m),
+                    B(40_000m, 60_000m, 0.065m),
+                    B(60_000m, 250_000m, 0.085m),
+                    B(250_000m, 500_000m, 0.0925m),
+                    B(500_000m, 1_000_000m, 0.0975m),
+                    B(1_000_000m, null, 0.1075m)
+                ]
+            },
+
+            [UsState.DE] = new()
+            {
+                StandardDeductionSingle = 3_250m,
+                StandardDeductionMarried = 6_500m,
+                AllowanceCreditAmount = 110m,
+                BracketsSingle =
+                [
+                    B(0, 2_000m, 0m),
+                    B(2_000m, 5_000m, 0.022m),
+                    B(5_000m, 10_000m, 0.039m),
+                    B(10_000m, 20_000m, 0.048m),
+                    B(20_000m, 25_000m, 0.052m),
+                    B(25_000m, 60_000m, 0.0555m),
+                    B(60_000m, 125_000m, 0.0605m),
+                    B(125_000m, 250_000m, 0.0675m),
+                    B(250_000m, null, 0.0695m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 2_000m, 0m),
+                    B(2_000m, 5_000m, 0.022m),
+                    B(5_000m, 10_000m, 0.039m),
+                    B(10_000m, 20_000m, 0.048m),
+                    B(20_000m, 25_000m, 0.052m),
+                    B(25_000m, 60_000m, 0.0555m),
+                    B(60_000m, 125_000m, 0.0605m),
+                    B(125_000m, 250_000m, 0.0675m),
+                    B(250_000m, null, 0.0695m)
+                ]
+            },
+
+            [UsState.HI] = new()
+            {
+                StandardDeductionSingle = 2_200m,
+                StandardDeductionMarried = 4_400m,
+                BracketsSingle =
+                [
+                    B(0, 2_400m, 0.014m),
+                    B(2_400m, 4_800m, 0.032m),
+                    B(4_800m, 9_600m, 0.055m),
+                    B(9_600m, 14_400m, 0.064m),
+                    B(14_400m, 19_200m, 0.068m),
+                    B(19_200m, 24_000m, 0.072m),
+                    B(24_000m, 36_000m, 0.076m),
+                    B(36_000m, 48_000m, 0.079m),
+                    B(48_000m, 150_000m, 0.0825m),
+                    B(150_000m, 175_000m, 0.09m),
+                    B(175_000m, 300_000m, 0.10m),
+                    B(300_000m, null, 0.11m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 4_800m, 0.014m),
+                    B(4_800m, 9_600m, 0.032m),
+                    B(9_600m, 19_200m, 0.055m),
+                    B(19_200m, 28_800m, 0.064m),
+                    B(28_800m, 38_400m, 0.068m),
+                    B(38_400m, 48_000m, 0.072m),
+                    B(48_000m, 72_000m, 0.076m),
+                    B(72_000m, 96_000m, 0.079m),
+                    B(96_000m, 300_000m, 0.0825m),
+                    B(300_000m, 350_000m, 0.09m),
+                    B(350_000m, 400_000m, 0.10m),
+                    B(400_000m, null, 0.11m)
+                ]
+            },
+
+            [UsState.KS] = new()
+            {
+                StandardDeductionSingle = 3_605m,
+                StandardDeductionMarried = 8_240m,
+                AllowanceAmount = 2_250m,
+                BracketsSingle =
+                [
+                    B(0, 23_000m, 0.052m),
+                    B(23_000m, null, 0.0558m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 46_000m, 0.052m),
+                    B(46_000m, null, 0.0558m)
+                ]
+            },
+
+            [UsState.LA] = new()
+            {
+                StandardDeductionSingle = 4_500m,
+                StandardDeductionMarried = 9_000m,
+                BracketsSingle =
+                [
+                    B(0, 12_500m, 0.0185m),
+                    B(12_500m, 50_000m, 0.035m),
+                    B(50_000m, null, 0.0425m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 25_000m, 0.0185m),
+                    B(25_000m, 100_000m, 0.035m),
+                    B(100_000m, null, 0.0425m)
+                ]
+            },
+
+            [UsState.ME] = new()
+            {
+                StandardDeductionSingle = 15_300m,
+                StandardDeductionMarried = 30_600m,
+                AllowanceAmount = 5_300m,
+                BracketsSingle =
+                [
+                    B(0, 27_400m, 0.058m),
+                    B(27_400m, 64_850m, 0.0675m),
+                    B(64_850m, null, 0.0715m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 54_850m, 0.058m),
+                    B(54_850m, 129_750m, 0.0675m),
+                    B(129_750m, null, 0.0715m)
+                ]
+            },
+
+            [UsState.MD] = new()
+            {
+                StandardDeductionSingle = 2_550m,
+                StandardDeductionMarried = 5_100m,
+                AllowanceAmount = 3_200m,
+                BracketsSingle =
+                [
+                    B(0, 1_000m, 0.02m),
+                    B(1_000m, 2_000m, 0.03m),
+                    B(2_000m, 3_000m, 0.04m),
+                    B(3_000m, 100_000m, 0.0475m),
+                    B(100_000m, 125_000m, 0.05m),
+                    B(125_000m, 150_000m, 0.0525m),
+                    B(150_000m, 250_000m, 0.055m),
+                    B(250_000m, 500_000m, 0.0575m),
+                    B(500_000m, 1_000_000m, 0.0625m),
+                    B(1_000_000m, null, 0.065m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 1_000m, 0.02m),
+                    B(1_000m, 2_000m, 0.03m),
+                    B(2_000m, 3_000m, 0.04m),
+                    B(3_000m, 150_000m, 0.0475m),
+                    B(150_000m, 175_000m, 0.05m),
+                    B(175_000m, 225_000m, 0.0525m),
+                    B(225_000m, 300_000m, 0.055m),
+                    B(300_000m, 600_000m, 0.0575m),
+                    B(600_000m, 1_200_000m, 0.0625m),
+                    B(1_200_000m, null, 0.065m)
+                ]
+            },
+
+            [UsState.MN] = new()
+            {
+                StandardDeductionSingle = 15_300m,
+                StandardDeductionMarried = 30_600m,
+                AllowanceAmount = 5_300m,
+                BracketsSingle =
+                [
+                    B(0, 33_310m, 0.0535m),
+                    B(33_310m, 109_430m, 0.068m),
+                    B(109_430m, 203_150m, 0.0785m),
+                    B(203_150m, null, 0.0985m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 48_700m, 0.0535m),
+                    B(48_700m, 193_480m, 0.068m),
+                    B(193_480m, 337_930m, 0.0785m),
+                    B(337_930m, null, 0.0985m)
+                ]
+            },
+
+            [UsState.MO] = new()
+            {
+                StandardDeductionSingle = 15_750m,
+                StandardDeductionMarried = 31_500m,
+                BracketsSingle =
+                [
+                    B(0, 1_313m, 0m),
+                    B(1_313m, 2_626m, 0.02m),
+                    B(2_626m, 3_939m, 0.025m),
+                    B(3_939m, 5_252m, 0.03m),
+                    B(5_252m, 6_565m, 0.035m),
+                    B(6_565m, 7_878m, 0.04m),
+                    B(7_878m, 9_191m, 0.045m),
+                    B(9_191m, null, 0.047m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 1_313m, 0m),
+                    B(1_313m, 2_626m, 0.02m),
+                    B(2_626m, 3_939m, 0.025m),
+                    B(3_939m, 5_252m, 0.03m),
+                    B(5_252m, 6_565m, 0.035m),
+                    B(6_565m, 7_878m, 0.04m),
+                    B(7_878m, 9_191m, 0.045m),
+                    B(9_191m, null, 0.047m)
+                ]
+            },
+
+            [UsState.MT] = new()
+            {
+                StandardDeductionSingle = 5_310m,
+                StandardDeductionMarried = 10_620m,
+                BracketsSingle =
+                [
+                    B(0, 23_800m, 0.047m),
+                    B(23_800m, null, 0.059m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 23_800m, 0.047m),
+                    B(23_800m, null, 0.059m)
+                ]
+            },
+
+            [UsState.NE] = new()
+            {
+                StandardDeductionSingle = 8_600m,
+                StandardDeductionMarried = 17_200m,
+                AllowanceCreditAmount = 171m,
+                BracketsSingle =
+                [
+                    B(0, 4_030m, 0.0246m),
+                    B(4_030m, 24_120m, 0.0351m),
+                    B(24_120m, 38_870m, 0.0501m),
+                    B(38_870m, null, 0.052m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 8_040m, 0.0246m),
+                    B(8_040m, 48_250m, 0.0351m),
+                    B(48_250m, 77_730m, 0.0501m),
+                    B(77_730m, null, 0.052m)
+                ]
+            },
+
+            [UsState.NJ] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                AllowanceAmount = 1_000m,
+                BracketsSingle =
+                [
+                    B(0, 20_000m, 0.014m),
+                    B(20_000m, 35_000m, 0.0175m),
+                    B(35_000m, 40_000m, 0.035m),
+                    B(40_000m, 75_000m, 0.0553m),
+                    B(75_000m, 500_000m, 0.0637m),
+                    B(500_000m, 1_000_000m, 0.0897m),
+                    B(1_000_000m, null, 0.1075m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 20_000m, 0.014m),
+                    B(20_000m, 50_000m, 0.0175m),
+                    B(50_000m, 70_000m, 0.0245m),
+                    B(70_000m, 80_000m, 0.035m),
+                    B(80_000m, 150_000m, 0.0553m),
+                    B(150_000m, 500_000m, 0.0637m),
+                    B(500_000m, 1_000_000m, 0.0897m),
+                    B(1_000_000m, null, 0.1075m)
+                ]
+            },
+
+            [UsState.NM] = new()
+            {
+                StandardDeductionSingle = 15_750m,
+                StandardDeductionMarried = 31_500m,
+                BracketsSingle =
+                [
+                    B(0, 5_500m, 0.017m),
+                    B(5_500m, 11_000m, 0.032m),
+                    B(11_000m, 16_000m, 0.047m),
+                    B(16_000m, 210_000m, 0.049m),
+                    B(210_000m, null, 0.059m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 8_000m, 0.017m),
+                    B(8_000m, 16_000m, 0.032m),
+                    B(16_000m, 24_000m, 0.047m),
+                    B(24_000m, 315_000m, 0.049m),
+                    B(315_000m, null, 0.059m)
+                ]
+            },
+
+            [UsState.NY] = new()
+            {
+                StandardDeductionSingle = 8_000m,
+                StandardDeductionMarried = 16_050m,
+                BracketsSingle =
+                [
+                    B(0, 8_500m, 0.04m),
+                    B(8_500m, 11_700m, 0.045m),
+                    B(11_700m, 13_900m, 0.0525m),
+                    B(13_900m, 21_400m, 0.059m),
+                    B(21_400m, 80_650m, 0.0609m),
+                    B(80_650m, 215_400m, 0.0641m),
+                    B(215_400m, 1_077_550m, 0.0685m),
+                    B(1_077_550m, 5_000_000m, 0.0965m),
+                    B(5_000_000m, 25_000_000m, 0.103m),
+                    B(25_000_000m, null, 0.109m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 17_150m, 0.04m),
+                    B(17_150m, 23_600m, 0.045m),
+                    B(23_600m, 27_900m, 0.0525m),
+                    B(27_900m, 43_000m, 0.059m),
+                    B(43_000m, 161_550m, 0.0609m),
+                    B(161_550m, 323_200m, 0.0641m),
+                    B(323_200m, 2_155_350m, 0.0685m),
+                    B(2_155_350m, 5_000_000m, 0.0965m),
+                    B(5_000_000m, 25_000_000m, 0.103m),
+                    B(25_000_000m, null, 0.109m)
+                ]
+            },
+
+            [UsState.ND] = new()
+            {
+                StandardDeductionSingle = 15_750m,
+                StandardDeductionMarried = 31_500m,
+                BracketsSingle =
+                [
+                    B(0, 46_500m, 0.011m),
+                    B(46_500m, 113_750m, 0.0204m),
+                    B(113_750m, null, 0.0264m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 78_650m, 0.011m),
+                    B(78_650m, 197_550m, 0.0204m),
+                    B(197_550m, null, 0.0264m)
+                ]
+            },
+
+            [UsState.OH] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                BracketsSingle =
+                [
+                    B(0, 26_050m, 0m),
+                    B(26_050m, null, 0.0275m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 26_050m, 0m),
+                    B(26_050m, null, 0.0275m)
+                ]
+            },
+
+            [UsState.OR] = new()
+            {
+                StandardDeductionSingle = 2_835m,
+                StandardDeductionMarried = 5_670m,
+                BracketsSingle =
+                [
+                    B(0, 4_300m, 0.0475m),
+                    B(4_300m, 10_750m, 0.0675m),
+                    B(10_750m, 125_000m, 0.0875m),
+                    B(125_000m, null, 0.099m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 8_600m, 0.0475m),
+                    B(8_600m, 21_500m, 0.0675m),
+                    B(21_500m, 250_000m, 0.0875m),
+                    B(250_000m, null, 0.099m)
+                ]
+            },
+
+            [UsState.RI] = new()
+            {
+                StandardDeductionSingle = 10_550m,
+                StandardDeductionMarried = 10_550m,
+                AllowanceAmount = 4_700m,
+                BracketsSingle =
+                [
+                    B(0, 77_450m, 0.0375m),
+                    B(77_450m, 176_050m, 0.0475m),
+                    B(176_050m, null, 0.0599m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 77_450m, 0.0375m),
+                    B(77_450m, 176_050m, 0.0475m),
+                    B(176_050m, null, 0.0599m)
+                ]
+            },
+
+            [UsState.SC] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                AllowanceAmount = 5_000m,
+                BracketsSingle =
+                [
+                    B(0, 3_640m, 0m),
+                    B(3_640m, 18_230m, 0.03m),
+                    B(18_230m, null, 0.06m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 3_640m, 0m),
+                    B(3_640m, 18_230m, 0.03m),
+                    B(18_230m, null, 0.06m)
+                ]
+            },
+
+            [UsState.VA] = new()
+            {
+                StandardDeductionSingle = 8_750m,
+                StandardDeductionMarried = 17_500m,
+                AllowanceAmount = 930m,
+                BracketsSingle =
+                [
+                    B(0, 3_000m, 0.02m),
+                    B(3_000m, 5_000m, 0.03m),
+                    B(5_000m, 17_000m, 0.05m),
+                    B(17_000m, null, 0.0575m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 3_000m, 0.02m),
+                    B(3_000m, 5_000m, 0.03m),
+                    B(5_000m, 17_000m, 0.05m),
+                    B(17_000m, null, 0.0575m)
+                ]
+            },
+
+            [UsState.VT] = new()
+            {
+                StandardDeductionSingle = 15_750m,
+                StandardDeductionMarried = 31_500m,
+                BracketsSingle =
+                [
+                    B(0, 47_900m, 0.0335m),
+                    B(47_900m, 116_000m, 0.066m),
+                    B(116_000m, 242_000m, 0.076m),
+                    B(242_000m, null, 0.0875m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 79_950m, 0.0335m),
+                    B(79_950m, 193_300m, 0.066m),
+                    B(193_300m, 294_600m, 0.076m),
+                    B(294_600m, null, 0.0875m)
+                ]
+            },
+
+            [UsState.WI] = new()
+            {
+                StandardDeductionSingle = 12_760m,
+                StandardDeductionMarried = 23_170m,
+                BracketsSingle =
+                [
+                    B(0, 13_810m, 0.0354m),
+                    B(13_810m, 27_630m, 0.0465m),
+                    B(27_630m, 304_170m, 0.053m),
+                    B(304_170m, null, 0.0765m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 18_410m, 0.0354m),
+                    B(18_410m, 36_820m, 0.0465m),
+                    B(36_820m, 405_550m, 0.053m),
+                    B(405_550m, null, 0.0765m)
+                ]
+            },
+
+            [UsState.WV] = new()
+            {
+                StandardDeductionSingle = 0m,
+                StandardDeductionMarried = 0m,
+                AllowanceAmount = 2_000m,
+                BracketsSingle =
+                [
+                    B(0, 10_000m, 0.03m),
+                    B(10_000m, 25_000m, 0.04m),
+                    B(25_000m, 40_000m, 0.045m),
+                    B(40_000m, 60_000m, 0.06m),
+                    B(60_000m, null, 0.065m)
+                ],
+                BracketsMarried =
+                [
+                    B(0, 10_000m, 0.03m),
+                    B(10_000m, 25_000m, 0.04m),
+                    B(25_000m, 40_000m, 0.045m),
+                    B(40_000m, 60_000m, 0.06m),
+                    B(60_000m, null, 0.065m)
+                ]
+            },
+        };
+}
