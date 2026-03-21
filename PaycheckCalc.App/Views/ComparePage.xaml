@@ -53,7 +53,7 @@
                         <!-- Pay Frequency -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="Pay Frequency" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.Frequency}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.Frequency}"
                                    TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                             <Label Grid.Column="2" Text="{Binding Frequency}"
                                    TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
@@ -63,7 +63,7 @@
                         <!-- Hourly Rate -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="Hourly Rate" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.HourlyRate, StringFormat='{0:C}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.HourlyRate, StringFormat='{0:C}'}"
                                    TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                             <Label Grid.Column="2" Text="{Binding HourlyRate, StringFormat='{0:C}'}"
                                    TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
@@ -73,7 +73,7 @@
                         <!-- Regular Hours -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="Regular Hours" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.RegularHours, StringFormat='{0:F2}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.RegularHours, StringFormat='{0:F2}'}"
                                    TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                             <Label Grid.Column="2" Text="{Binding RegularHours, StringFormat='{0:F2}'}"
                                    TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
@@ -83,7 +83,7 @@
                         <!-- Overtime Hours -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="Overtime Hours" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.OvertimeHours, StringFormat='{0:F2}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.OvertimeHours, StringFormat='{0:F2}'}"
                                    TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                             <Label Grid.Column="2" Text="{Binding OvertimeHours, StringFormat='{0:F2}'}"
                                    TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
@@ -93,7 +93,7 @@
                         <!-- OT Multiplier -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="OT Multiplier" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.OvertimeMultiplier, StringFormat='{0:F2}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.OvertimeMultiplier, StringFormat='{0:F2}'}"
                                    TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                             <Label Grid.Column="2" Text="{Binding OvertimeMultiplier, StringFormat='{0:F2}'}"
                                    TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
@@ -103,7 +103,7 @@
                         <!-- State -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="State" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.State}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.State}"
                                    TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                             <Label Grid.Column="2" Text="{Binding SelectedState}"
                                    TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
@@ -113,7 +113,7 @@
                         <!-- Pre-tax Deductions -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="Pre-tax Deductions" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.PretaxDeductions, StringFormat='{0:C}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.PretaxDeductions, StringFormat='{0:C}'}"
                                    TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                             <Label Grid.Column="2" Text="{Binding PretaxDeductions, StringFormat='{0:C}'}"
                                    TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
@@ -123,7 +123,7 @@
                         <!-- Post-tax Deductions -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="Post-tax Deductions" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.PosttaxDeductions, StringFormat='{0:C}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.PosttaxDeductions, StringFormat='{0:C}'}"
                                    TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                             <Label Grid.Column="2" Text="{Binding PosttaxDeductions, StringFormat='{0:C}'}"
                                    TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
@@ -144,9 +144,9 @@
                         <!-- Gross Pay -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="Gross Pay" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.Result.GrossPay, StringFormat='{0:C}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.ResultCard.GrossPay, StringFormat='{0:C}'}"
                                    TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="{Binding Result.GrossPay, StringFormat='{0:C}'}"
+                            <Label Grid.Column="2" Text="{Binding ResultCard.GrossPay, StringFormat='{0:C}'}"
                                    TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView HeightRequest="1" Color="#F0F0F0" />
@@ -154,9 +154,9 @@
                         <!-- Federal Taxable Income -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="Federal Taxable" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.Result.FederalTaxableIncome, StringFormat='{0:C}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.ResultCard.FederalTaxableIncome, StringFormat='{0:C}'}"
                                    TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="{Binding Result.FederalTaxableIncome, StringFormat='{0:C}'}"
+                            <Label Grid.Column="2" Text="{Binding ResultCard.FederalTaxableIncome, StringFormat='{0:C}'}"
                                    TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView HeightRequest="1" Color="#F0F0F0" />
@@ -164,9 +164,9 @@
                         <!-- State Taxable Wages -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="State Taxable" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.Result.StateTaxableWages, StringFormat='{0:C}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.ResultCard.StateTaxableWages, StringFormat='{0:C}'}"
                                    TextColor="#1565C0" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="{Binding Result.StateTaxableWages, StringFormat='{0:C}'}"
+                            <Label Grid.Column="2" Text="{Binding ResultCard.StateTaxableWages, StringFormat='{0:C}'}"
                                    TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                         </Grid>
 
@@ -185,9 +185,9 @@
                         <!-- Federal Tax -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="Federal Tax" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.Result.FederalWithholding, StringFormat='{0:C}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.ResultCard.FederalWithholding, StringFormat='{0:C}'}"
                                    TextColor="#C62828" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="{Binding Result.FederalWithholding, StringFormat='{0:C}'}"
+                            <Label Grid.Column="2" Text="{Binding ResultCard.FederalWithholding, StringFormat='{0:C}'}"
                                    TextColor="#C62828" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView HeightRequest="1" Color="#F0F0F0" />
@@ -195,9 +195,9 @@
                         <!-- Social Security Tax -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="Social Security" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.Result.SocialSecurityWithholding, StringFormat='{0:C}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.ResultCard.SocialSecurityWithholding, StringFormat='{0:C}'}"
                                    TextColor="#C62828" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="{Binding Result.SocialSecurityWithholding, StringFormat='{0:C}'}"
+                            <Label Grid.Column="2" Text="{Binding ResultCard.SocialSecurityWithholding, StringFormat='{0:C}'}"
                                    TextColor="#C62828" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView HeightRequest="1" Color="#F0F0F0" />
@@ -205,9 +205,9 @@
                         <!-- Medicare Tax -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="Medicare Tax" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.Result.MedicareWithholding, StringFormat='{0:C}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.ResultCard.MedicareWithholding, StringFormat='{0:C}'}"
                                    TextColor="#C62828" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="{Binding Result.MedicareWithholding, StringFormat='{0:C}'}"
+                            <Label Grid.Column="2" Text="{Binding ResultCard.MedicareWithholding, StringFormat='{0:C}'}"
                                    TextColor="#C62828" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView HeightRequest="1" Color="#F0F0F0" />
@@ -215,9 +215,9 @@
                         <!-- State Tax -->
                         <Grid ColumnDefinitions="*,*,*" Padding="0,8">
                             <Label Text="State Tax" TextColor="#37474F" FontSize="13" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="{Binding SavedComparison.Result.StateWithholding, StringFormat='{0:C}'}"
+                            <Label Grid.Column="1" Text="{Binding SavedScenario.ResultCard.StateWithholding, StringFormat='{0:C}'}"
                                    TextColor="#C62828" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="{Binding Result.StateWithholding, StringFormat='{0:C}'}"
+                            <Label Grid.Column="2" Text="{Binding ResultCard.StateWithholding, StringFormat='{0:C}'}"
                                    TextColor="#C62828" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                         </Grid>
 
@@ -236,11 +236,11 @@
                         <Label Grid.Row="1" Grid.Column="2" Text="Current" TextColor="#A5D6A7"
                                FontSize="11" HorizontalTextAlignment="Center" />
                         <Label Grid.Row="2" Grid.Column="1"
-                               Text="{Binding SavedComparison.Result.NetPay, StringFormat='{0:C}'}"
+                               Text="{Binding SavedScenario.ResultCard.NetPay, StringFormat='{0:C}'}"
                                TextColor="White" FontAttributes="Bold" FontSize="22"
                                HorizontalTextAlignment="Center" />
                         <Label Grid.Row="2" Grid.Column="2"
-                               Text="{Binding Result.NetPay, StringFormat='{0:C}'}"
+                               Text="{Binding ResultCard.NetPay, StringFormat='{0:C}'}"
                                TextColor="White" FontAttributes="Bold" FontSize="22"
                                HorizontalTextAlignment="Center" />
                     </Grid>

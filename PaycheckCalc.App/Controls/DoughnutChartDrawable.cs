@@ -1,4 +1,4 @@
-using PaycheckCalc.Core.Models;
+using PaycheckCalc.App.Models;
 
 namespace PaycheckCalc.App.Controls;
 
@@ -10,7 +10,7 @@ public sealed class DoughnutChartDrawable : IDrawable
     private const int MinArcSegments = 8;
     private const float DegreesPerSegment = 3f;
 
-    public PaycheckResult? Result { get; set; }
+    public ResultCardModel? Result { get; set; }
 
     private static readonly Color[] SliceColors =
     {
