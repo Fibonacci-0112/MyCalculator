@@ -45,7 +45,7 @@ public sealed class PayCalculator
         var stateValues = input.StateInputValues ?? new StateInputValues();
         var stateResult = calc.Calculate(context, stateValues);
 
-        var net = gross - preTax - postTax - stateResult.Withholding - ss - medicare - addl - federal;
+        var net = gross - preTax - postTax - stateResult.Withholding - stateResult.DisabilityInsurance - ss - medicare - addl - federal;
 
         return new PaycheckResult
         {
@@ -55,6 +55,7 @@ public sealed class PayCalculator
             State = input.State,
             StateTaxableWages = RoundMoney(stateResult.TaxableWages),
             StateWithholding = RoundMoney(stateResult.Withholding),
+            StateDisabilityInsurance = RoundMoney(stateResult.DisabilityInsurance),
             SocialSecurityWithholding = RoundMoney(ss),
             MedicareWithholding = RoundMoney(medicare),
             AdditionalMedicareWithholding = RoundMoney(addl),

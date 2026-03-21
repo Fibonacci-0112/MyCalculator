@@ -9,6 +9,7 @@ public sealed class PaycheckResult
     public UsState State { get; init; }
     public decimal StateTaxableWages { get; init; }
     public decimal StateWithholding { get; init; }
+    public decimal StateDisabilityInsurance { get; init; }
 
     public decimal SocialSecurityWithholding { get; init; }
     public decimal MedicareWithholding { get; init; }
@@ -17,6 +18,6 @@ public sealed class PaycheckResult
     public decimal FederalTaxableIncome { get; init; }
     public decimal FederalWithholding { get; init; }
 
-    public decimal TotalTaxes => StateWithholding + SocialSecurityWithholding + MedicareWithholding + AdditionalMedicareWithholding + FederalWithholding;
+    public decimal TotalTaxes => StateWithholding + StateDisabilityInsurance + SocialSecurityWithholding + MedicareWithholding + AdditionalMedicareWithholding + FederalWithholding;
     public decimal NetPay { get; init; }
 }

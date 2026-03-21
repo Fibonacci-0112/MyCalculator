@@ -2,9 +2,14 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:PaycheckCalc.App.Controls"
+             xmlns:helpers="clr-namespace:PaycheckCalc.App.Helpers"
              x:Class="PaycheckCalc.App.Views.ResultsPage"
              Title="Results"
              BackgroundColor="#F0F4FF">
+
+    <ContentPage.Resources>
+        <helpers:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
+    </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*">
 
@@ -92,8 +97,20 @@
                         <BoxView HeightRequest="1" Color="#F0F0F0" />
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
-                            <Label Text="State Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="State Income Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
                             <Label Text="{Binding Result.StateWithholding, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#C62828" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+
+                        <BoxView HeightRequest="1" Color="#F0F0F0"
+                                 IsVisible="{Binding Result.StateDisabilityInsurance, Converter={StaticResource GreaterThanZeroConverter}}" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10"
+                              IsVisible="{Binding Result.StateDisabilityInsurance, Converter={StaticResource GreaterThanZeroConverter}}">
+                            <Label Text="State Disability Insurance" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Result.StateDisabilityInsurance, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#C62828" FontAttributes="Bold"
                                    FontSize="15" VerticalTextAlignment="Center" />

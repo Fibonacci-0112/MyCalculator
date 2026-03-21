@@ -62,9 +62,9 @@ public sealed class CaliforniaPercentageCalculator
         decimal taxableIncome = Math.Max(0m, grossPay - estimatedDeduction - standardDeduction);
         if (taxableIncome <= 0m) return 0m;
 
-        // Step 4: Compute tax using per-period brackets directly
+        // Step 4: Compute tax using per-period brackets directly (round cents down)
         var brackets = _data.TaxRateTables[periodKey][rateTableStatusKey];
-        decimal tax = ComputeTaxFromBrackets(taxableIncome, brackets);
+        decimal tax = FloorToTwoDecimals(ComputeTaxFromBrackets(taxableIncome, brackets));
 
         // Step 5: Subtract exemption allowance credit (Table 4)
         decimal exemptionCredit = _data.ExemptionAllowanceCredits.GetAmount(periodKey, regularAllowances);
@@ -84,6 +84,9 @@ public sealed class CaliforniaPercentageCalculator
         }
         return 0m;
     }
+
+    private static decimal FloorToTwoDecimals(decimal value)
+        => Math.Floor(value * 100m) / 100m;
 
     /// <summary>
     /// Determines the threshold/deduction status key based on filing status and regular allowances.

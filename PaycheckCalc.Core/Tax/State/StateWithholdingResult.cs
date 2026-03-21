@@ -14,6 +14,12 @@ public sealed class StateWithholdingResult
     public decimal Withholding { get; init; }
 
     /// <summary>
+    /// State disability insurance withholding for the pay period (e.g., California SDI).
+    /// Zero when the state does not impose disability insurance.
+    /// </summary>
+    public decimal DisabilityInsurance { get; init; }
+
+    /// <summary>
     /// Optional human-readable note (e.g., "Exempt — no tax due", 
     /// "Includes local tax surcharge").
     /// </summary>

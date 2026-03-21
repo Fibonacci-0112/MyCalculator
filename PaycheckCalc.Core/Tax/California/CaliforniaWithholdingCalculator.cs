@@ -11,6 +11,9 @@ public sealed class CaliforniaWithholdingCalculator : IStateWithholdingCalculato
 {
     private readonly CaliforniaPercentageCalculator _inner;
 
+    /// <summary>2026 California SDI rate (1.3%) applied to all gross wages.</summary>
+    private const decimal SdiRate = 0.013m;
+
     private static readonly IReadOnlyList<string> FilingStatusOptions =
         ["Single", "Married", "Head of Household"];
 
@@ -81,10 +84,14 @@ public sealed class CaliforniaWithholdingCalculator : IStateWithholdingCalculato
             regularAllowances,
             estimatedDeductionAllowances);
 
+        // California SDI: 1.3% of ALL gross wages (no wage cap)
+        var sdi = Math.Round(Math.Max(0m, context.GrossWages) * SdiRate, 2, MidpointRounding.AwayFromZero);
+
         return new StateWithholdingResult
         {
             TaxableWages = grossWages,
-            Withholding = withholding + additionalWithholding
+            Withholding = withholding + additionalWithholding,
+            DisabilityInsurance = sdi
         };
     }
 
