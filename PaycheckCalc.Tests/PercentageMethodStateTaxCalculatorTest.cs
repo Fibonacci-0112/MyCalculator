@@ -342,9 +342,22 @@ public class PercentageMethodStateTaxCalculatorTest
     }
 
     [Fact]
-    public void AllConfiguredStates_Count_Is39()
+    public void AllExpectedStates_AreConfigured()
     {
-        Assert.Equal(39, StateTaxConfigs2026.Configs.Count);
+        UsState[] expectedStates =
+        [
+            UsState.AR, UsState.AZ, UsState.CA, UsState.CO, UsState.CT,
+            UsState.DC, UsState.DE, UsState.GA, UsState.HI, UsState.IA,
+            UsState.ID, UsState.IL, UsState.IN, UsState.KS, UsState.KY,
+            UsState.LA, UsState.MA, UsState.MD, UsState.ME, UsState.MI,
+            UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
+            UsState.ND, UsState.NE, UsState.NJ, UsState.NM, UsState.NY,
+            UsState.OH, UsState.OR, UsState.RI, UsState.SC, UsState.UT,
+            UsState.VA, UsState.VT, UsState.WI, UsState.WV
+        ];
+
+        foreach (var state in expectedStates)
+            Assert.True(StateTaxConfigs2026.Configs.ContainsKey(state), $"{state} should be configured");
     }
 
     // ── Helper ───────────────────────────────────────────────────────
