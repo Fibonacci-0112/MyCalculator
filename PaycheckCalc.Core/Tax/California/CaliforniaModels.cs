@@ -4,41 +4,49 @@ namespace PaycheckCalc.Core.Tax.California;
 
 internal sealed class CaliforniaMethodBData
 {
-    [JsonPropertyName("lowIncomeExemption")]
-    public Dictionary<string, LowHighThreshold> LowIncomeExemption { get; set; } = new();
+    [JsonPropertyName("lowIncomeExemptionThresholds")]
+    public Dictionary<string, Dictionary<string, decimal>> LowIncomeExemptionThresholds { get; set; } = new();
 
-    [JsonPropertyName("estimatedDeductionPerAllowance")]
-    public Dictionary<string, decimal> EstimatedDeductionPerAllowance { get; set; } = new();
+    [JsonPropertyName("estimatedDeductionAllowances")]
+    public AllowanceLookup EstimatedDeductionAllowances { get; set; } = new();
 
-    [JsonPropertyName("standardDeduction")]
-    public Dictionary<string, LowHighThreshold> StandardDeduction { get; set; } = new();
+    [JsonPropertyName("standardDeductions")]
+    public Dictionary<string, Dictionary<string, decimal>> StandardDeductions { get; set; } = new();
 
-    [JsonPropertyName("exemptionAllowanceCreditPerAllowance")]
-    public Dictionary<string, decimal> ExemptionAllowanceCreditPerAllowance { get; set; } = new();
+    [JsonPropertyName("exemptionAllowanceCredits")]
+    public AllowanceLookup ExemptionAllowanceCredits { get; set; } = new();
 
-    [JsonPropertyName("annualBrackets")]
-    public BracketsByFilingStatus AnnualBrackets { get; set; } = new();
+    [JsonPropertyName("taxRateTables")]
+    public Dictionary<string, Dictionary<string, List<CaliforniaBracket>>> TaxRateTables { get; set; } = new();
 }
 
-internal sealed class LowHighThreshold
+internal sealed class AllowanceLookup
 {
-    [JsonPropertyName("low")]
-    public decimal Low { get; set; }
+    [JsonPropertyName("maxExplicitAllowanceCount")]
+    public int MaxExplicitAllowanceCount { get; set; }
 
-    [JsonPropertyName("high")]
-    public decimal High { get; set; }
-}
+    [JsonPropertyName("multiplyOneAllowanceAmountWhenGreaterThanMax")]
+    public bool MultiplyOneAllowanceAmountWhenGreaterThanMax { get; set; }
 
-internal sealed class BracketsByFilingStatus
-{
-    [JsonPropertyName("single")]
-    public List<CaliforniaBracket> Single { get; set; } = new();
+    [JsonPropertyName("oneAllowanceAmountByPayrollPeriod")]
+    public Dictionary<string, decimal> OneAllowanceAmountByPayrollPeriod { get; set; } = new();
 
-    [JsonPropertyName("married")]
-    public List<CaliforniaBracket> Married { get; set; } = new();
+    [JsonPropertyName("amountsByPayrollPeriod")]
+    public Dictionary<string, List<decimal>> AmountsByPayrollPeriod { get; set; } = new();
 
-    [JsonPropertyName("headOfHousehold")]
-    public List<CaliforniaBracket> HeadOfHousehold { get; set; } = new();
+    public decimal GetAmount(string periodKey, int allowanceCount)
+    {
+        if (allowanceCount <= 0) return 0m;
+
+        var amounts = AmountsByPayrollPeriod[periodKey];
+        if (allowanceCount < amounts.Count)
+            return amounts[allowanceCount];
+
+        if (MultiplyOneAllowanceAmountWhenGreaterThanMax)
+            return allowanceCount * OneAllowanceAmountByPayrollPeriod[periodKey];
+
+        return amounts[^1];
+    }
 }
 
 internal sealed class CaliforniaBracket
@@ -51,4 +59,10 @@ internal sealed class CaliforniaBracket
 
     [JsonPropertyName("rate")]
     public decimal Rate { get; set; }
+
+    [JsonPropertyName("amountOver")]
+    public decimal AmountOver { get; set; }
+
+    [JsonPropertyName("plus")]
+    public decimal Plus { get; set; }
 }

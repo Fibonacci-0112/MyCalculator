@@ -1,87 +1,536 @@
 {
   "schemaVersion": 1,
+  "stateCode": "CA",
+  "taxYear": 2026,
+  "methodCode": "MethodB",
+  "displayName": "California Withholding Schedules - Method B",
   "source": {
-    "name": "California EDD Method B Withholding Tables",
-    "year": 2026,
-    "method": "B",
-    "publication": "DE 44 / 26methb.pdf"
+    "documentTitle": "California Withholding Schedules for 2026 - Method B",
+    "pdf": "https://edd.ca.gov/siteassets/files/pdf_pub_ctr/26methb.pdf"
   },
-  "lowIncomeExemption": {
-    "daily":       { "low": 73,    "high": 145  },
-    "weekly":      { "low": 363,   "high": 727  },
-    "biweekly":    { "low": 727,   "high": 1454 },
-    "semimonthly": { "low": 787,   "high": 1575 },
-    "monthly":     { "low": 1575,  "high": 3149 },
-    "quarterly":   { "low": 4725,  "high": 9448 },
-    "semiannual":  { "low": 9448,  "high": 18896 },
-    "annual":      { "low": 18896, "high": 37792 }
-  },
-  "estimatedDeductionPerAllowance": {
-    "daily": 4,
-    "weekly": 19,
-    "biweekly": 38,
-    "semimonthly": 42,
-    "monthly": 83,
-    "quarterly": 250,
-    "semiannual": 500,
-    "annual": 1000
-  },
-  "standardDeduction": {
-    "daily":       { "low": 22,   "high": 44   },
-    "weekly":      { "low": 110,  "high": 219  },
-    "biweekly":    { "low": 219,  "high": 439  },
-    "semimonthly": { "low": 238,  "high": 476  },
-    "monthly":     { "low": 476,  "high": 951  },
-    "quarterly":   { "low": 1427, "high": 2853 },
-    "semiannual":  { "low": 2853, "high": 5706 },
-    "annual":      { "low": 5706, "high": 11412 }
-  },
-  "exemptionAllowanceCreditPerAllowance": {
-    "daily": 0.65,
-    "weekly": 3.24,
-    "biweekly": 6.47,
-    "semimonthly": 7.01,
-    "monthly": 14.03,
-    "quarterly": 42.09,
-    "semiannual": 84.18,
-    "annual": 168.40
-  },
-  "annualBrackets": {
-    "single": [
-      { "over": 0,         "notOver": 11079,   "rate": 0.01  },
-      { "over": 11079,     "notOver": 26264,   "rate": 0.02  },
-      { "over": 26264,     "notOver": 41452,   "rate": 0.04  },
-      { "over": 41452,     "notOver": 57542,   "rate": 0.06  },
-      { "over": 57542,     "notOver": 72724,   "rate": 0.08  },
-      { "over": 72724,     "notOver": 371479,  "rate": 0.093 },
-      { "over": 371479,    "notOver": 445771,  "rate": 0.103 },
-      { "over": 445771,    "notOver": 742953,  "rate": 0.113 },
-      { "over": 742953,    "notOver": 1000000, "rate": 0.123 },
-      { "over": 1000000,   "notOver": null,    "rate": 0.133 }
+  "enumKeys": {
+    "payrollPeriods": [
+      "Weekly",
+      "Biweekly",
+      "Semimonthly",
+      "Monthly",
+      "Quarterly",
+      "Semiannual",
+      "Annual",
+      "DailyMiscellaneous"
     ],
-    "married": [
-      { "over": 0,         "notOver": 22158,   "rate": 0.01  },
-      { "over": 22158,     "notOver": 52528,   "rate": 0.02  },
-      { "over": 52528,     "notOver": 82904,   "rate": 0.04  },
-      { "over": 82904,     "notOver": 115084,  "rate": 0.06  },
-      { "over": 115084,    "notOver": 145448,  "rate": 0.08  },
-      { "over": 145448,    "notOver": 742958,  "rate": 0.093 },
-      { "over": 742958,    "notOver": 891542,  "rate": 0.103 },
-      { "over": 891542,    "notOver": 1000000, "rate": 0.113 },
-      { "over": 1000000,   "notOver": 1485906, "rate": 0.123 },
-      { "over": 1485906,   "notOver": null,    "rate": 0.133 }
+    "thresholdStatusKeys": [
+      "SingleOrDualIncomeMarriedOrMultipleEmployers",
+      "MarriedZeroOrOneAllowance",
+      "MarriedTwoOrMoreAllowances",
+      "UnmarriedHeadOfHousehold"
     ],
-    "headOfHousehold": [
-      { "over": 0,         "notOver": 22158,   "rate": 0.01  },
-      { "over": 22158,     "notOver": 52528,   "rate": 0.02  },
-      { "over": 52528,     "notOver": 82904,   "rate": 0.04  },
-      { "over": 82904,     "notOver": 115084,  "rate": 0.06  },
-      { "over": 115084,    "notOver": 145448,  "rate": 0.08  },
-      { "over": 145448,    "notOver": 742958,  "rate": 0.093 },
-      { "over": 742958,    "notOver": 891542,  "rate": 0.103 },
-      { "over": 891542,    "notOver": 1000000, "rate": 0.113 },
-      { "over": 1000000,   "notOver": 1485906, "rate": 0.123 },
-      { "over": 1485906,   "notOver": null,    "rate": 0.133 }
+    "rateTableStatusKeys": [
+      "SingleOrDualIncomeMarriedOrMultipleEmployers",
+      "Married",
+      "UnmarriedHeadOfHousehold"
     ]
+  },
+  "lowIncomeExemptionThresholds": {
+    "Weekly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 363,
+      "MarriedZeroOrOneAllowance": 363,
+      "MarriedTwoOrMoreAllowances": 727,
+      "UnmarriedHeadOfHousehold": 727
+    },
+    "Biweekly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 727,
+      "MarriedZeroOrOneAllowance": 727,
+      "MarriedTwoOrMoreAllowances": 1454,
+      "UnmarriedHeadOfHousehold": 1454
+    },
+    "Semimonthly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 787,
+      "MarriedZeroOrOneAllowance": 787,
+      "MarriedTwoOrMoreAllowances": 1575,
+      "UnmarriedHeadOfHousehold": 1575
+    },
+    "Monthly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 1575,
+      "MarriedZeroOrOneAllowance": 1575,
+      "MarriedTwoOrMoreAllowances": 3149,
+      "UnmarriedHeadOfHousehold": 3149
+    },
+    "Quarterly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 4724,
+      "MarriedZeroOrOneAllowance": 4724,
+      "MarriedTwoOrMoreAllowances": 9448,
+      "UnmarriedHeadOfHousehold": 9448
+    },
+    "Semiannual": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 9448,
+      "MarriedZeroOrOneAllowance": 9448,
+      "MarriedTwoOrMoreAllowances": 18896,
+      "UnmarriedHeadOfHousehold": 18896
+    },
+    "Annual": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 18896,
+      "MarriedZeroOrOneAllowance": 18896,
+      "MarriedTwoOrMoreAllowances": 37791,
+      "UnmarriedHeadOfHousehold": 37791
+    },
+    "DailyMiscellaneous": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 73,
+      "MarriedZeroOrOneAllowance": 73,
+      "MarriedTwoOrMoreAllowances": 145,
+      "UnmarriedHeadOfHousehold": 145
+    }
+  },
+  "estimatedDeductionAllowances": {
+    "maxExplicitAllowanceCount": 10,
+    "multiplyOneAllowanceAmountWhenGreaterThanMax": true,
+    "oneAllowanceAmountByPayrollPeriod": {
+      "Weekly": 19,
+      "Biweekly": 38,
+      "Semimonthly": 42,
+      "Monthly": 83,
+      "Quarterly": 250,
+      "Semiannual": 500,
+      "Annual": 1000,
+      "DailyMiscellaneous": 4
+    },
+    "amountsByPayrollPeriod": {
+      "Weekly": [0, 19, 38, 58, 77, 96, 115, 135, 154, 173, 192],
+      "Biweekly": [0, 38, 77, 115, 154, 192, 231, 269, 308, 346, 385],
+      "Semimonthly": [0, 42, 83, 125, 167, 208, 250, 292, 333, 375, 417],
+      "Monthly": [0, 83, 167, 250, 333, 417, 500, 583, 667, 750, 833],
+      "Quarterly": [0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500],
+      "Semiannual": [0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000],
+      "Annual": [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000],
+      "DailyMiscellaneous": [0, 4, 8, 12, 15, 19, 23, 27, 31, 35, 38]
+    },
+    "sourceTable": "Table2"
+  },
+  "standardDeductions": {
+    "Weekly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 110,
+      "MarriedZeroOrOneAllowance": 110,
+      "MarriedTwoOrMoreAllowances": 219,
+      "UnmarriedHeadOfHousehold": 219
+    },
+    "Biweekly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 219,
+      "MarriedZeroOrOneAllowance": 219,
+      "MarriedTwoOrMoreAllowances": 439,
+      "UnmarriedHeadOfHousehold": 439
+    },
+    "Semimonthly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 238,
+      "MarriedZeroOrOneAllowance": 238,
+      "MarriedTwoOrMoreAllowances": 476,
+      "UnmarriedHeadOfHousehold": 476
+    },
+    "Monthly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 476,
+      "MarriedZeroOrOneAllowance": 476,
+      "MarriedTwoOrMoreAllowances": 951,
+      "UnmarriedHeadOfHousehold": 951
+    },
+    "Quarterly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 1427,
+      "MarriedZeroOrOneAllowance": 1427,
+      "MarriedTwoOrMoreAllowances": 2853,
+      "UnmarriedHeadOfHousehold": 2853
+    },
+    "Semiannual": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 2853,
+      "MarriedZeroOrOneAllowance": 2853,
+      "MarriedTwoOrMoreAllowances": 5706,
+      "UnmarriedHeadOfHousehold": 5706
+    },
+    "Annual": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 5706,
+      "MarriedZeroOrOneAllowance": 5706,
+      "MarriedTwoOrMoreAllowances": 11412,
+      "UnmarriedHeadOfHousehold": 11412
+    },
+    "DailyMiscellaneous": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": 22,
+      "MarriedZeroOrOneAllowance": 22,
+      "MarriedTwoOrMoreAllowances": 44,
+      "UnmarriedHeadOfHousehold": 44
+    }
+  },
+  "exemptionAllowanceCredits": {
+    "maxExplicitAllowanceCount": 10,
+    "multiplyOneAllowanceAmountWhenGreaterThanMax": true,
+    "oneAllowanceCreditByPayrollPeriod": {
+      "Weekly": 3.24,
+      "Biweekly": 6.47,
+      "Semimonthly": 7.01,
+      "Monthly": 14.03,
+      "Quarterly": 42.08,
+      "Semiannual": 84.15,
+      "Annual": 168.3,
+      "DailyMiscellaneous": 0.65
+    },
+    "amountsByPayrollPeriod": {
+      "Weekly": [0.0, 3.24, 6.47, 9.71, 12.95, 16.18, 19.42, 22.66, 25.89, 29.13, 32.37],
+      "Biweekly": [0.0, 6.47, 12.95, 19.42, 25.89, 32.37, 38.84, 45.31, 51.78, 58.26, 64.73],
+      "Semimonthly": [0.0, 7.01, 14.03, 21.04, 28.05, 35.06, 42.08, 49.09, 56.1, 63.11, 70.13],
+      "Monthly": [0.0, 14.03, 28.05, 42.08, 56.1, 70.13, 84.15, 98.18, 112.2, 126.23, 140.25],
+      "Quarterly": [0.0, 42.08, 84.15, 126.23, 168.3, 210.38, 252.45, 294.53, 336.6, 378.68, 420.75],
+      "Semiannual": [0.0, 84.15, 168.3, 252.45, 336.6, 420.75, 504.9, 589.05, 673.2, 757.35, 841.5],
+      "Annual": [0.0, 168.3, 336.6, 504.9, 673.2, 841.5, 1009.8, 1178.1, 1346.4, 1514.7, 1683.0],
+      "DailyMiscellaneous": [0.0, 0.65, 1.29, 1.94, 2.59, 3.24, 3.88, 4.53, 5.18, 5.83, 6.47]
+    },
+    "sourceTable": "Table4"
+  },
+  "taxRateTables": {
+    "Weekly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": [
+        { "over": 0, "notOver": 213, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 213, "notOver": 505, "rate": 0.022, "amountOver": 213, "plus": 2.34 },
+        { "over": 505, "notOver": 797, "rate": 0.044, "amountOver": 505, "plus": 8.76 },
+        { "over": 797, "notOver": 1107, "rate": 0.066, "amountOver": 797, "plus": 21.61 },
+        { "over": 1107, "notOver": 1399, "rate": 0.088, "amountOver": 1107, "plus": 42.07 },
+        { "over": 1399, "notOver": 7144, "rate": 0.1023, "amountOver": 1399, "plus": 67.77 },
+        { "over": 7144, "notOver": 8573, "rate": 0.1133, "amountOver": 7144, "plus": 655.48 },
+        { "over": 8573, "notOver": 14288, "rate": 0.1243, "amountOver": 8573, "plus": 817.39 },
+        { "over": 14288, "notOver": 19231, "rate": 0.1353, "amountOver": 14288, "plus": 1527.76 },
+        { "over": 19231, "notOver": null, "rate": 0.1463, "amountOver": 19231, "plus": 2196.55 }
+      ],
+      "Married": [
+        { "over": 0, "notOver": 426, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 426, "notOver": 1010, "rate": 0.022, "amountOver": 426, "plus": 4.69 },
+        { "over": 1010, "notOver": 1594, "rate": 0.044, "amountOver": 1010, "plus": 17.54 },
+        { "over": 1594, "notOver": 2214, "rate": 0.066, "amountOver": 1594, "plus": 43.24 },
+        { "over": 2214, "notOver": 2798, "rate": 0.088, "amountOver": 2214, "plus": 84.16 },
+        { "over": 2798, "notOver": 14288, "rate": 0.1023, "amountOver": 2798, "plus": 135.55 },
+        { "over": 14288, "notOver": 17146, "rate": 0.1133, "amountOver": 14288, "plus": 1310.98 },
+        { "over": 17146, "notOver": 19231, "rate": 0.1243, "amountOver": 17146, "plus": 1634.79 },
+        { "over": 19231, "notOver": 28575, "rate": 0.1353, "amountOver": 19231, "plus": 1893.96 },
+        { "over": 28575, "notOver": null, "rate": 0.1463, "amountOver": 28575, "plus": 3158.2 }
+      ],
+      "UnmarriedHeadOfHousehold": [
+        { "over": 0, "notOver": 426, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 426, "notOver": 1010, "rate": 0.022, "amountOver": 426, "plus": 4.69 },
+        { "over": 1010, "notOver": 1302, "rate": 0.044, "amountOver": 1010, "plus": 17.54 },
+        { "over": 1302, "notOver": 1612, "rate": 0.066, "amountOver": 1302, "plus": 30.39 },
+        { "over": 1612, "notOver": 1904, "rate": 0.088, "amountOver": 1612, "plus": 50.85 },
+        { "over": 1904, "notOver": 9716, "rate": 0.1023, "amountOver": 1904, "plus": 76.55 },
+        { "over": 9716, "notOver": 11659, "rate": 0.1133, "amountOver": 9716, "plus": 875.72 },
+        { "over": 11659, "notOver": 19231, "rate": 0.1243, "amountOver": 11659, "plus": 1095.86 },
+        { "over": 19231, "notOver": 19431, "rate": 0.1353, "amountOver": 19231, "plus": 2037.06 },
+        { "over": 19431, "notOver": null, "rate": 0.1463, "amountOver": 19431, "plus": 2064.12 }
+      ]
+    },
+    "Biweekly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": [
+        { "over": 0, "notOver": 426, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 426, "notOver": 1010, "rate": 0.022, "amountOver": 426, "plus": 4.69 },
+        { "over": 1010, "notOver": 1594, "rate": 0.044, "amountOver": 1010, "plus": 17.54 },
+        { "over": 1594, "notOver": 2214, "rate": 0.066, "amountOver": 1594, "plus": 43.24 },
+        { "over": 2214, "notOver": 2798, "rate": 0.088, "amountOver": 2214, "plus": 84.16 },
+        { "over": 2798, "notOver": 14288, "rate": 0.1023, "amountOver": 2798, "plus": 135.55 },
+        { "over": 14288, "notOver": 17146, "rate": 0.1133, "amountOver": 14288, "plus": 1310.98 },
+        { "over": 17146, "notOver": 28576, "rate": 0.1243, "amountOver": 17146, "plus": 1634.79 },
+        { "over": 28576, "notOver": 38462, "rate": 0.1353, "amountOver": 28576, "plus": 3055.54 },
+        { "over": 38462, "notOver": null, "rate": 0.1463, "amountOver": 38462, "plus": 4393.12 }
+      ],
+      "Married": [
+        { "over": 0, "notOver": 852, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 852, "notOver": 2020, "rate": 0.022, "amountOver": 852, "plus": 9.37 },
+        { "over": 2020, "notOver": 3188, "rate": 0.044, "amountOver": 2020, "plus": 35.07 },
+        { "over": 3188, "notOver": 4428, "rate": 0.066, "amountOver": 3188, "plus": 86.46 },
+        { "over": 4428, "notOver": 5596, "rate": 0.088, "amountOver": 4428, "plus": 168.3 },
+        { "over": 5596, "notOver": 28576, "rate": 0.1023, "amountOver": 5596, "plus": 271.08 },
+        { "over": 28576, "notOver": 34292, "rate": 0.1133, "amountOver": 28576, "plus": 2621.93 },
+        { "over": 34292, "notOver": 38462, "rate": 0.1243, "amountOver": 34292, "plus": 3269.55 },
+        { "over": 38462, "notOver": 57150, "rate": 0.1353, "amountOver": 38462, "plus": 3787.88 },
+        { "over": 57150, "notOver": null, "rate": 0.1463, "amountOver": 57150, "plus": 6316.37 }
+      ],
+      "UnmarriedHeadOfHousehold": [
+        { "over": 0, "notOver": 852, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 852, "notOver": 2020, "rate": 0.022, "amountOver": 852, "plus": 9.37 },
+        { "over": 2020, "notOver": 2604, "rate": 0.044, "amountOver": 2020, "plus": 35.07 },
+        { "over": 2604, "notOver": 3224, "rate": 0.066, "amountOver": 2604, "plus": 60.77 },
+        { "over": 3224, "notOver": 3808, "rate": 0.088, "amountOver": 3224, "plus": 101.69 },
+        { "over": 3808, "notOver": 19432, "rate": 0.1023, "amountOver": 3808, "plus": 153.08 },
+        { "over": 19432, "notOver": 23318, "rate": 0.1133, "amountOver": 19432, "plus": 1751.42 },
+        { "over": 23318, "notOver": 38462, "rate": 0.1243, "amountOver": 23318, "plus": 2191.7 },
+        { "over": 38462, "notOver": 38862, "rate": 0.1353, "amountOver": 38462, "plus": 4074.1 },
+        { "over": 38862, "notOver": null, "rate": 0.1463, "amountOver": 38862, "plus": 4128.22 }
+      ]
+    },
+    "Semimonthly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": [
+        { "over": 0, "notOver": 462, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 462, "notOver": 1094, "rate": 0.022, "amountOver": 462, "plus": 5.08 },
+        { "over": 1094, "notOver": 1727, "rate": 0.044, "amountOver": 1094, "plus": 18.98 },
+        { "over": 1727, "notOver": 2398, "rate": 0.066, "amountOver": 1727, "plus": 46.83 },
+        { "over": 2398, "notOver": 3030, "rate": 0.088, "amountOver": 2398, "plus": 91.12 },
+        { "over": 3030, "notOver": 15478, "rate": 0.1023, "amountOver": 3030, "plus": 146.74 },
+        { "over": 15478, "notOver": 18574, "rate": 0.1133, "amountOver": 15478, "plus": 1420.17 },
+        { "over": 18574, "notOver": 30956, "rate": 0.1243, "amountOver": 18574, "plus": 1770.95 },
+        { "over": 30956, "notOver": 41667, "rate": 0.1353, "amountOver": 30956, "plus": 3310.03 },
+        { "over": 41667, "notOver": null, "rate": 0.1463, "amountOver": 41667, "plus": 4759.23 }
+      ],
+      "Married": [
+        { "over": 0, "notOver": 924, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 924, "notOver": 2188, "rate": 0.022, "amountOver": 924, "plus": 10.16 },
+        { "over": 2188, "notOver": 3454, "rate": 0.044, "amountOver": 2188, "plus": 37.97 },
+        { "over": 3454, "notOver": 4796, "rate": 0.066, "amountOver": 3454, "plus": 93.67 },
+        { "over": 4796, "notOver": 6060, "rate": 0.088, "amountOver": 4796, "plus": 182.24 },
+        { "over": 6060, "notOver": 30956, "rate": 0.1023, "amountOver": 6060, "plus": 293.47 },
+        { "over": 30956, "notOver": 37148, "rate": 0.1133, "amountOver": 30956, "plus": 2840.33 },
+        { "over": 37148, "notOver": 41667, "rate": 0.1243, "amountOver": 37148, "plus": 3541.88 },
+        { "over": 41667, "notOver": 61913, "rate": 0.1353, "amountOver": 41667, "plus": 4103.59 },
+        { "over": 61913, "notOver": null, "rate": 0.1463, "amountOver": 61913, "plus": 6842.87 }
+      ],
+      "UnmarriedHeadOfHousehold": [
+        { "over": 0, "notOver": 924, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 924, "notOver": 2189, "rate": 0.022, "amountOver": 924, "plus": 10.16 },
+        { "over": 2189, "notOver": 2822, "rate": 0.044, "amountOver": 2189, "plus": 37.99 },
+        { "over": 2822, "notOver": 3492, "rate": 0.066, "amountOver": 2822, "plus": 65.84 },
+        { "over": 3492, "notOver": 4125, "rate": 0.088, "amountOver": 3492, "plus": 110.06 },
+        { "over": 4125, "notOver": 21050, "rate": 0.1023, "amountOver": 4125, "plus": 165.76 },
+        { "over": 21050, "notOver": 25260, "rate": 0.1133, "amountOver": 21050, "plus": 1897.19 },
+        { "over": 25260, "notOver": 41667, "rate": 0.1243, "amountOver": 25260, "plus": 2374.18 },
+        { "over": 41667, "notOver": 42101, "rate": 0.1353, "amountOver": 41667, "plus": 4413.57 },
+        { "over": 42101, "notOver": null, "rate": 0.1463, "amountOver": 42101, "plus": 4472.29 }
+      ]
+    },
+    "Monthly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": [
+        { "over": 0, "notOver": 924, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 924, "notOver": 2188, "rate": 0.022, "amountOver": 924, "plus": 10.16 },
+        { "over": 2188, "notOver": 3454, "rate": 0.044, "amountOver": 2188, "plus": 37.97 },
+        { "over": 3454, "notOver": 4796, "rate": 0.066, "amountOver": 3454, "plus": 93.67 },
+        { "over": 4796, "notOver": 6060, "rate": 0.088, "amountOver": 4796, "plus": 182.24 },
+        { "over": 6060, "notOver": 30956, "rate": 0.1023, "amountOver": 6060, "plus": 293.47 },
+        { "over": 30956, "notOver": 37148, "rate": 0.1133, "amountOver": 30956, "plus": 2840.33 },
+        { "over": 37148, "notOver": 61912, "rate": 0.1243, "amountOver": 37148, "plus": 3541.88 },
+        { "over": 61912, "notOver": 83334, "rate": 0.1353, "amountOver": 61912, "plus": 6620.05 },
+        { "over": 83334, "notOver": null, "rate": 0.1463, "amountOver": 83334, "plus": 9518.45 }
+      ],
+      "Married": [
+        { "over": 0, "notOver": 1848, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 1848, "notOver": 4376, "rate": 0.022, "amountOver": 1848, "plus": 20.33 },
+        { "over": 4376, "notOver": 6908, "rate": 0.044, "amountOver": 4376, "plus": 75.95 },
+        { "over": 6908, "notOver": 9592, "rate": 0.066, "amountOver": 6908, "plus": 187.36 },
+        { "over": 9592, "notOver": 12120, "rate": 0.088, "amountOver": 9592, "plus": 364.5 },
+        { "over": 12120, "notOver": 61912, "rate": 0.1023, "amountOver": 12120, "plus": 586.96 },
+        { "over": 61912, "notOver": 74296, "rate": 0.1133, "amountOver": 61912, "plus": 5680.68 },
+        { "over": 74296, "notOver": 83334, "rate": 0.1243, "amountOver": 74296, "plus": 7083.79 },
+        { "over": 83334, "notOver": 123826, "rate": 0.1353, "amountOver": 83334, "plus": 8207.21 },
+        { "over": 123826, "notOver": null, "rate": 0.1463, "amountOver": 123826, "plus": 13685.78 }
+      ],
+      "UnmarriedHeadOfHousehold": [
+        { "over": 0, "notOver": 1848, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 1848, "notOver": 4378, "rate": 0.022, "amountOver": 1848, "plus": 20.33 },
+        { "over": 4378, "notOver": 5644, "rate": 0.044, "amountOver": 4378, "plus": 75.99 },
+        { "over": 5644, "notOver": 6984, "rate": 0.066, "amountOver": 5644, "plus": 131.69 },
+        { "over": 6984, "notOver": 8250, "rate": 0.088, "amountOver": 6984, "plus": 220.13 },
+        { "over": 8250, "notOver": 42100, "rate": 0.1023, "amountOver": 8250, "plus": 331.54 },
+        { "over": 42100, "notOver": 50520, "rate": 0.1133, "amountOver": 42100, "plus": 3794.4 },
+        { "over": 50520, "notOver": 83334, "rate": 0.1243, "amountOver": 50520, "plus": 4748.39 },
+        { "over": 83334, "notOver": 84202, "rate": 0.1353, "amountOver": 83334, "plus": 8827.17 },
+        { "over": 84202, "notOver": null, "rate": 0.1463, "amountOver": 84202, "plus": 8944.61 }
+      ]
+    },
+    "Quarterly": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": [
+        { "over": 0, "notOver": 2770, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 2770, "notOver": 6566, "rate": 0.022, "amountOver": 2770, "plus": 30.47 },
+        { "over": 6566, "notOver": 10363, "rate": 0.044, "amountOver": 6566, "plus": 113.98 },
+        { "over": 10363, "notOver": 14386, "rate": 0.066, "amountOver": 10363, "plus": 281.05 },
+        { "over": 14386, "notOver": 18181, "rate": 0.088, "amountOver": 14386, "plus": 546.57 },
+        { "over": 18181, "notOver": 92870, "rate": 0.1023, "amountOver": 18181, "plus": 880.53 },
+        { "over": 92870, "notOver": 111443, "rate": 0.1133, "amountOver": 92870, "plus": 8521.21 },
+        { "over": 111443, "notOver": 185738, "rate": 0.1243, "amountOver": 111443, "plus": 10625.53 },
+        { "over": 185738, "notOver": 250000, "rate": 0.1353, "amountOver": 185738, "plus": 19860.4 },
+        { "over": 250000, "notOver": null, "rate": 0.1463, "amountOver": 250000, "plus": 28555.05 }
+      ],
+      "Married": [
+        { "over": 0, "notOver": 5540, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 5540, "notOver": 13132, "rate": 0.022, "amountOver": 5540, "plus": 60.94 },
+        { "over": 13132, "notOver": 20726, "rate": 0.044, "amountOver": 13132, "plus": 227.96 },
+        { "over": 20726, "notOver": 28772, "rate": 0.066, "amountOver": 20726, "plus": 562.1 },
+        { "over": 28772, "notOver": 36362, "rate": 0.088, "amountOver": 28772, "plus": 1093.14 },
+        { "over": 36362, "notOver": 185740, "rate": 0.1023, "amountOver": 36362, "plus": 1761.06 },
+        { "over": 185740, "notOver": 222886, "rate": 0.1133, "amountOver": 185740, "plus": 17042.43 },
+        { "over": 222886, "notOver": 250000, "rate": 0.1243, "amountOver": 222886, "plus": 21251.07 },
+        { "over": 250000, "notOver": 371477, "rate": 0.1353, "amountOver": 250000, "plus": 24621.34 },
+        { "over": 371477, "notOver": null, "rate": 0.1463, "amountOver": 371477, "plus": 41057.18 }
+      ],
+      "UnmarriedHeadOfHousehold": [
+        { "over": 0, "notOver": 5543, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 5543, "notOver": 13133, "rate": 0.022, "amountOver": 5543, "plus": 60.97 },
+        { "over": 13133, "notOver": 16929, "rate": 0.044, "amountOver": 13133, "plus": 227.95 },
+        { "over": 16929, "notOver": 20951, "rate": 0.066, "amountOver": 16929, "plus": 394.97 },
+        { "over": 20951, "notOver": 24748, "rate": 0.088, "amountOver": 20951, "plus": 660.42 },
+        { "over": 24748, "notOver": 126302, "rate": 0.1023, "amountOver": 24748, "plus": 994.56 },
+        { "over": 126302, "notOver": 151563, "rate": 0.1133, "amountOver": 126302, "plus": 11383.53 },
+        { "over": 151563, "notOver": 250000, "rate": 0.1243, "amountOver": 151563, "plus": 14245.6 },
+        { "over": 250000, "notOver": 252604, "rate": 0.1353, "amountOver": 250000, "plus": 26481.32 },
+        { "over": 252604, "notOver": null, "rate": 0.1463, "amountOver": 252604, "plus": 26833.64 }
+      ]
+    },
+    "Semiannual": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": [
+        { "over": 0, "notOver": 5540, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 5540, "notOver": 13132, "rate": 0.022, "amountOver": 5540, "plus": 60.94 },
+        { "over": 13132, "notOver": 20726, "rate": 0.044, "amountOver": 13132, "plus": 227.96 },
+        { "over": 20726, "notOver": 28772, "rate": 0.066, "amountOver": 20726, "plus": 562.1 },
+        { "over": 28772, "notOver": 36362, "rate": 0.088, "amountOver": 28772, "plus": 1093.14 },
+        { "over": 36362, "notOver": 185740, "rate": 0.1023, "amountOver": 36362, "plus": 1761.06 },
+        { "over": 185740, "notOver": 222886, "rate": 0.1133, "amountOver": 185740, "plus": 17042.43 },
+        { "over": 222886, "notOver": 371476, "rate": 0.1243, "amountOver": 222886, "plus": 21251.07 },
+        { "over": 371476, "notOver": 500000, "rate": 0.1353, "amountOver": 371476, "plus": 39720.81 },
+        { "over": 500000, "notOver": null, "rate": 0.1463, "amountOver": 500000, "plus": 57110.11 }
+      ],
+      "Married": [
+        { "over": 0, "notOver": 11080, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 11080, "notOver": 26264, "rate": 0.022, "amountOver": 11080, "plus": 121.88 },
+        { "over": 26264, "notOver": 41452, "rate": 0.044, "amountOver": 26264, "plus": 455.93 },
+        { "over": 41452, "notOver": 57544, "rate": 0.066, "amountOver": 41452, "plus": 1124.2 },
+        { "over": 57544, "notOver": 72724, "rate": 0.088, "amountOver": 57544, "plus": 2186.27 },
+        { "over": 72724, "notOver": 371480, "rate": 0.1023, "amountOver": 72724, "plus": 3522.11 },
+        { "over": 371480, "notOver": 445772, "rate": 0.1133, "amountOver": 371480, "plus": 34084.85 },
+        { "over": 445772, "notOver": 500000, "rate": 0.1243, "amountOver": 445772, "plus": 42502.13 },
+        { "over": 500000, "notOver": 742954, "rate": 0.1353, "amountOver": 500000, "plus": 49242.67 },
+        { "over": 742954, "notOver": null, "rate": 0.1463, "amountOver": 742954, "plus": 82114.35 }
+      ],
+      "UnmarriedHeadOfHousehold": [
+        { "over": 0, "notOver": 11086, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 11086, "notOver": 26266, "rate": 0.022, "amountOver": 11086, "plus": 121.95 },
+        { "over": 26266, "notOver": 33858, "rate": 0.044, "amountOver": 26266, "plus": 455.91 },
+        { "over": 33858, "notOver": 41902, "rate": 0.066, "amountOver": 33858, "plus": 789.96 },
+        { "over": 41902, "notOver": 49496, "rate": 0.088, "amountOver": 41902, "plus": 1320.86 },
+        { "over": 49496, "notOver": 252604, "rate": 0.1023, "amountOver": 49496, "plus": 1989.13 },
+        { "over": 252604, "notOver": 303126, "rate": 0.1133, "amountOver": 252604, "plus": 22767.08 },
+        { "over": 303126, "notOver": 500000, "rate": 0.1243, "amountOver": 303126, "plus": 28491.22 },
+        { "over": 500000, "notOver": 505208, "rate": 0.1353, "amountOver": 500000, "plus": 52962.66 },
+        { "over": 505208, "notOver": null, "rate": 0.1463, "amountOver": 505208, "plus": 53667.3 }
+      ]
+    },
+    "Annual": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": [
+        { "over": 0, "notOver": 11079, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 11079, "notOver": 26264, "rate": 0.022, "amountOver": 11079, "plus": 121.87 },
+        { "over": 26264, "notOver": 41452, "rate": 0.044, "amountOver": 26264, "plus": 455.94 },
+        { "over": 41452, "notOver": 57542, "rate": 0.066, "amountOver": 41452, "plus": 1124.21 },
+        { "over": 57542, "notOver": 72724, "rate": 0.088, "amountOver": 57542, "plus": 2186.15 },
+        { "over": 72724, "notOver": 371479, "rate": 0.1023, "amountOver": 72724, "plus": 3522.17 },
+        { "over": 371479, "notOver": 445771, "rate": 0.1133, "amountOver": 371479, "plus": 34084.81 },
+        { "over": 445771, "notOver": 742953, "rate": 0.1243, "amountOver": 445771, "plus": 42502.09 },
+        { "over": 742953, "notOver": 1000000, "rate": 0.1353, "amountOver": 742953, "plus": 79441.81 },
+        { "over": 1000000, "notOver": null, "rate": 0.1463, "amountOver": 1000000, "plus": 114220.27 }
+      ],
+      "Married": [
+        { "over": 0, "notOver": 22158, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 22158, "notOver": 52528, "rate": 0.022, "amountOver": 22158, "plus": 243.74 },
+        { "over": 52528, "notOver": 82904, "rate": 0.044, "amountOver": 52528, "plus": 911.88 },
+        { "over": 82904, "notOver": 115084, "rate": 0.066, "amountOver": 82904, "plus": 2248.42 },
+        { "over": 115084, "notOver": 145448, "rate": 0.088, "amountOver": 115084, "plus": 4372.3 },
+        { "over": 145448, "notOver": 742958, "rate": 0.1023, "amountOver": 145448, "plus": 7044.33 },
+        { "over": 742958, "notOver": 891542, "rate": 0.1133, "amountOver": 742958, "plus": 68169.6 },
+        { "over": 891542, "notOver": 1000000, "rate": 0.1243, "amountOver": 891542, "plus": 85004.17 },
+        { "over": 1000000, "notOver": 1485906, "rate": 0.1353, "amountOver": 1000000, "plus": 98485.5 },
+        { "over": 1485906, "notOver": null, "rate": 0.1463, "amountOver": 1485906, "plus": 164228.58 }
+      ],
+      "UnmarriedHeadOfHousehold": [
+        { "over": 0, "notOver": 22173, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 22173, "notOver": 52530, "rate": 0.022, "amountOver": 22173, "plus": 243.9 },
+        { "over": 52530, "notOver": 67716, "rate": 0.044, "amountOver": 52530, "plus": 911.75 },
+        { "over": 67716, "notOver": 83805, "rate": 0.066, "amountOver": 67716, "plus": 1579.93 },
+        { "over": 83805, "notOver": 98990, "rate": 0.088, "amountOver": 83805, "plus": 2641.8 },
+        { "over": 98990, "notOver": 505208, "rate": 0.1023, "amountOver": 98990, "plus": 3978.08 },
+        { "over": 505208, "notOver": 606251, "rate": 0.1133, "amountOver": 505208, "plus": 45534.18 },
+        { "over": 606251, "notOver": 1000000, "rate": 0.1243, "amountOver": 606251, "plus": 56982.35 },
+        { "over": 1000000, "notOver": 1010417, "rate": 0.1353, "amountOver": 1000000, "plus": 105925.35 },
+        { "over": 1010417, "notOver": null, "rate": 0.1463, "amountOver": 1010417, "plus": 107334.77 }
+      ]
+    },
+    "DailyMiscellaneous": {
+      "SingleOrDualIncomeMarriedOrMultipleEmployers": [
+        { "over": 0, "notOver": 43, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 43, "notOver": 101, "rate": 0.022, "amountOver": 43, "plus": 0.47 },
+        { "over": 101, "notOver": 159, "rate": 0.044, "amountOver": 101, "plus": 1.75 },
+        { "over": 159, "notOver": 221, "rate": 0.066, "amountOver": 159, "plus": 4.3 },
+        { "over": 221, "notOver": 280, "rate": 0.088, "amountOver": 221, "plus": 8.39 },
+        { "over": 280, "notOver": 1429, "rate": 0.1023, "amountOver": 280, "plus": 13.58 },
+        { "over": 1429, "notOver": 1715, "rate": 0.1133, "amountOver": 1429, "plus": 131.12 },
+        { "over": 1715, "notOver": 2858, "rate": 0.1243, "amountOver": 1715, "plus": 163.52 },
+        { "over": 2858, "notOver": 3846, "rate": 0.1353, "amountOver": 2858, "plus": 305.59 },
+        { "over": 3846, "notOver": null, "rate": 0.1463, "amountOver": 3846, "plus": 439.27 }
+      ],
+      "Married": [
+        { "over": 0, "notOver": 86, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 86, "notOver": 202, "rate": 0.022, "amountOver": 86, "plus": 0.95 },
+        { "over": 202, "notOver": 318, "rate": 0.044, "amountOver": 202, "plus": 3.5 },
+        { "over": 318, "notOver": 442, "rate": 0.066, "amountOver": 318, "plus": 8.6 },
+        { "over": 442, "notOver": 560, "rate": 0.088, "amountOver": 442, "plus": 16.78 },
+        { "over": 560, "notOver": 2858, "rate": 0.1023, "amountOver": 560, "plus": 27.16 },
+        { "over": 2858, "notOver": 3430, "rate": 0.1133, "amountOver": 2858, "plus": 262.25 },
+        { "over": 3430, "notOver": 3846, "rate": 0.1243, "amountOver": 3430, "plus": 327.06 },
+        { "over": 3846, "notOver": 5715, "rate": 0.1353, "amountOver": 3846, "plus": 378.77 },
+        { "over": 5715, "notOver": null, "rate": 0.1463, "amountOver": 5715, "plus": 631.65 }
+      ],
+      "UnmarriedHeadOfHousehold": [
+        { "over": 0, "notOver": 85, "rate": 0.011, "amountOver": 0, "plus": 0.0 },
+        { "over": 85, "notOver": 202, "rate": 0.022, "amountOver": 85, "plus": 0.94 },
+        { "over": 202, "notOver": 260, "rate": 0.044, "amountOver": 202, "plus": 3.51 },
+        { "over": 260, "notOver": 322, "rate": 0.066, "amountOver": 260, "plus": 6.06 },
+        { "over": 322, "notOver": 381, "rate": 0.088, "amountOver": 322, "plus": 10.15 },
+        { "over": 381, "notOver": 1943, "rate": 0.1023, "amountOver": 381, "plus": 15.34 },
+        { "over": 1943, "notOver": 2332, "rate": 0.1133, "amountOver": 1943, "plus": 175.13 },
+        { "over": 2332, "notOver": 3846, "rate": 0.1243, "amountOver": 2332, "plus": 219.2 },
+        { "over": 3846, "notOver": 3886, "rate": 0.1353, "amountOver": 3846, "plus": 407.39 },
+        { "over": 3886, "notOver": null, "rate": 0.1463, "amountOver": 3886, "plus": 412.8 }
+      ]
+    }
+  },
+  "sourceTableMap": {
+    "lowIncomeExemptionThresholds": "Table1",
+    "standardDeductions": "Table3",
+    "taxRateTables": {
+      "Weekly": {
+        "SingleOrDualIncomeMarriedOrMultipleEmployers": "Table23",
+        "Married": "Table24",
+        "UnmarriedHeadOfHousehold": "Table25"
+      },
+      "Biweekly": {
+        "SingleOrDualIncomeMarriedOrMultipleEmployers": "Table26",
+        "Married": "Table27",
+        "UnmarriedHeadOfHousehold": "Table28"
+      },
+      "Semimonthly": {
+        "SingleOrDualIncomeMarriedOrMultipleEmployers": "Table17",
+        "Married": "Table18",
+        "UnmarriedHeadOfHousehold": "Table19"
+      },
+      "Monthly": {
+        "SingleOrDualIncomeMarriedOrMultipleEmployers": "Table20",
+        "Married": "Table21",
+        "UnmarriedHeadOfHousehold": "Table22"
+      },
+      "Quarterly": {
+        "SingleOrDualIncomeMarriedOrMultipleEmployers": "Table11",
+        "Married": "Table12",
+        "UnmarriedHeadOfHousehold": "Table13"
+      },
+      "Semiannual": {
+        "SingleOrDualIncomeMarriedOrMultipleEmployers": "Table14",
+        "Married": "Table15",
+        "UnmarriedHeadOfHousehold": "Table16"
+      },
+      "Annual": {
+        "SingleOrDualIncomeMarriedOrMultipleEmployers": "Table5",
+        "Married": "Table6",
+        "UnmarriedHeadOfHousehold": "Table7"
+      },
+      "DailyMiscellaneous": {
+        "SingleOrDualIncomeMarriedOrMultipleEmployers": "Table8",
+        "Married": "Table9",
+        "UnmarriedHeadOfHousehold": "Table10"
+      }
+    }
   }
 }
