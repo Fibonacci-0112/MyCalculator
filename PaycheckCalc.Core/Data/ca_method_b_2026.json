@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "name": "California EDD Method B Withholding Tables",
+    "year": 2026,
+    "method": "B",
+    "publication": "DE 44 / 26methb.pdf"
+  },
+  "lowIncomeExemption": {
+    "daily":       { "low": 73,    "high": 145  },
+    "weekly":      { "low": 363,   "high": 727  },
+    "biweekly":    { "low": 727,   "high": 1454 },
+    "semimonthly": { "low": 787,   "high": 1575 },
+    "monthly":     { "low": 1575,  "high": 3149 },
+    "quarterly":   { "low": 4725,  "high": 9448 },
+    "semiannual":  { "low": 9448,  "high": 18896 },
+    "annual":      { "low": 18896, "high": 37792 }
+  },
+  "estimatedDeductionPerAllowance": {
+    "daily": 4,
+    "weekly": 19,
+    "biweekly": 38,
+    "semimonthly": 42,
+    "monthly": 83,
+    "quarterly": 250,
+    "semiannual": 500,
+    "annual": 1000
+  },
+  "standardDeduction": {
+    "daily":       { "low": 22,   "high": 44   },
+    "weekly":      { "low": 110,  "high": 219  },
+    "biweekly":    { "low": 219,  "high": 439  },
+    "semimonthly": { "low": 238,  "high": 476  },
+    "monthly":     { "low": 476,  "high": 951  },
+    "quarterly":   { "low": 1427, "high": 2853 },
+    "semiannual":  { "low": 2853, "high": 5706 },
+    "annual":      { "low": 5706, "high": 11412 }
+  },
+  "exemptionAllowanceCreditPerAllowance": {
+    "daily": 0.65,
+    "weekly": 3.24,
+    "biweekly": 6.47,
+    "semimonthly": 7.01,
+    "monthly": 14.03,
+    "quarterly": 42.09,
+    "semiannual": 84.18,
+    "annual": 168.40
+  },
+  "annualBrackets": {
+    "single": [
+      { "over": 0,         "notOver": 11079,   "rate": 0.01  },
+      { "over": 11079,     "notOver": 26264,   "rate": 0.02  },
+      { "over": 26264,     "notOver": 41452,   "rate": 0.04  },
+      { "over": 41452,     "notOver": 57542,   "rate": 0.06  },
+      { "over": 57542,     "notOver": 72724,   "rate": 0.08  },
+      { "over": 72724,     "notOver": 371479,  "rate": 0.093 },
+      { "over": 371479,    "notOver": 445771,  "rate": 0.103 },
+      { "over": 445771,    "notOver": 742953,  "rate": 0.113 },
+      { "over": 742953,    "notOver": 1000000, "rate": 0.123 },
+      { "over": 1000000,   "notOver": null,    "rate": 0.133 }
+    ],
+    "married": [
+      { "over": 0,         "notOver": 22158,   "rate": 0.01  },
+      { "over": 22158,     "notOver": 52528,   "rate": 0.02  },
+      { "over": 52528,     "notOver": 82904,   "rate": 0.04  },
+      { "over": 82904,     "notOver": 115084,  "rate": 0.06  },
+      { "over": 115084,    "notOver": 145448,  "rate": 0.08  },
+      { "over": 145448,    "notOver": 742958,  "rate": 0.093 },
+      { "over": 742958,    "notOver": 891542,  "rate": 0.103 },
+      { "over": 891542,    "notOver": 1000000, "rate": 0.113 },
+      { "over": 1000000,   "notOver": 1485906, "rate": 0.123 },
+      { "over": 1485906,   "notOver": null,    "rate": 0.133 }
+    ],
+    "headOfHousehold": [
+      { "over": 0,         "notOver": 22158,   "rate": 0.01  },
+      { "over": 22158,     "notOver": 52528,   "rate": 0.02  },
+      { "over": 52528,     "notOver": 82904,   "rate": 0.04  },
+      { "over": 82904,     "notOver": 115084,  "rate": 0.06  },
+      { "over": 115084,    "notOver": 145448,  "rate": 0.08  },
+      { "over": 145448,    "notOver": 742958,  "rate": 0.093 },
+      { "over": 742958,    "notOver": 891542,  "rate": 0.103 },
+      { "over": 891542,    "notOver": 1000000, "rate": 0.113 },
+      { "over": 1000000,   "notOver": 1485906, "rate": 0.123 },
+      { "over": 1485906,   "notOver": null,    "rate": 0.133 }
+    ]
+  }
+}

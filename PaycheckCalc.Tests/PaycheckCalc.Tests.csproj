@@ -25,5 +25,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Link>ok_ow2_2026_percentage.json</Link>
     </None>
+    <None Include="..\PaycheckCalc.Core\Data\ca_method_b_2026.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>ca_method_b_2026.json</Link>
+    </None>
   </ItemGroup>
 </Project>

@@ -151,38 +151,7 @@ public static class StateTaxConfigs2026
                 ]
             },
 
-            [UsState.CA] = new()
-            {
-                StandardDeductionSingle = 5_706m,
-                StandardDeductionMarried = 11_412m,
-                AllowanceAmount = 1_000m,
-                BracketsSingle =
-                [
-                    B(0, 11_079m, 0.01m),
-                    B(11_079m, 26_264m, 0.02m),
-                    B(26_264m, 41_452m, 0.04m),
-                    B(41_452m, 57_542m, 0.06m),
-                    B(57_542m, 72_724m, 0.08m),
-                    B(72_724m, 371_479m, 0.093m),
-                    B(371_479m, 445_771m, 0.103m),
-                    B(445_771m, 742_953m, 0.113m),
-                    B(742_953m, 1_000_000m, 0.123m),
-                    B(1_000_000m, null, 0.133m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 22_158m, 0.01m),
-                    B(22_158m, 52_528m, 0.02m),
-                    B(52_528m, 82_904m, 0.04m),
-                    B(82_904m, 115_084m, 0.06m),
-                    B(115_084m, 145_448m, 0.08m),
-                    B(145_448m, 742_958m, 0.093m),
-                    B(742_958m, 891_542m, 0.103m),
-                    B(891_542m, 1_000_000m, 0.113m),
-                    B(1_000_000m, 1_485_906m, 0.123m),
-                    B(1_485_906m, null, 0.133m)
-                ]
-            },
+            // California — handled by CaliforniaWithholdingCalculator (Method B)
 
             [UsState.CT] = new()
             {

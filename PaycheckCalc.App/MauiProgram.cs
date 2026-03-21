@@ -6,6 +6,7 @@ using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Pay;
 using PaycheckCalc.Core.Tax.Fica;
 using PaycheckCalc.Core.Tax.Alabama;
+using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.Federal;
@@ -40,6 +41,14 @@ public static class MauiProgram
 
             return new Irs15TPercentageCalculator(json);
         });
+        builder.Services.AddSingleton<CaliforniaPercentageCalculator>(sp =>
+        {
+            using var stream = FileSystem.OpenAppPackageFileAsync("ca_method_b_2026.json").Result;
+            using var reader = new StreamReader(stream);
+            var json = reader.ReadToEnd();
+
+            return new CaliforniaPercentageCalculator(json);
+        });
 
         builder.Services.AddSingleton(new FicaCalculator());
 
@@ -50,6 +59,10 @@ public static class MauiProgram
 
             // Alabama — unique filing statuses, dependents, federal withholding
             registry.Register(new AlabamaWithholdingCalculator());
+
+            // California — Method B (EDD DE 44)
+            var caCalc = sp.GetRequiredService<CaliforniaPercentageCalculator>();
+            registry.Register(new CaliforniaWithholdingCalculator(caCalc));
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
