@@ -17,7 +17,8 @@ public sealed class DoughnutChartDrawable : IDrawable
         Color.FromArgb("#C62828"), // Federal Tax - red
         Color.FromArgb("#1565C0"), // Social Security Tax - blue
         Color.FromArgb("#6A1B9A"), // Medicare Tax - purple
-        Color.FromArgb("#EF6C00"), // State Tax - orange
+        Color.FromArgb("#EF6C00"), // State Income Tax - orange
+        Color.FromArgb("#F9A825"), // State Disability Insurance - amber
         Color.FromArgb("#2E7D32"), // Net Pay - green
     };
 
@@ -36,9 +37,11 @@ public sealed class DoughnutChartDrawable : IDrawable
         if (Result.MedicareWithholding + Result.AdditionalMedicareWithholding > 0)
             slices.Add(("Medicare Tax", (float)(Result.MedicareWithholding + Result.AdditionalMedicareWithholding), SliceColors[2]));
         if (Result.StateWithholding > 0)
-            slices.Add(("State Tax", (float)Result.StateWithholding, SliceColors[3]));
+            slices.Add(("State Income Tax", (float)Result.StateWithholding, SliceColors[3]));
+        if (Result.StateDisabilityInsurance > 0)
+            slices.Add(("State Disability Ins.", (float)Result.StateDisabilityInsurance, SliceColors[4]));
         if (Result.NetPay > 0)
-            slices.Add(("Net Pay", (float)Result.NetPay, SliceColors[4]));
+            slices.Add(("Net Pay", (float)Result.NetPay, SliceColors[5]));
 
         if (slices.Count == 0) return;
 

@@ -25,14 +25,14 @@ public class CaliforniaPercentageCalculatorTest
         // TI = $10,000 - $0 - $476 = $9,524
         // Step 4: Per-period brackets (Monthly Single Table 20):
         //   $9,524 falls in bracket over $6,060 @10.23%
-        //   Tax = $293.47 + 0.1023 × ($9,524 - $6,060) = $293.47 + $354.0972 = $647.5672
-        //   (using exact bracket: plus=293.47, amountOver=6060)
+        //   Tax = $293.47 + 0.1023 × ($9,524 - $6,060) = $293.47 + $354.3672 = $647.8372
+        //   Rounded down (floor) to $647.83
         // Step 5: Credit: 1 allowance → $14.03
-        // Withholding = $647.8372 - $14.03 = $633.8072 → $633.81
+        // Withholding = $647.83 - $14.03 = $633.80
         var result = calc.CalculateWithholding(10000m, PayFrequency.Monthly,
             CaliforniaFilingStatus.Single, regularAllowances: 1, estimatedDeductionAllowances: 0);
 
-        Assert.Equal(633.81m, result);
+        Assert.Equal(633.80m, result);
     }
 
     [Fact]
@@ -170,12 +170,13 @@ public class CaliforniaPercentageCalculatorTest
         // Step 4: Per-period brackets (Semimonthly Single Table 17):
         //   $4,637 falls in bracket over $3,030 @10.23%
         //   Tax = $146.74 + 0.1023 × ($4,637 - $3,030) = $146.74 + $164.3961 = $311.1361
+        //   Rounded down (floor) to $311.13
         // Step 5: Credit: 2 allowances semimonthly → $14.03
-        // Withholding = $311.1361 - $14.03 = $297.1061 → $297.11
+        // Withholding = $311.13 - $14.03 = $297.10
         var result = calc.CalculateWithholding(5000m, PayFrequency.Semimonthly,
             CaliforniaFilingStatus.Single, regularAllowances: 2, estimatedDeductionAllowances: 3);
 
-        Assert.Equal(297.11m, result);
+        Assert.Equal(297.10m, result);
     }
 
     [Fact]
@@ -206,11 +207,12 @@ public class CaliforniaPercentageCalculatorTest
         //   $99,524 falls in bracket over $83,334 @14.63%
         //   Tax = $9,518.45 + 0.1463 × ($99,524 - $83,334)
         //       = $9,518.45 + 0.1463 × $16,190 = $9,518.45 + $2,368.597 = $11,887.047
-        // Credit: 0 → Withholding = $11,887.047 → $11,887.05
+        //   Rounded down (floor) to $11,887.04
+        // Credit: 0 → Withholding = $11,887.04
         var result = calc.CalculateWithholding(100000m, PayFrequency.Monthly,
             CaliforniaFilingStatus.Single, regularAllowances: 0, estimatedDeductionAllowances: 0);
 
-        Assert.Equal(11887.05m, result);
+        Assert.Equal(11887.04m, result);
     }
 
     // ── WithholdingCalculator adapter tests ──────────────────────────
@@ -286,7 +288,8 @@ public class CaliforniaPercentageCalculatorTest
         var result = calc.Calculate(context, values);
 
         Assert.Equal(10000m, result.TaxableWages);
-        Assert.Equal(633.81m, result.Withholding);
+        Assert.Equal(633.80m, result.Withholding);
+        Assert.Equal(130.00m, result.DisabilityInsurance);
     }
 
     [Fact]
@@ -310,8 +313,9 @@ public class CaliforniaPercentageCalculatorTest
 
         var result = calc.Calculate(context, values);
 
-        // 633.81 + 25 = 658.81
-        Assert.Equal(658.81m, result.Withholding);
+        // 633.80 + 25 = 658.80
+        Assert.Equal(658.80m, result.Withholding);
+        Assert.Equal(130.00m, result.DisabilityInsurance);
     }
 
     [Fact]
@@ -339,7 +343,90 @@ public class CaliforniaPercentageCalculatorTest
         Assert.Equal(8000m, result.TaxableWages);
         // Gross for calc = $8,000, std ded = $476, TI = $7,524
         // Per-period brackets (Monthly Single): bracket over $6,060 @10.23%
-        // Tax = $293.47 + 0.1023 × ($7,524 - $6,060) = $293.47 + $149.7672 = $443.2372 → $443.24
-        Assert.Equal(443.24m, result.Withholding);
+        // Tax = $293.47 + 0.1023 × ($7,524 - $6,060) = $293.47 + $149.7672 = $443.2372
+        //   Rounded down (floor) to $443.23
+        Assert.Equal(443.23m, result.Withholding);
+        // SDI is 1.3% of ALL gross wages ($10,000), not reduced wages
+        Assert.Equal(130.00m, result.DisabilityInsurance);
+    }
+
+    [Fact]
+    public void WithholdingCalculator_Sdi_CalculatedOnAllGrossWages()
+    {
+        var inner = LoadCalculator();
+        var calc = new CaliforniaWithholdingCalculator(inner);
+
+        // SDI = 1.3% × $5,000 = $65.00
+        var context = new CommonWithholdingContext(
+            UsState.CA,
+            GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly,
+            Year: 2026);
+        var values = new StateInputValues
+        {
+            ["FilingStatus"] = "Single",
+            ["RegularAllowances"] = 0,
+            ["EstimatedDeductionAllowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
+
+        Assert.Equal(65.00m, result.DisabilityInsurance);
+    }
+
+    [Fact]
+    public void WithholdingCalculator_Sdi_ZeroGrossWages_ReturnsZero()
+    {
+        var inner = LoadCalculator();
+        var calc = new CaliforniaWithholdingCalculator(inner);
+
+        var context = new CommonWithholdingContext(
+            UsState.CA,
+            GrossWages: 0m,
+            PayPeriod: PayFrequency.Monthly,
+            Year: 2026);
+        var values = new StateInputValues
+        {
+            ["FilingStatus"] = "Single",
+            ["RegularAllowances"] = 0,
+            ["EstimatedDeductionAllowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
+
+        Assert.Equal(0m, result.DisabilityInsurance);
+        Assert.Equal(0m, result.Withholding);
+    }
+
+    [Fact]
+    public void WithholdingCalculator_Sdi_NotReducedByPreTaxDeductions()
+    {
+        var inner = LoadCalculator();
+        var calc = new CaliforniaWithholdingCalculator(inner);
+
+        // Gross = $10,000, pre-tax deductions = $3,000
+        // SDI should be 1.3% × $10,000 = $130 (ALL wages, not reduced by pre-tax)
+        var context = new CommonWithholdingContext(
+            UsState.CA,
+            GrossWages: 10000m,
+            PayPeriod: PayFrequency.Monthly,
+            Year: 2026,
+            PreTaxDeductionsReducingStateWages: 3000m);
+        var values = new StateInputValues
+        {
+            ["FilingStatus"] = "Single",
+            ["RegularAllowances"] = 0,
+            ["EstimatedDeductionAllowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
+
+        // SDI on full $10,000 gross
+        Assert.Equal(130.00m, result.DisabilityInsurance);
+        // Income tax on reduced $7,000 wages
+        Assert.Equal(7000m, result.TaxableWages);
     }
 }
