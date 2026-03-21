@@ -26,6 +26,7 @@ public partial class CalculatorViewModel : ObservableObject
         Frequency = PayFrequency.Biweekly;
         OvertimeMultiplier = 1.5m;
         SelectedState = UsState.OK;
+        SelectedStatePickerItem = StatePickerItems.FirstOrDefault(s => s.Value == SelectedState);
         SelectedFederalPickerItem = FederalStatuses[0];
 
         // Build initial dynamic state fields from schema
@@ -85,13 +86,28 @@ public partial class CalculatorViewModel : ObservableObject
 
     [ObservableProperty] public partial UsState SelectedState { get; set; }
 
+    [ObservableProperty]
+    public partial PickerItem<UsState>? SelectedStatePickerItem { get; set; }
+
+    partial void OnSelectedStatePickerItemChanged(PickerItem<UsState>? value)
+    {
+        if (value != null)
+            SelectedState = value.Value;
+    }
+
     /// <summary>
     /// Dynamic state input fields driven by the selected state's schema.
     /// The UI binds to this collection to render the appropriate controls.
     /// </summary>
     public ObservableCollection<StateFieldViewModel> StateFields { get; } = new();
 
-    partial void OnSelectedStateChanged(UsState value) => RebuildStateFields();
+    partial void OnSelectedStateChanged(UsState value)
+    {
+        // Keep the picker item in sync when SelectedState is set programmatically
+        if (SelectedStatePickerItem?.Value != value)
+            SelectedStatePickerItem = StatePickerItems.FirstOrDefault(s => s.Value == value);
+        RebuildStateFields();
+    }
 
     private void RebuildStateFields()
     {
@@ -170,6 +186,12 @@ public partial class CalculatorViewModel : ObservableObject
 
     public IReadOnlyList<PayFrequency> Frequencies { get; } = Enum.GetValues(typeof(PayFrequency)).Cast<PayFrequency>().ToList();
     public IReadOnlyList<UsState> SupportedStates => _stateRegistry.SupportedStates;
+
+    private IReadOnlyList<PickerItem<UsState>>? _statePickerItems;
+    public IReadOnlyList<PickerItem<UsState>> StatePickerItems =>
+        _statePickerItems ??= SupportedStates
+            .Select(s => new PickerItem<UsState>(s, EnumDisplay.UsStateName(s.ToString())))
+            .ToList();
 
     [RelayCommand]
     private void Calculate()
