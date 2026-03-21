@@ -17,22 +17,29 @@ public partial class CalculatorViewModel : ObservableObject
 {
     private readonly PayCalculator _calc;
     private readonly StateTaxCalculatorFactory _stateFactory;
+    private readonly StateCalculatorRegistry _stateRegistry;
+    private bool _isRebuildingFields;
 
-    public CalculatorViewModel(PayCalculator calc, StateTaxCalculatorFactory stateFactory)
+    public CalculatorViewModel(PayCalculator calc, StateTaxCalculatorFactory stateFactory, StateCalculatorRegistry stateRegistry)
     {
         _calc = calc;
         _stateFactory = stateFactory;
+        _stateRegistry = stateRegistry;
         Frequency = PayFrequency.Biweekly;
         FilingStatus = FilingStatus.Single;
         OvertimeMultiplier = 1.5m;
         SelectedState = UsState.OK;
         SelectedFederalPickerItem = FederalStatuses[0];
 
+        // Build initial dynamic state fields from schema
+        RebuildStateFields();
+
         // Auto-recalculate whenever any input property changes
         PropertyChanged += (s, e) =>
         {
             if (e.PropertyName != nameof(Result) && e.PropertyName != nameof(SelectedInputTab)
                 && !e.PropertyName!.StartsWith("IsTab")
+                && e.PropertyName != nameof(StateFields)
                 && e.PropertyName != nameof(SavedComparison)
                 && e.PropertyName != nameof(HasSavedComparison)
                 && e.PropertyName != nameof(HasNoSavedComparison)
@@ -83,6 +90,37 @@ public partial class CalculatorViewModel : ObservableObject
     [ObservableProperty] public partial UsState SelectedState { get; set; }
     [ObservableProperty] public partial int StateAllowances { get; set; }
     [ObservableProperty] public partial decimal StateAdditionalWithholding { get; set; }
+
+    /// <summary>
+    /// Dynamic state input fields driven by the selected state's schema.
+    /// The UI binds to this collection to render the appropriate controls.
+    /// </summary>
+    public ObservableCollection<StateFieldViewModel> StateFields { get; } = new();
+
+    partial void OnSelectedStateChanged(UsState value) => RebuildStateFields();
+
+    private void RebuildStateFields()
+    {
+        _isRebuildingFields = true;
+        try
+        {
+            StateFields.Clear();
+            if (_stateRegistry.IsSupported(SelectedState))
+            {
+                var calc = _stateRegistry.GetCalculator(SelectedState);
+                foreach (var field in calc.GetInputSchema())
+                    StateFields.Add(new StateFieldViewModel(field, () =>
+                    {
+                        if (!_isRebuildingFields)
+                            Calculate();
+                    }));
+            }
+        }
+        finally
+        {
+            _isRebuildingFields = false;
+        }
+    }
 
     [ObservableProperty] public partial decimal PretaxDeductions { get; set; }
     [ObservableProperty] public partial decimal PosttaxDeductions { get; set; }
@@ -139,11 +177,16 @@ public partial class CalculatorViewModel : ObservableObject
 
     public IReadOnlyList<PayFrequency> Frequencies { get; } = Enum.GetValues(typeof(PayFrequency)).Cast<PayFrequency>().ToList();
     public IReadOnlyList<FilingStatus> Statuses { get; } = Enum.GetValues(typeof(FilingStatus)).Cast<FilingStatus>().ToList();
-    public IReadOnlyList<UsState> SupportedStates => _stateFactory.SupportedStates;
+    public IReadOnlyList<UsState> SupportedStates => _stateRegistry.SupportedStates;
 
     [RelayCommand]
     private void Calculate()
     {
+        // Build dynamic state input values from the schema-driven fields
+        var stateValues = new StateInputValues();
+        foreach (var field in StateFields)
+            stateValues[field.Key] = field.GetResolvedValue();
+
         var input = new PaycheckInput
         {
             Frequency = Frequency,
@@ -155,6 +198,7 @@ public partial class CalculatorViewModel : ObservableObject
             State = SelectedState,
             StateAllowances = StateAllowances,
             StateAdditionalWithholding = StateAdditionalWithholding,
+            StateInputValues = stateValues,
             FederalW4 = new FederalW4Input
             {
                     FilingStatus = FederalFilingStatus,
