@@ -85,8 +85,7 @@ public sealed class CaliforniaWithholdingCalculator : IStateWithholdingCalculato
             estimatedDeductionAllowances);
 
         // California SDI: 1.3% of ALL gross wages (no wage cap)
-        var sdiWages = Math.Max(0m, context.GrossWages);
-        var sdi = Math.Round(sdiWages * SdiRate, 2, MidpointRounding.AwayFromZero);
+        var sdi = Math.Round(Math.Max(0m, context.GrossWages) * SdiRate, 2, MidpointRounding.AwayFromZero);
 
         return new StateWithholdingResult
         {
