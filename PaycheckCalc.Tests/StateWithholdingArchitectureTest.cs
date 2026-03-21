@@ -285,20 +285,18 @@ public class AlabamaWithholdingCalculatorTest
     }
 
     [Fact]
-    public void Schema_HasFourFields()
+    public void Schema_HasThreeFields()
     {
         var calc = new AlabamaWithholdingCalculator();
         var schema = calc.GetInputSchema();
 
-        Assert.Equal(4, schema.Count);
+        Assert.Equal(3, schema.Count);
         Assert.Equal("FilingStatus", schema[0].Key);
         Assert.Equal(StateFieldType.Picker, schema[0].FieldType);
         Assert.Equal(5, schema[0].Options!.Count); // 0, Single, MFJ, MFS, HoF
         Assert.Equal("Dependents", schema[1].Key);
         Assert.Equal(StateFieldType.Integer, schema[1].FieldType);
-        Assert.Equal("FederalWithholding", schema[2].Key);
-        Assert.Equal(StateFieldType.Decimal, schema[2].FieldType);
-        Assert.Equal("AdditionalWithholding", schema[3].Key);
+        Assert.Equal("AdditionalWithholding", schema[2].Key);
     }
 
     [Fact]
@@ -321,12 +319,12 @@ public class AlabamaWithholdingCalculatorTest
     public void SingleFiling_ProducesPositiveWithholding()
     {
         var calc = new AlabamaWithholdingCalculator();
-        var context = new CommonWithholdingContext(UsState.AL, 3000m, PayFrequency.Biweekly, 2026);
+        var context = new CommonWithholdingContext(UsState.AL, 3000m, PayFrequency.Biweekly, 2026,
+            FederalWithholdingPerPeriod: 200m);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
             ["Dependents"] = 0,
-            ["FederalWithholding"] = 200m,
             ["AdditionalWithholding"] = 0m
         };
 
@@ -345,7 +343,6 @@ public class AlabamaWithholdingCalculatorTest
         {
             ["FilingStatus"] = "0",
             ["Dependents"] = 0,
-            ["FederalWithholding"] = 0m,
             ["AdditionalWithholding"] = 0m
         };
 
@@ -364,7 +361,6 @@ public class AlabamaWithholdingCalculatorTest
         {
             ["FilingStatus"] = "Married Filing Jointly",
             ["Dependents"] = 0,
-            ["FederalWithholding"] = 0m,
             ["AdditionalWithholding"] = 0m
         });
 
@@ -372,7 +368,6 @@ public class AlabamaWithholdingCalculatorTest
         {
             ["FilingStatus"] = "Married Filing Jointly",
             ["Dependents"] = 3,
-            ["FederalWithholding"] = 0m,
             ["AdditionalWithholding"] = 0m
         });
 
@@ -389,14 +384,12 @@ public class AlabamaWithholdingCalculatorTest
         {
             ["FilingStatus"] = "Single",
             ["Dependents"] = 0,
-            ["FederalWithholding"] = 0m,
             ["AdditionalWithholding"] = 0m
         };
         var extraValues = new StateInputValues
         {
             ["FilingStatus"] = "Single",
             ["Dependents"] = 0,
-            ["FederalWithholding"] = 0m,
             ["AdditionalWithholding"] = 25m
         };
 
@@ -419,16 +412,44 @@ public class AlabamaWithholdingCalculatorTest
             {
                 ["FilingStatus"] = status,
                 ["Dependents"] = 0,
-                ["FederalWithholding"] = 0m,
                 ["AdditionalWithholding"] = 0m
             });
             Assert.True(result.TaxableWages >= 0m, $"Alabama {status}: taxable wages should be >= 0");
             Assert.True(result.Withholding >= 0m, $"Alabama {status}: withholding should be >= 0");
         }
     }
-}
+    [Fact]
+    public void FederalWithholding_ReadFromContext_ReducesStateTax()
+    {
+        var calc = new AlabamaWithholdingCalculator();
+        var values = new StateInputValues
+        {
+            ["FilingStatus"] = "Single",
+            ["Dependents"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
 
-// ─── OklahomaWithholdingCalculator Tests ────────────────────────────────
+        var contextNoFed = new CommonWithholdingContext(UsState.AL, 3000m, PayFrequency.Biweekly, 2026,
+            FederalWithholdingPerPeriod: 0m);
+        var contextWithFed = new CommonWithholdingContext(UsState.AL, 3000m, PayFrequency.Biweekly, 2026,
+            FederalWithholdingPerPeriod: 200m);
+
+        var resultNoFed = calc.Calculate(contextNoFed, values);
+        var resultWithFed = calc.Calculate(contextWithFed, values);
+
+        Assert.True(resultWithFed.Withholding < resultNoFed.Withholding,
+            "Federal withholding passed via context should reduce Alabama state tax");
+    }
+
+    [Fact]
+    public void Schema_DoesNotIncludeFederalWithholding()
+    {
+        var calc = new AlabamaWithholdingCalculator();
+        var schema = calc.GetInputSchema();
+
+        Assert.DoesNotContain(schema, f => f.Key == "FederalWithholding");
+    }
+}
 
 public class OklahomaWithholdingCalculatorTest
 {
@@ -601,8 +622,9 @@ public class FullRegistryIntegrationTest
         var alSchema = registry.GetCalculator(UsState.AL).GetInputSchema();
         var okSchema = registry.GetCalculator(UsState.OK).GetInputSchema();
 
-        // Alabama has 4 fields (FilingStatus with 5 options, Dependents, FederalWithholding, AdditionalWithholding)
-        Assert.Equal(4, alSchema.Count);
+        // Alabama has 3 fields (FilingStatus with 5 options, Dependents, AdditionalWithholding)
+        // FederalWithholding is passed via CommonWithholdingContext, not shown in the UI schema
+        Assert.Equal(3, alSchema.Count);
         Assert.Equal(5, alSchema[0].Options!.Count);
 
         // Oklahoma has 3 fields (FilingStatus with 2 options, Allowances, AdditionalWithholding)

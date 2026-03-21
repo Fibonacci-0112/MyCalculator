@@ -28,5 +28,12 @@ public sealed record CommonWithholdingContext
     /// Sum of pre-tax deductions that reduce state taxable wages
     /// (e.g., 401k, health insurance, HSA).
     /// </summary>
-    decimal PreTaxDeductionsReducingStateWages = 0m
+    decimal PreTaxDeductionsReducingStateWages = 0m,
+
+    /// <summary>
+    /// Federal income tax withholding for the current pay period,
+    /// computed before state tax. States like Alabama deduct this
+    /// from gross income when calculating state taxable wages.
+    /// </summary>
+    decimal FederalWithholdingPerPeriod = 0m
 );
