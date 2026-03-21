@@ -7,12 +7,12 @@ namespace PaycheckCalc.Core.Tax.California;
 /// Calculates California state income tax withholding using Method B
 /// from EDD Publication DE 44 (26methb.pdf).
 /// <para>
-/// Algorithm (Method B):
+/// Algorithm (Method B) — per-period calculation:
 /// 1. Low-income exemption test (Table 1): if gross pay ≤ threshold, withhold $0.
-/// 2. Estimated deduction adjustment (Table 2): subtract estimated-deduction allowances × per-period amount.
+/// 2. Estimated deduction adjustment (Table 2): subtract estimated-deduction allowance amount.
 /// 3. Standard deduction subtraction (Table 3): subtract standard deduction for filing status and pay period.
-/// 4. Compute tax on taxable income using graduated brackets for the filing status.
-/// 5. Subtract exemption allowance credit (Table 4): regular allowances × per-period credit.
+/// 4. Compute tax on taxable income using per-period graduated brackets for the filing status.
+/// 5. Subtract exemption allowance credit (Table 4): look up credit from table.
 /// 6. Withholding = max(0, computed tax − exemption credit), rounded to 2 decimal places.
 /// </para>
 /// </summary>
@@ -45,89 +45,83 @@ public sealed class CaliforniaPercentageCalculator
     {
         if (grossPay <= 0m) return 0m;
 
-        var freqKey = FrequencyKey(frequency);
-        int periods = GetPayPeriods(frequency);
-
-        // Determine whether to use the "high" threshold/deduction
-        // High applies to: Head of Household always, or Married with 2+ regular allowances
-        bool useHigh = filingStatus == CaliforniaFilingStatus.HeadOfHousehold
-                    || (filingStatus == CaliforniaFilingStatus.Married && regularAllowances >= 2);
+        var periodKey = PeriodKey(frequency);
+        var thresholdStatusKey = GetThresholdStatusKey(filingStatus, regularAllowances);
+        var rateTableStatusKey = GetRateTableStatusKey(filingStatus);
 
         // Step 1: Low-income exemption test (Table 1)
-        var exemption = _data.LowIncomeExemption[freqKey];
-        decimal threshold = useHigh ? exemption.High : exemption.Low;
+        decimal threshold = _data.LowIncomeExemptionThresholds[periodKey][thresholdStatusKey];
         if (grossPay <= threshold) return 0m;
 
         // Step 2: Estimated deduction adjustment (Table 2)
-        decimal deductionPerAllowance = _data.EstimatedDeductionPerAllowance[freqKey];
-        decimal estimatedDeduction = estimatedDeductionAllowances * deductionPerAllowance;
+        decimal estimatedDeduction = _data.EstimatedDeductionAllowances.GetAmount(periodKey, estimatedDeductionAllowances);
 
         // Step 3: Standard deduction subtraction (Table 3)
-        var stdDed = _data.StandardDeduction[freqKey];
-        decimal standardDeduction = useHigh ? stdDed.High : stdDed.Low;
+        decimal standardDeduction = _data.StandardDeductions[periodKey][thresholdStatusKey];
 
         decimal taxableIncome = Math.Max(0m, grossPay - estimatedDeduction - standardDeduction);
         if (taxableIncome <= 0m) return 0m;
 
-        // Step 4: Compute tax using annualize/de-annualize approach
-        decimal annualTaxable = taxableIncome * periods;
-        var brackets = GetBrackets(filingStatus);
-        decimal annualTax = ComputeTaxFromBrackets(annualTaxable, brackets);
-        decimal perPeriodTax = annualTax / periods;
+        // Step 4: Compute tax using per-period brackets directly
+        var brackets = _data.TaxRateTables[periodKey][rateTableStatusKey];
+        decimal tax = ComputeTaxFromBrackets(taxableIncome, brackets);
 
         // Step 5: Subtract exemption allowance credit (Table 4)
-        decimal creditPerAllowance = _data.ExemptionAllowanceCreditPerAllowance[freqKey];
-        decimal exemptionCredit = regularAllowances * creditPerAllowance;
+        decimal exemptionCredit = _data.ExemptionAllowanceCredits.GetAmount(periodKey, regularAllowances);
 
-        decimal withholding = Math.Max(0m, perPeriodTax - exemptionCredit);
+        decimal withholding = Math.Max(0m, tax - exemptionCredit);
 
         return Math.Round(withholding, 2, MidpointRounding.AwayFromZero);
     }
 
-    private IReadOnlyList<CaliforniaBracket> GetBrackets(CaliforniaFilingStatus status) => status switch
-    {
-        CaliforniaFilingStatus.Single => _data.AnnualBrackets.Single,
-        CaliforniaFilingStatus.Married => _data.AnnualBrackets.Married,
-        CaliforniaFilingStatus.HeadOfHousehold => _data.AnnualBrackets.HeadOfHousehold,
-        _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Unsupported filing status")
-    };
-
     private static decimal ComputeTaxFromBrackets(decimal taxableIncome, IReadOnlyList<CaliforniaBracket> brackets)
     {
-        decimal tax = 0m;
-        foreach (var bracket in brackets)
+        for (int i = brackets.Count - 1; i >= 0; i--)
         {
-            if (taxableIncome <= bracket.Over) break;
-            decimal ceiling = bracket.NotOver ?? decimal.MaxValue;
-            decimal taxableInBracket = Math.Min(taxableIncome, ceiling) - bracket.Over;
-            tax += taxableInBracket * bracket.Rate;
+            var bracket = brackets[i];
+            if (taxableIncome > bracket.Over)
+                return bracket.Plus + bracket.Rate * (taxableIncome - bracket.AmountOver);
         }
-        return tax;
+        return 0m;
     }
 
-    private static string FrequencyKey(PayFrequency frequency) => frequency switch
-    {
-        PayFrequency.Daily => "daily",
-        PayFrequency.Weekly => "weekly",
-        PayFrequency.Biweekly => "biweekly",
-        PayFrequency.Semimonthly => "semimonthly",
-        PayFrequency.Monthly => "monthly",
-        PayFrequency.Quarterly => "quarterly",
-        PayFrequency.Semiannual => "semiannual",
-        PayFrequency.Annual => "annual",
-        _ => throw new ArgumentOutOfRangeException(nameof(frequency), frequency, "Unsupported pay frequency")
-    };
+    /// <summary>
+    /// Determines the threshold/deduction status key based on filing status and regular allowances.
+    /// Four categories per Table 1 and Table 3 of the PDF.
+    /// </summary>
+    private static string GetThresholdStatusKey(CaliforniaFilingStatus filingStatus, int regularAllowances) =>
+        filingStatus switch
+        {
+            CaliforniaFilingStatus.Single => "SingleOrDualIncomeMarriedOrMultipleEmployers",
+            CaliforniaFilingStatus.HeadOfHousehold => "UnmarriedHeadOfHousehold",
+            CaliforniaFilingStatus.Married when regularAllowances >= 2 => "MarriedTwoOrMoreAllowances",
+            CaliforniaFilingStatus.Married => "MarriedZeroOrOneAllowance",
+            _ => throw new ArgumentOutOfRangeException(nameof(filingStatus), filingStatus, "Unsupported filing status")
+        };
 
-    private static int GetPayPeriods(PayFrequency frequency) => frequency switch
+    /// <summary>
+    /// Determines the rate table status key based on filing status.
+    /// Three categories per Tables 5–28 of the PDF.
+    /// </summary>
+    private static string GetRateTableStatusKey(CaliforniaFilingStatus filingStatus) =>
+        filingStatus switch
+        {
+            CaliforniaFilingStatus.Single => "SingleOrDualIncomeMarriedOrMultipleEmployers",
+            CaliforniaFilingStatus.Married => "Married",
+            CaliforniaFilingStatus.HeadOfHousehold => "UnmarriedHeadOfHousehold",
+            _ => throw new ArgumentOutOfRangeException(nameof(filingStatus), filingStatus, "Unsupported filing status")
+        };
+
+    private static string PeriodKey(PayFrequency frequency) => frequency switch
     {
-        PayFrequency.Daily => 260,
-        PayFrequency.Weekly => 52,
-        PayFrequency.Biweekly => 26,
-        PayFrequency.Semimonthly => 24,
-        PayFrequency.Monthly => 12,
-        PayFrequency.Quarterly => 4,
-        PayFrequency.Semiannual => 2,
-        PayFrequency.Annual => 1,
+        PayFrequency.Daily => "DailyMiscellaneous",
+        PayFrequency.Weekly => "Weekly",
+        PayFrequency.Biweekly => "Biweekly",
+        PayFrequency.Semimonthly => "Semimonthly",
+        PayFrequency.Monthly => "Monthly",
+        PayFrequency.Quarterly => "Quarterly",
+        PayFrequency.Semiannual => "Semiannual",
+        PayFrequency.Annual => "Annual",
         _ => throw new ArgumentOutOfRangeException(nameof(frequency), frequency, "Unsupported pay frequency")
     };
 }
