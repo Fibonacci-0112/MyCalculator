@@ -289,30 +289,67 @@
                 <Border BackgroundColor="White" StrokeThickness="0"
                         StrokeShape="RoundRectangle 12" Padding="16"
                         IsVisible="{Binding IsTab3Visible}">
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto"
-                          ColumnSpacing="12" RowSpacing="14">
-                        <Label Text="Pre-tax Deductions" Grid.Row="0" Grid.Column="0"
-                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
-                        <Entry Text="{Binding PretaxDeductions}" Keyboard="Numeric" Grid.Row="0" Grid.Column="1"
-                               TextColor="Black" BackgroundColor="#EEF2FF">
-                            <Entry.Behaviors>
-                                <behaviors:DecimalFormatBehavior IsCurrency="True" />
-                            </Entry.Behaviors>
-                        </Entry>
-                        <Label Text="Post-tax Deductions" Grid.Row="1" Grid.Column="0"
-                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
-                        <Entry Text="{Binding PosttaxDeductions}" Keyboard="Numeric" Grid.Row="1" Grid.Column="1"
-                               TextColor="Black" BackgroundColor="#EEF2FF">
-                            <Entry.Behaviors>
-                                <behaviors:DecimalFormatBehavior IsCurrency="True" />
-                            </Entry.Behaviors>
-                        </Entry>
+                    <VerticalStackLayout Spacing="10">
+
+                        <!-- Deduction items list -->
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Deductions}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BackgroundColor="#F8FAFF" StrokeThickness="1" Stroke="#E0E0E0"
+                                            StrokeShape="RoundRectangle 8" Padding="12">
+                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto"
+                                              RowSpacing="8" ColumnSpacing="8">
+                                            <!-- Name -->
+                                            <Entry Grid.Row="0" Grid.Column="0" Placeholder="Name (e.g. 401k)"
+                                                   Text="{Binding Name}" TextColor="Black" BackgroundColor="#EEF2FF"
+                                                   FontSize="14" />
+                                            <!-- Remove button -->
+                                            <Button Grid.Row="0" Grid.Column="1" Text="✕"
+                                                    FontSize="14" Padding="6,2"
+                                                    BackgroundColor="#EF5350" TextColor="White" CornerRadius="4"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveDeductionCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            <!-- Amount -->
+                                            <Grid Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="8">
+                                                <Label Text="Amount" TextColor="#37474F" FontSize="13"
+                                                       VerticalTextAlignment="Center" />
+                                                <Entry Grid.Column="1" Text="{Binding Amount}" Keyboard="Numeric"
+                                                       TextColor="Black" BackgroundColor="#EEF2FF" FontSize="14">
+                                                    <Entry.Behaviors>
+                                                        <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                                    </Entry.Behaviors>
+                                                </Entry>
+                                            </Grid>
+                                            <!-- Type picker -->
+                                            <Grid Grid.Row="2" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="8">
+                                                <Label Text="Type" TextColor="#37474F" FontSize="13"
+                                                       VerticalTextAlignment="Center" />
+                                                <Picker Grid.Column="1" ItemsSource="{Binding DeductionTypes}"
+                                                        SelectedItem="{Binding Type}" TextColor="Black" />
+                                            </Grid>
+                                            <!-- ReducesStateTaxableWages toggle -->
+                                            <Grid Grid.Row="3" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <Label Text="Reduces State Taxable Wages" TextColor="#37474F" FontSize="13"
+                                                       VerticalTextAlignment="Center" />
+                                                <Switch Grid.Column="1" IsToggled="{Binding ReducesStateTaxableWages}"
+                                                        OnColor="#1565C0" />
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+
+                        <!-- Add Deduction button -->
+                        <Button Text="+ Add Deduction" Command="{Binding AddDeductionCommand}"
+                                BackgroundColor="#E3F2FD" TextColor="#1565C0"
+                                FontAttributes="Bold" CornerRadius="8" />
+
                         <Button Text="Calculate" Command="{Binding CalculateCommand}"
-                                Grid.Row="2" Grid.ColumnSpan="2"
                                 BackgroundColor="#1565C0" TextColor="White"
                                 FontAttributes="Bold" CornerRadius="8"
                                 Margin="0,6,0,0" />
-                    </Grid>
+                    </VerticalStackLayout>
                 </Border>
 
             </VerticalStackLayout>

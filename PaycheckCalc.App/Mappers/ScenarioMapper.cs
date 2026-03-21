@@ -19,8 +19,8 @@ public static class ScenarioMapper
             OvertimeHours = vm.OvertimeHours,
             OvertimeMultiplier = vm.OvertimeMultiplier,
             State = vm.SelectedState,
-            PretaxDeductions = vm.PretaxDeductions,
-            PosttaxDeductions = vm.PosttaxDeductions,
+            PretaxDeductions = vm.TotalPretaxDeductions,
+            PosttaxDeductions = vm.TotalPosttaxDeductions,
             ResultCard = vm.ResultCard
         };
     }
