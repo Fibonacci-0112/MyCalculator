@@ -237,7 +237,7 @@
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                             <Label Text="State" Grid.Column="0"
                                    VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
-                            <Picker ItemsSource="{Binding SupportedStates}" SelectedItem="{Binding SelectedState}"
+                            <Picker ItemsSource="{Binding StatePickerItems}" SelectedItem="{Binding SelectedStatePickerItem}"
                                     Grid.Column="1" TextColor="Black" />
                         </Grid>
 

@@ -26,6 +26,7 @@ public partial class CalculatorViewModel : ObservableObject
         Frequency = PayFrequency.Biweekly;
         OvertimeMultiplier = 1.5m;
         SelectedState = UsState.OK;
+        SelectedStatePickerItem = StatePickerItems.FirstOrDefault(s => s.Value == SelectedState);
         SelectedFederalPickerItem = FederalStatuses[0];
 
         // Build initial dynamic state fields from schema
@@ -84,6 +85,15 @@ public partial class CalculatorViewModel : ObservableObject
     [ObservableProperty] public partial decimal OvertimeMultiplier { get; set; }
 
     [ObservableProperty] public partial UsState SelectedState { get; set; }
+
+    [ObservableProperty]
+    public partial PickerItem<UsState>? SelectedStatePickerItem { get; set; }
+
+    partial void OnSelectedStatePickerItemChanged(PickerItem<UsState>? value)
+    {
+        if (value != null)
+            SelectedState = value.Value;
+    }
 
     /// <summary>
     /// Dynamic state input fields driven by the selected state's schema.
@@ -170,6 +180,12 @@ public partial class CalculatorViewModel : ObservableObject
 
     public IReadOnlyList<PayFrequency> Frequencies { get; } = Enum.GetValues(typeof(PayFrequency)).Cast<PayFrequency>().ToList();
     public IReadOnlyList<UsState> SupportedStates => _stateRegistry.SupportedStates;
+
+    private IReadOnlyList<PickerItem<UsState>>? _statePickerItems;
+    public IReadOnlyList<PickerItem<UsState>> StatePickerItems =>
+        _statePickerItems ??= SupportedStates
+            .Select(s => new PickerItem<UsState>(s, EnumDisplay.UsStateName(s.ToString())))
+            .ToList();
 
     [RelayCommand]
     private void Calculate()
