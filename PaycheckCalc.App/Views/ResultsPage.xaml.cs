@@ -33,13 +33,13 @@ public partial class ResultsPage : ContentPage
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(CalculatorViewModel.Result))
+        if (e.PropertyName == nameof(CalculatorViewModel.ResultCard))
             UpdateChart();
     }
 
     private void UpdateChart()
     {
-        _chartDrawable.Result = _vm.Result;
+        _chartDrawable.Result = _vm.ResultCard;
         DoughnutChart.Invalidate();
     }
 }

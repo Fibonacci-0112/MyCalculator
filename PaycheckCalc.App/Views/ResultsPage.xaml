@@ -32,7 +32,7 @@
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
                             <Label Text="Gross Pay" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
-                            <Label Text="{Binding Result.GrossPay, StringFormat='{0:C}'}"
+                            <Label Text="{Binding ResultCard.GrossPay, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#37474F" FontAttributes="Bold"
                                    FontSize="16" VerticalTextAlignment="Center" />
@@ -41,7 +41,7 @@
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
                             <Label Text="Federal Taxable Income" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
-                            <Label Text="{Binding Result.FederalTaxableIncome, StringFormat='{0:C}'}"
+                            <Label Text="{Binding ResultCard.FederalTaxableIncome, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#37474F" FontAttributes="Bold"
                                    FontSize="15" VerticalTextAlignment="Center" />
@@ -50,7 +50,7 @@
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
                             <Label Text="State Taxable Income" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
-                            <Label Text="{Binding Result.StateTaxableWages, StringFormat='{0:C}'}"
+                            <Label Text="{Binding ResultCard.StateTaxableWages, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#37474F" FontAttributes="Bold"
                                    FontSize="15" VerticalTextAlignment="Center" />
@@ -71,7 +71,7 @@
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
                             <Label Text="Federal Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
-                            <Label Text="{Binding Result.FederalWithholding, StringFormat='{0:C}'}"
+                            <Label Text="{Binding ResultCard.FederalWithholding, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#C62828" FontAttributes="Bold"
                                    FontSize="15" VerticalTextAlignment="Center" />
@@ -80,7 +80,7 @@
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
                             <Label Text="Social Security Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
-                            <Label Text="{Binding Result.SocialSecurityWithholding, StringFormat='{0:C}'}"
+                            <Label Text="{Binding ResultCard.SocialSecurityWithholding, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#C62828" FontAttributes="Bold"
                                    FontSize="15" VerticalTextAlignment="Center" />
@@ -89,7 +89,7 @@
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
                             <Label Text="Medicare Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
-                            <Label Text="{Binding Result.MedicareWithholding, StringFormat='{0:C}'}"
+                            <Label Text="{Binding ResultCard.MedicareWithholding, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#C62828" FontAttributes="Bold"
                                    FontSize="15" VerticalTextAlignment="Center" />
@@ -98,19 +98,19 @@
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
                             <Label Text="State Income Tax" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
-                            <Label Text="{Binding Result.StateWithholding, StringFormat='{0:C}'}"
+                            <Label Text="{Binding ResultCard.StateWithholding, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#C62828" FontAttributes="Bold"
                                    FontSize="15" VerticalTextAlignment="Center" />
                         </Grid>
 
                         <BoxView HeightRequest="1" Color="#F0F0F0"
-                                 IsVisible="{Binding Result.StateDisabilityInsurance, Converter={StaticResource GreaterThanZeroConverter}}" />
+                                 IsVisible="{Binding ResultCard.StateDisabilityInsurance, Converter={StaticResource GreaterThanZeroConverter}}" />
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10"
-                              IsVisible="{Binding Result.StateDisabilityInsurance, Converter={StaticResource GreaterThanZeroConverter}}">
+                              IsVisible="{Binding ResultCard.StateDisabilityInsurance, Converter={StaticResource GreaterThanZeroConverter}}">
                             <Label Text="State Disability Insurance" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
-                            <Label Text="{Binding Result.StateDisabilityInsurance, StringFormat='{0:C}'}"
+                            <Label Text="{Binding ResultCard.StateDisabilityInsurance, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#C62828" FontAttributes="Bold"
                                    FontSize="15" VerticalTextAlignment="Center" />
@@ -126,7 +126,7 @@
                         <Label Text="NET PAY" TextColor="#A5D6A7"
                                FontSize="12" FontAttributes="Bold"
                                HorizontalTextAlignment="Center" />
-                        <Label Text="{Binding Result.NetPay, StringFormat='{0:C}'}"
+                        <Label Text="{Binding ResultCard.NetPay, StringFormat='{0:C}'}"
                                TextColor="White" FontAttributes="Bold" FontSize="36"
                                HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>

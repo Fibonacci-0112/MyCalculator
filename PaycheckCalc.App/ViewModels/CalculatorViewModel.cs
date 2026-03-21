@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using PaycheckCalc.App.Helpers; 
+using PaycheckCalc.App.Helpers;
+using PaycheckCalc.App.Mappers;
+using PaycheckCalc.App.Models;
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Pay;
 using PaycheckCalc.Core.Tax.Federal;
@@ -119,22 +121,28 @@ public partial class CalculatorViewModel : ObservableObject
     [ObservableProperty] public partial decimal FederalStep4aOtherIncome { get; set; }
     [ObservableProperty] public partial decimal FederalStep4bDeductions { get; set; }
     [ObservableProperty] public partial decimal FederalStep4cExtraWithholding { get; set; }
-    [ObservableProperty] public partial PaycheckCalc.Core.Models.PaycheckResult? Result { get; set; }
+    /// <summary>
+    /// Presentation-ready result card for the UI — never the raw domain PaycheckResult.
+    /// </summary>
+    [ObservableProperty] public partial ResultCardModel? ResultCard { get; set; }
 
-    partial void OnResultChanged(PaycheckCalc.Core.Models.PaycheckResult? value)
+    partial void OnResultCardChanged(ResultCardModel? value)
     {
         OnPropertyChanged(nameof(NetPayDifference));
     }
 
-    [ObservableProperty] public partial ComparisonSnapshot? SavedComparison { get; set; }
+    /// <summary>
+    /// Saved scenario snapshot for side-by-side comparison.
+    /// </summary>
+    [ObservableProperty] public partial ScenarioSnapshot? SavedScenario { get; set; }
 
-    public bool HasSavedComparison => SavedComparison is not null;
-    public bool HasNoSavedComparison => SavedComparison is null;
+    public bool HasSavedComparison => SavedScenario is not null;
+    public bool HasNoSavedComparison => SavedScenario is null;
 
     public decimal NetPayDifference =>
-        (Result?.NetPay ?? 0m) - (SavedComparison?.Result?.NetPay ?? 0m);
+        (ResultCard?.NetPay ?? 0m) - (SavedScenario?.ResultCard?.NetPay ?? 0m);
 
-    partial void OnSavedComparisonChanged(ComparisonSnapshot? value)
+    partial void OnSavedScenarioChanged(ScenarioSnapshot? value)
     {
         OnPropertyChanged(nameof(HasSavedComparison));
         OnPropertyChanged(nameof(HasNoSavedComparison));
@@ -144,18 +152,7 @@ public partial class CalculatorViewModel : ObservableObject
     [RelayCommand]
     private void SaveForCompare()
     {
-        SavedComparison = new ComparisonSnapshot
-        {
-            Frequency = Frequency,
-            HourlyRate = HourlyRate,
-            RegularHours = RegularHours,
-            OvertimeHours = OvertimeHours,
-            OvertimeMultiplier = OvertimeMultiplier,
-            State = SelectedState,
-            PretaxDeductions = PretaxDeductions,
-            PosttaxDeductions = PosttaxDeductions,
-            Result = Result
-        };
+        SavedScenario = ScenarioMapper.Capture(this);
     }
 
     public IReadOnlyList<PayFrequency> Frequencies { get; } = Enum.GetValues(typeof(PayFrequency)).Cast<PayFrequency>().ToList();
@@ -175,31 +172,13 @@ public partial class CalculatorViewModel : ObservableObject
         foreach (var field in StateFields)
             stateValues[field.Key] = field.GetResolvedValue();
 
-        var input = new PaycheckInput
-        {
-            Frequency = Frequency,
-            HourlyRate = HourlyRate,
-            RegularHours = RegularHours,
-            OvertimeHours = OvertimeHours,
-            OvertimeMultiplier = OvertimeMultiplier,
-            State = SelectedState,
-            StateInputValues = stateValues,
-            FederalW4 = new FederalW4Input
-            {
-                    FilingStatus = FederalFilingStatus,
-                    Step2Checked = FederalStep2Checked,
-                    Step3TaxCredits = FederalStep3Credits,
-                    Step4aOtherIncome = FederalStep4aOtherIncome,
-                    Step4bDeductions = FederalStep4bDeductions,
-                    Step4cExtraWithholding = FederalStep4cExtraWithholding
-            },
-             Deductions = new[]
-            {
-                new Deduction { Name = "Pre-tax", Type = DeductionType.PreTax, Amount = PretaxDeductions, ReducesStateTaxableWages = true },
-                new Deduction { Name = "Post-tax", Type = DeductionType.PostTax, Amount = PosttaxDeductions }
-            }
-        };
+        // Map ViewModel state → domain input via mapper
+        var input = PaycheckInputMapper.Map(this, stateValues);
 
-        Result = _calc.Calculate(input);
+        // Run domain calculation
+        var domainResult = _calc.Calculate(input);
+
+        // Map domain result → presentation model via mapper
+        ResultCard = ResultCardMapper.Map(domainResult);
     }
 }
