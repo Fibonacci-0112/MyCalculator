@@ -10,12 +10,9 @@ namespace PaycheckCalc.App.ViewModels;
 /// </summary>
 public partial class StateFieldViewModel : ObservableObject
 {
-    private readonly Action _onValueChanged;
-
-    public StateFieldViewModel(StateFieldDefinition definition, Action onValueChanged)
+    public StateFieldViewModel(StateFieldDefinition definition)
     {
         Definition = definition;
-        _onValueChanged = onValueChanged;
 
         // Initialize from the schema default
         if (definition.FieldType == StateFieldType.Picker)
@@ -47,10 +44,6 @@ public partial class StateFieldViewModel : ObservableObject
 
     // Toggle value (Switch binding)
     [ObservableProperty] public partial bool BoolValue { get; set; }
-
-    partial void OnSelectedOptionChanged(string? value) => _onValueChanged();
-    partial void OnStringValueChanged(string value) => _onValueChanged();
-    partial void OnBoolValueChanged(bool value) => _onValueChanged();
 
     /// <summary>
     /// Returns the resolved typed value to store in <see cref="StateInputValues"/>.

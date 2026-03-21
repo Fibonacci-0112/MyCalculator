@@ -17,7 +17,6 @@ public partial class CalculatorViewModel : ObservableObject
 {
     private readonly PayCalculator _calc;
     private readonly StateCalculatorRegistry _stateRegistry;
-    private bool _isRebuildingFields;
 
     public CalculatorViewModel(PayCalculator calc, StateCalculatorRegistry stateRegistry)
     {
@@ -31,19 +30,6 @@ public partial class CalculatorViewModel : ObservableObject
 
         // Build initial dynamic state fields from schema
         RebuildStateFields();
-
-        // Auto-recalculate whenever any input property changes
-        PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName != nameof(Result) && e.PropertyName != nameof(SelectedInputTab)
-                && !e.PropertyName!.StartsWith("IsTab")
-                && e.PropertyName != nameof(StateFields)
-                && e.PropertyName != nameof(SavedComparison)
-                && e.PropertyName != nameof(HasSavedComparison)
-                && e.PropertyName != nameof(HasNoSavedComparison)
-                && e.PropertyName != nameof(NetPayDifference))
-                Calculate();
-        };
     }
 
     [ObservableProperty] public partial int SelectedInputTab { get; set; } = 0;
@@ -111,24 +97,12 @@ public partial class CalculatorViewModel : ObservableObject
 
     private void RebuildStateFields()
     {
-        _isRebuildingFields = true;
-        try
+        StateFields.Clear();
+        if (_stateRegistry.IsSupported(SelectedState))
         {
-            StateFields.Clear();
-            if (_stateRegistry.IsSupported(SelectedState))
-            {
-                var calc = _stateRegistry.GetCalculator(SelectedState);
-                foreach (var field in calc.GetInputSchema())
-                    StateFields.Add(new StateFieldViewModel(field, () =>
-                    {
-                        if (!_isRebuildingFields)
-                            Calculate();
-                    }));
-            }
-        }
-        finally
-        {
-            _isRebuildingFields = false;
+            var calc = _stateRegistry.GetCalculator(SelectedState);
+            foreach (var field in calc.GetInputSchema())
+                StateFields.Add(new StateFieldViewModel(field));
         }
     }
 
