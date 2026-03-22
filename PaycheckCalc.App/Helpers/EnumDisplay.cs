@@ -6,6 +6,13 @@ namespace PaycheckCalc.App.Helpers;
 
 public static class EnumDisplay
 {
+    public static string DeductionType(string name) => name switch
+    {
+        "PreTax" => "Pre-Tax",
+        "PostTax" => "Post-Tax",
+        _ => SplitPascalCase(name)
+    };
+
     public static string PayFrequency(string name) => name switch
     {
         "BiWeekly" => "Bi-Weekly",

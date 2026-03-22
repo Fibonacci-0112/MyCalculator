@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using PaycheckCalc.App.Helpers;
 using PaycheckCalc.Core.Models;
 
 namespace PaycheckCalc.App.ViewModels;
@@ -11,7 +12,6 @@ public partial class DeductionItemViewModel : ObservableObject
 {
     [ObservableProperty] public partial string Name { get; set; } = "";
     [ObservableProperty] public partial decimal Amount { get; set; }
-    [ObservableProperty] public partial DeductionType Type { get; set; }
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsPercentageAmount))]
     public partial DeductionAmountType AmountType { get; set; } = DeductionAmountType.Dollar;
@@ -24,8 +24,27 @@ public partial class DeductionItemViewModel : ObservableObject
     /// </summary>
     public bool IsPercentageAmount => AmountType == DeductionAmountType.Percentage;
 
-    public IReadOnlyList<DeductionType> DeductionTypes { get; } =
-        Enum.GetValues<DeductionType>().ToList();
+    /// <summary>
+    /// The deduction type (PreTax/PostTax) as a plain enum value, used by mappers and view model logic.
+    /// </summary>
+    public DeductionType Type => SelectedDeductionTypePickerItem?.Value ?? DeductionType.PreTax;
+
+    /// <summary>
+    /// Picker items for deduction type with user-friendly display labels (e.g. "Pre-Tax", "Post-Tax").
+    /// </summary>
+    public IReadOnlyList<PickerItem<DeductionType>> DeductionTypeItems { get; } =
+        Enum.GetValues<DeductionType>()
+            .Select(t => new PickerItem<DeductionType>(t, EnumDisplay.DeductionType(t.ToString())))
+            .ToList();
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Type))]
+    public partial PickerItem<DeductionType>? SelectedDeductionTypePickerItem { get; set; }
+
+    public DeductionItemViewModel()
+    {
+        SelectedDeductionTypePickerItem = DeductionTypeItems[0];
+    }
 
     public IReadOnlyList<DeductionAmountType> AmountTypes { get; } =
         Enum.GetValues<DeductionAmountType>().ToList();

@@ -332,8 +332,8 @@
                                             <Grid Grid.Row="3" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="8">
                                                 <Label Text="Type" TextColor="#37474F" FontSize="13"
                                                        VerticalTextAlignment="Center" />
-                                                <Picker Grid.Column="1" ItemsSource="{Binding DeductionTypes}"
-                                                        SelectedItem="{Binding Type}" TextColor="Black" />
+                                                <Picker Grid.Column="1" ItemsSource="{Binding DeductionTypeItems}"
+                                                        SelectedItem="{Binding SelectedDeductionTypePickerItem}" TextColor="Black" />
                                             </Grid>
                                             <!-- ReducesStateTaxableWages toggle -->
                                             <Grid Grid.Row="4" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
