@@ -20,6 +20,7 @@ public partial class CalculatorViewModel : ObservableObject
     private readonly PayCalculator _calc;
     private readonly AnnualProjectionCalculator _projectionCalc;
     private readonly StateCalculatorRegistry _stateRegistry;
+    private UsState _previousState;
 
     public CalculatorViewModel(PayCalculator calc, AnnualProjectionCalculator projectionCalc, StateCalculatorRegistry stateRegistry)
     {
@@ -184,8 +185,6 @@ public partial class CalculatorViewModel : ObservableObject
         }
         _stateFieldCache[state] = cache;
     }
-
-    private UsState _previousState;
 
     /// <summary>
     /// Collection of itemized deductions. Users can add, remove, and edit each entry.
