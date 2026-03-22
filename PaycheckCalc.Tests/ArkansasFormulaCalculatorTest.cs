@@ -285,9 +285,10 @@ public class ArkansasWithholdingCalculatorTest
         var schema = calc.GetInputSchema();
 
         Assert.Equal(StateFieldType.Picker, schema[0].FieldType);
-        Assert.Equal(2, schema[0].Options!.Count);
+        Assert.Equal(3, schema[0].Options!.Count);
         Assert.Contains("Single", schema[0].Options!);
         Assert.Contains("Married Filing Jointly", schema[0].Options!);
+        Assert.Contains("Head of Household", schema[0].Options!);
     }
 
     [Fact]
@@ -296,13 +297,14 @@ public class ArkansasWithholdingCalculatorTest
         var calc = LoadCalculator();
         Assert.Empty(calc.Validate(new StateInputValues { ["FilingStatus"] = "Single" }));
         Assert.Empty(calc.Validate(new StateInputValues { ["FilingStatus"] = "Married Filing Jointly" }));
+        Assert.Empty(calc.Validate(new StateInputValues { ["FilingStatus"] = "Head of Household" }));
     }
 
     [Fact]
     public void Validate_InvalidStatus_ReturnsError()
     {
         var calc = LoadCalculator();
-        Assert.Single(calc.Validate(new StateInputValues { ["FilingStatus"] = "Head of Household" }));
+        Assert.Single(calc.Validate(new StateInputValues { ["FilingStatus"] = "InvalidStatus" }));
     }
 
     /// <summary>
@@ -317,6 +319,26 @@ public class ArkansasWithholdingCalculatorTest
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
+            ["Exemptions"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
+        Assert.Equal(58.17m, result.Withholding);
+    }
+
+    /// <summary>
+    /// Biweekly, $2,000 gross, Head of Household, 0 exemptions, 0 additional.
+    /// Arkansas uses the same formula for all filing statuses → $58.17.
+    /// </summary>
+    [Fact]
+    public void Calculate_Biweekly_HeadOfHousehold_ZeroExemptions()
+    {
+        var calc = LoadCalculator();
+        var context = new CommonWithholdingContext(UsState.AR, 2000m, PayFrequency.Biweekly, 2026);
+        var values = new StateInputValues
+        {
+            ["FilingStatus"] = "Head of Household",
             ["Exemptions"] = 0,
             ["AdditionalWithholding"] = 0m
         };

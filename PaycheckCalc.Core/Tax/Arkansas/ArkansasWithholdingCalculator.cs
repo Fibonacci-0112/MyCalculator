@@ -12,7 +12,7 @@ public sealed class ArkansasWithholdingCalculator : IStateWithholdingCalculator
     private readonly ArkansasFormulaCalculator _inner;
 
     private static readonly IReadOnlyList<string> FilingStatusOptions =
-        ["Single", "Married Filing Jointly"];
+        ["Single", "Married Filing Jointly", "Head of Household"];
 
     private static readonly IReadOnlyList<StateFieldDefinition> Schema =
     [
