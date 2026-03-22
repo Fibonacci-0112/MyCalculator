@@ -138,7 +138,7 @@
                 <Border BackgroundColor="White" StrokeThickness="0"
                         StrokeShape="RoundRectangle 12" Padding="16"
                         IsVisible="{Binding IsTab0Visible}">
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
                           ColumnSpacing="12" RowSpacing="14">
                         <Label Text="Pay Frequency" Grid.Row="0" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
@@ -176,8 +176,12 @@
                                 <behaviors:DecimalFormatBehavior />
                             </Entry.Behaviors>
                         </Entry>
+                        <Label Text="Paycheck # (this year)" Grid.Row="5" Grid.Column="0"
+                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                        <Entry Text="{Binding PaycheckNumber}" Keyboard="Numeric" Grid.Row="5" Grid.Column="1"
+                               TextColor="Black" BackgroundColor="#EEF2FF" />
                         <Button Text="Calculate" Command="{Binding CalculateCommand}"
-                                Grid.Row="5" Grid.ColumnSpan="2"
+                                Grid.Row="6" Grid.ColumnSpan="2"
                                 BackgroundColor="#1565C0" TextColor="White"
                                 FontAttributes="Bold" CornerRadius="8"
                                 Margin="0,6,0,0" />
