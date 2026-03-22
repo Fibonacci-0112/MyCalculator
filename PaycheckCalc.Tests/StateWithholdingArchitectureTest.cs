@@ -1,5 +1,6 @@
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Tax.Alabama;
+using PaycheckCalc.Core.Tax.Arkansas;
 using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
@@ -661,6 +662,10 @@ public class FullRegistryIntegrationTest
         var registry = new StateCalculatorRegistry();
 
         registry.Register(new AlabamaWithholdingCalculator());
+
+        var arDataPath = Path.Combine(AppContext.BaseDirectory, "ar_withholding_2026.json");
+        var arJson = File.ReadAllText(arDataPath);
+        registry.Register(new ArkansasWithholdingCalculator(new ArkansasFormulaCalculator(arJson)));
 
         var caDataPath = Path.Combine(AppContext.BaseDirectory, "ca_method_b_2026.json");
         var caJson = File.ReadAllText(caDataPath);
