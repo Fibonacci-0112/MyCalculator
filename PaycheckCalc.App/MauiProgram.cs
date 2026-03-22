@@ -89,6 +89,11 @@ public static class MauiProgram
                 sp.GetRequiredService<FicaCalculator>(),
                 sp.GetRequiredService<Irs15TPercentageCalculator>()));
 
+        builder.Services.AddSingleton<AnnualProjectionCalculator>(sp =>
+            new AnnualProjectionCalculator(
+                sp.GetRequiredService<Irs15TPercentageCalculator>(),
+                sp.GetRequiredService<FicaCalculator>()));
+
         builder.Services.AddSingleton<CalculatorViewModel>();
         builder.Services.AddSingleton<InputsPage>();
         builder.Services.AddSingleton<ResultsPage>();

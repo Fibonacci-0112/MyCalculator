@@ -18,11 +18,13 @@ public record PickerItem<T>(T Value, string Text)
 public partial class CalculatorViewModel : ObservableObject
 {
     private readonly PayCalculator _calc;
+    private readonly AnnualProjectionCalculator _projectionCalc;
     private readonly StateCalculatorRegistry _stateRegistry;
 
-    public CalculatorViewModel(PayCalculator calc, StateCalculatorRegistry stateRegistry)
+    public CalculatorViewModel(PayCalculator calc, AnnualProjectionCalculator projectionCalc, StateCalculatorRegistry stateRegistry)
     {
         _calc = calc;
+        _projectionCalc = projectionCalc;
         _stateRegistry = stateRegistry;
         Frequency = PayFrequency.Biweekly;
         OvertimeMultiplier = 1.5m;
@@ -71,6 +73,11 @@ public partial class CalculatorViewModel : ObservableObject
     [ObservableProperty] public partial decimal RegularHours { get; set; }
     [ObservableProperty] public partial decimal OvertimeHours { get; set; }
     [ObservableProperty] public partial decimal OvertimeMultiplier { get; set; }
+
+    /// <summary>
+    /// 1-based paycheck number within the current year for annual projections.
+    /// </summary>
+    [ObservableProperty] public partial int PaycheckNumber { get; set; } = 1;
 
     [ObservableProperty] public partial UsState SelectedState { get; set; }
 
@@ -143,10 +150,16 @@ public partial class CalculatorViewModel : ObservableObject
     [ObservableProperty] public partial decimal FederalStep4aOtherIncome { get; set; }
     [ObservableProperty] public partial decimal FederalStep4bDeductions { get; set; }
     [ObservableProperty] public partial decimal FederalStep4cExtraWithholding { get; set; }
+
     /// <summary>
     /// Presentation-ready result card for the UI — never the raw domain PaycheckResult.
     /// </summary>
     [ObservableProperty] public partial ResultCardModel? ResultCard { get; set; }
+
+    /// <summary>
+    /// Presentation-ready annual projection for the UI.
+    /// </summary>
+    [ObservableProperty] public partial AnnualProjectionModel? Projection { get; set; }
 
     partial void OnResultCardChanged(ResultCardModel? value)
     {
@@ -202,5 +215,9 @@ public partial class CalculatorViewModel : ObservableObject
 
         // Map domain result → presentation model via mapper
         ResultCard = ResultCardMapper.Map(domainResult);
+
+        // Compute annual projections
+        var domainProjection = _projectionCalc.Calculate(input, domainResult);
+        Projection = AnnualProjectionMapper.Map(domainProjection);
     }
 }

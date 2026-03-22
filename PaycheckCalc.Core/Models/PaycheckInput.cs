@@ -26,4 +26,11 @@ public sealed class PaycheckInput
      
     public decimal YtdSocialSecurityWages { get; init; } = 0m;
     public decimal YtdMedicareWages { get; init; } = 0m;
+
+    /// <summary>
+    /// 1-based paycheck number within the current year (e.g. 1 for the first paycheck).
+    /// Used by the annual projection calculator to compute projected YTD and remaining paychecks.
+    /// Defaults to 1 when not specified.
+    /// </summary>
+    public int PaycheckNumber { get; init; } = 1;
 }
