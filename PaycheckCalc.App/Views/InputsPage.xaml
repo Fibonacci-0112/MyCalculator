@@ -255,33 +255,66 @@
                                     Grid.Column="1" TextColor="Black" />
                         </Grid>
 
+                        <!-- Friendly message for no-input states (e.g. no income tax) -->
+                        <Label Text="No extra inputs required for this state."
+                               IsVisible="{Binding HasNoStateFields}"
+                               TextColor="#78909C" FontSize="13"
+                               FontAttributes="Italic"
+                               HorizontalTextAlignment="Center"
+                               Margin="0,8,0,0" />
+
                         <!-- Dynamic fields rendered from the state calculator's schema -->
                         <VerticalStackLayout BindableLayout.ItemsSource="{Binding StateFields}" Spacing="14">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                                        <Label Text="{Binding Label}" Grid.Column="0"
-                                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
-                                        <!-- Picker control for Picker fields -->
-                                        <Picker IsVisible="{Binding IsPicker}"
-                                                ItemsSource="{Binding Options}"
-                                                SelectedItem="{Binding SelectedOption}"
-                                                Grid.Column="1" TextColor="Black" />
-                                        <!-- Entry control for Integer/Decimal fields -->
-                                        <Entry IsVisible="{Binding IsNumeric}"
-                                               Text="{Binding StringValue}"
-                                               Keyboard="Numeric"
-                                               Grid.Column="1"
-                                               TextColor="Black" BackgroundColor="#EEF2FF" />
-                                        <!-- Switch control for Toggle fields -->
-                                        <Switch IsVisible="{Binding IsToggle}"
-                                                IsToggled="{Binding BoolValue}"
-                                                Grid.Column="1"
-                                                OnColor="#1565C0" />
-                                    </Grid>
+                                    <VerticalStackLayout Spacing="4">
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                            <Label Text="{Binding Label}" Grid.Column="0"
+                                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                                            <!-- Picker control for Picker fields -->
+                                            <Picker IsVisible="{Binding IsPicker}"
+                                                    ItemsSource="{Binding Options}"
+                                                    SelectedItem="{Binding SelectedOption}"
+                                                    Grid.Column="1" TextColor="Black" />
+                                            <!-- Entry control for Integer/Decimal fields -->
+                                            <Entry IsVisible="{Binding IsNumeric}"
+                                                   Text="{Binding StringValue}"
+                                                   Keyboard="Numeric"
+                                                   Grid.Column="1"
+                                                   TextColor="Black" BackgroundColor="#EEF2FF" />
+                                            <!-- Entry control for Text fields -->
+                                            <Entry IsVisible="{Binding IsText}"
+                                                   Text="{Binding StringValue}"
+                                                   Keyboard="Default"
+                                                   Grid.Column="1"
+                                                   TextColor="Black" BackgroundColor="#EEF2FF" />
+                                            <!-- Switch control for Toggle fields -->
+                                            <Switch IsVisible="{Binding IsToggle}"
+                                                    IsToggled="{Binding BoolValue}"
+                                                    Grid.Column="1"
+                                                    OnColor="#1565C0" />
+                                        </Grid>
+                                        <!-- Field-level error message -->
+                                        <Label Text="{Binding ErrorMessage}"
+                                               IsVisible="{Binding HasError}"
+                                               TextColor="#D32F2F" FontSize="11"
+                                               Margin="0,-2,0,0" />
+                                    </VerticalStackLayout>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>
                         </VerticalStackLayout>
+
+                        <!-- State-level validation summary -->
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding StateValidationErrors}"
+                                             IsVisible="{Binding HasStateValidationErrors}"
+                                             Spacing="2" Margin="0,4,0,0">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Label Text="{Binding .}" TextColor="#D32F2F" FontSize="12" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+
                         <Button Text="Calculate" Command="{Binding CalculateCommand}"
                                 BackgroundColor="#1565C0" TextColor="White"
                                 FontAttributes="Bold" CornerRadius="8"

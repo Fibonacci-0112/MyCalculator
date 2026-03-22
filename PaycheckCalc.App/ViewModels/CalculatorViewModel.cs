@@ -20,6 +20,7 @@ public partial class CalculatorViewModel : ObservableObject
     private readonly PayCalculator _calc;
     private readonly AnnualProjectionCalculator _projectionCalc;
     private readonly StateCalculatorRegistry _stateRegistry;
+    private UsState _previousState;
 
     public CalculatorViewModel(PayCalculator calc, AnnualProjectionCalculator projectionCalc, StateCalculatorRegistry stateRegistry)
     {
@@ -29,6 +30,7 @@ public partial class CalculatorViewModel : ObservableObject
         Frequency = PayFrequency.Biweekly;
         OvertimeMultiplier = 1.5m;
         SelectedState = UsState.OK;
+        _previousState = SelectedState;
         SelectedStatePickerItem = StatePickerItems.FirstOrDefault(s => s.Value == SelectedState);
         SelectedFederalPickerItem = FederalStatuses[0];
 
@@ -96,6 +98,27 @@ public partial class CalculatorViewModel : ObservableObject
     /// </summary>
     public ObservableCollection<StateFieldViewModel> StateFields { get; } = new();
 
+    /// <summary>
+    /// State-level validation errors returned by the calculator's <c>Validate</c> method.
+    /// </summary>
+    [ObservableProperty] public partial ObservableCollection<string> StateValidationErrors { get; set; } = new();
+
+    public bool HasStateValidationErrors => StateValidationErrors.Count > 0;
+
+    partial void OnStateValidationErrorsChanged(ObservableCollection<string> value)
+    {
+        OnPropertyChanged(nameof(HasStateValidationErrors));
+    }
+
+    /// <summary>True when the selected state has no extra input fields (e.g., no-income-tax states).</summary>
+    public bool HasNoStateFields => StateFields.Count == 0;
+
+    /// <summary>
+    /// Cache of entered field values keyed by UsState → (fieldKey → rawValue).
+    /// Preserves user-entered values when switching between states.
+    /// </summary>
+    private readonly Dictionary<UsState, Dictionary<string, object?>> _stateFieldCache = new();
+
     partial void OnSelectedStateChanged(UsState value)
     {
         // Keep the picker item in sync when SelectedState is set programmatically
@@ -106,13 +129,61 @@ public partial class CalculatorViewModel : ObservableObject
 
     private void RebuildStateFields()
     {
+        // Save values for the outgoing state before clearing
+        if (StateFields.Count > 0)
+        {
+            SaveFieldsForState(_previousState);
+        }
+
         StateFields.Clear();
+        StateValidationErrors = new ObservableCollection<string>();
+
         if (_stateRegistry.IsSupported(SelectedState))
         {
             var calc = _stateRegistry.GetCalculator(SelectedState);
             foreach (var field in calc.GetInputSchema())
-                StateFields.Add(new StateFieldViewModel(field));
+            {
+                var vm = new StateFieldViewModel(field);
+                // Restore cached values if available
+                if (_stateFieldCache.TryGetValue(SelectedState, out var cache) &&
+                    cache.TryGetValue(field.Key, out var cached))
+                {
+                    switch (field.FieldType)
+                    {
+                        case StateFieldType.Picker:
+                            vm.SelectedOption = cached?.ToString();
+                            break;
+                        case StateFieldType.Toggle:
+                            vm.BoolValue = cached is true;
+                            break;
+                        default:
+                            vm.StringValue = cached?.ToString() ?? "";
+                            break;
+                    }
+                }
+                StateFields.Add(vm);
+            }
         }
+
+        _previousState = SelectedState;
+        OnPropertyChanged(nameof(HasNoStateFields));
+    }
+
+    /// <summary>Save field values into the cache for a specific state.</summary>
+    private void SaveFieldsForState(UsState state)
+    {
+        if (StateFields.Count == 0) return;
+        var cache = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+        foreach (var field in StateFields)
+        {
+            cache[field.Key] = field.Definition.FieldType switch
+            {
+                StateFieldType.Picker => field.SelectedOption,
+                StateFieldType.Toggle => field.BoolValue,
+                _ => field.StringValue
+            };
+        }
+        _stateFieldCache[state] = cache;
     }
 
     /// <summary>
@@ -206,6 +277,27 @@ public partial class CalculatorViewModel : ObservableObject
         var stateValues = new StateInputValues();
         foreach (var field in StateFields)
             stateValues[field.Key] = field.GetResolvedValue();
+
+        // Run local field-level validation on each state field
+        bool hasFieldErrors = false;
+        foreach (var field in StateFields)
+        {
+            field.Validate();
+            if (field.HasError) hasFieldErrors = true;
+        }
+
+        // Run state calculator's Validate(...) for cross-field / business rules
+        var stateErrors = new List<string>();
+        if (_stateRegistry.IsSupported(SelectedState))
+        {
+            var calc = _stateRegistry.GetCalculator(SelectedState);
+            stateErrors.AddRange(calc.Validate(stateValues));
+        }
+        StateValidationErrors = new ObservableCollection<string>(stateErrors);
+
+        // Block calculation when state input is invalid
+        if (hasFieldErrors || stateErrors.Count > 0)
+            return;
 
         // Map ViewModel state → domain input via mapper
         var input = PaycheckInputMapper.Map(this, stateValues);
