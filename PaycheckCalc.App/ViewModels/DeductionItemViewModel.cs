@@ -14,6 +14,7 @@ public partial class DeductionItemViewModel : ObservableObject
     [ObservableProperty] public partial decimal Amount { get; set; }
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsPercentageAmount))]
+    [NotifyPropertyChangedFor(nameof(IsDollarAmount))]
     public partial DeductionAmountType AmountType { get; set; } = DeductionAmountType.Dollar;
 
     [ObservableProperty] public partial bool ReducesStateTaxableWages { get; set; } = true;
@@ -23,6 +24,12 @@ public partial class DeductionItemViewModel : ObservableObject
     /// Used by the UI to switch the amount entry format between currency and percent.
     /// </summary>
     public bool IsPercentageAmount => AmountType == DeductionAmountType.Percentage;
+
+    /// <summary>
+    /// True when <see cref="AmountType"/> is not <see cref="DeductionAmountType.Percentage"/>.
+    /// Used by the UI to apply currency formatting to the amount entry.
+    /// </summary>
+    public bool IsDollarAmount => AmountType != DeductionAmountType.Percentage;
 
     /// <summary>
     /// The deduction type (PreTax/PostTax) as a plain enum value, used by mappers and view model logic.

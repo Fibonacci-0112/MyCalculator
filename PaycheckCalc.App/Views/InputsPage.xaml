@@ -353,7 +353,7 @@
                                                 <Entry Grid.Column="1" Text="{Binding Amount}" Keyboard="Numeric"
                                                        TextColor="Black" BackgroundColor="#EEF2FF" FontSize="14">
                                                     <Entry.Behaviors>
-                                                        <behaviors:DecimalFormatBehavior IsCurrency="True"
+                                                        <behaviors:DecimalFormatBehavior IsCurrency="{Binding IsDollarAmount}"
                                                                                         IsPercentage="{Binding IsPercentageAmount}" />
                                                     </Entry.Behaviors>
                                                 </Entry>

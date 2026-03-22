@@ -7,7 +7,8 @@ public class DecimalFormatBehavior : Behavior<Entry>
     private Entry? _entry;
 
     public static readonly BindableProperty IsCurrencyProperty =
-        BindableProperty.Create(nameof(IsCurrency), typeof(bool), typeof(DecimalFormatBehavior), false);
+        BindableProperty.Create(nameof(IsCurrency), typeof(bool), typeof(DecimalFormatBehavior), false,
+            propertyChanged: OnIsCurrencyChanged);
 
     public bool IsCurrency
     {
@@ -39,6 +40,14 @@ public class DecimalFormatBehavior : Behavior<Entry>
         entry.Focused -= OnFocused;
         _entry = null;
         base.OnDetachingFrom(entry);
+    }
+
+    private static void OnIsCurrencyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is DecimalFormatBehavior behavior && behavior._entry is { IsFocused: false } entry)
+        {
+            behavior.FormatText(entry);
+        }
     }
 
     private static void OnIsPercentageChanged(BindableObject bindable, object oldValue, object newValue)
