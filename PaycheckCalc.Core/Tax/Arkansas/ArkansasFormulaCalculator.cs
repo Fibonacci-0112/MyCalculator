@@ -14,6 +14,7 @@ namespace PaycheckCalc.Core.Tax.Arkansas;
 ///      For $100,001 and over, use the exact dollar amount.
 ///   3. Compute annual gross tax using the graduated bracket table.
 ///      Tax = rate × net taxable income − subtraction amount.
+///      Round the annual gross tax to two decimal places.
 ///   4. Compute personal tax credits (exemptions × $29).
 ///   5. Subtract personal tax credits from annual gross tax to get annual net tax.
 ///   6. Divide annual net tax by number of pay periods to get per-period withholding.
@@ -55,8 +56,9 @@ public sealed class ArkansasFormulaCalculator
         if (netTaxableIncome < _data.RoundToNearest50Threshold)
             netTaxableIncome = RoundToNearest50(netTaxableIncome);
 
-        // Step 3 – Compute annual gross tax from the bracket table
+        // Step 3 – Compute annual gross tax from the bracket table, then round
         decimal annualGrossTax = ComputeGrossTax(netTaxableIncome);
+        annualGrossTax = Math.Round(annualGrossTax, 2, MidpointRounding.AwayFromZero);
 
         // Step 4 – Personal tax credits
         decimal personalTaxCredits = exemptions * _data.PersonalTaxCreditPerExemption;
