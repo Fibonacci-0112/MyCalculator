@@ -58,7 +58,7 @@ public sealed class ArkansasFormulaCalculator
 
         // Step 3 – Compute annual gross tax from the bracket table, then round
         decimal annualGrossTax = ComputeGrossTax(netTaxableIncome);
-        annualGrossTax = Math.Round(annualGrossTax, 2, MidpointRounding.AwayFromZero);
+        annualGrossTax = Math.Round(annualGrossTax, 0, MidpointRounding.AwayFromZero);
 
         // Step 4 – Personal tax credits
         decimal personalTaxCredits = exemptions * _data.PersonalTaxCreditPerExemption;
