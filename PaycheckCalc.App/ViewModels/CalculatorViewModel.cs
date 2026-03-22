@@ -8,6 +8,7 @@ using PaycheckCalc.Core.Pay;
 using PaycheckCalc.Core.Tax.Federal;
 using PaycheckCalc.Core.Tax.State;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace PaycheckCalc.App.ViewModels;
 
@@ -36,6 +37,9 @@ public partial class CalculatorViewModel : ObservableObject
 
         // Build initial dynamic state fields from schema
         RebuildStateFields();
+
+        // Keep computed deduction totals in sync with the collection
+        Deductions.CollectionChanged += OnDeductionsCollectionChanged;
     }
 
     [ObservableProperty] public partial int SelectedInputTab { get; set; } = 0;
@@ -209,6 +213,34 @@ public partial class CalculatorViewModel : ObservableObject
     private void RemoveDeduction(DeductionItemViewModel item)
     {
         Deductions.Remove(item);
+    }
+
+    private void OnDeductionsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems is not null)
+            foreach (DeductionItemViewModel item in e.NewItems)
+                item.PropertyChanged += OnDeductionItemPropertyChanged;
+
+        if (e.OldItems is not null)
+            foreach (DeductionItemViewModel item in e.OldItems)
+                item.PropertyChanged -= OnDeductionItemPropertyChanged;
+
+        RaiseDeductionTotalsChanged();
+    }
+
+    private void OnDeductionItemPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(DeductionItemViewModel.Amount)
+                           or nameof(DeductionItemViewModel.Type))
+        {
+            RaiseDeductionTotalsChanged();
+        }
+    }
+
+    private void RaiseDeductionTotalsChanged()
+    {
+        OnPropertyChanged(nameof(TotalPretaxDeductions));
+        OnPropertyChanged(nameof(TotalPosttaxDeductions));
     }
 
     // Federal (IRS 15-T / W-4)
