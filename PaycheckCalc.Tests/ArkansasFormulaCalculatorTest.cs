@@ -162,6 +162,24 @@ public class ArkansasFormulaCalculatorTest
         Assert.Equal(5664.37m, result);
     }
 
+    /// <summary>
+    /// Income over $100,001 where gross tax has more than two decimal places.
+    /// Annual gross = 105,001, 1 period. Net = 105,001 − 2,470 = 102,531.
+    /// No $50 rounding (≥ 100,001). Exact amount used.
+    /// Bracket: $97,801+ → 3.9% × 102,531 − 89.30 = 3,998.709 − 89.30 = 3,909.409.
+    /// Round annual gross tax → 3,909.41.
+    /// Credits = 2 × $29 = $58.
+    /// Net tax = 3,909.41 − 58 = 3,851.41.
+    /// Per period = 3,851.41 / 1 = 3,851.41.
+    /// </summary>
+    [Fact]
+    public void HighIncome_GrossTaxRounded_BeforeCredits()
+    {
+        var calc = LoadCalculator();
+        var result = calc.CalculateWithholding(105001m, 1, 2);
+        Assert.Equal(3851.41m, result);
+    }
+
     // ── Exemptions and personal tax credits ─────────────────────────────
 
     /// <summary>
