@@ -6,6 +6,7 @@ using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Pay;
 using PaycheckCalc.Core.Tax.Fica;
 using PaycheckCalc.Core.Tax.Alabama;
+using PaycheckCalc.Core.Tax.Arkansas;
 using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
@@ -25,6 +26,14 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
+        builder.Services.AddSingleton<ArkansasFormulaCalculator>(sp =>
+        {
+            using var stream = FileSystem.OpenAppPackageFileAsync("ar_withholding_2026.json").Result;
+            using var reader = new StreamReader(stream);
+            var json = reader.ReadToEnd();
+
+            return new ArkansasFormulaCalculator(json);
+        });
         builder.Services.AddSingleton<OklahomaOw2PercentageCalculator>(sp =>
         {
             using var stream = FileSystem.OpenAppPackageFileAsync("ok_ow2_2026_percentage.json").Result;
@@ -59,6 +68,10 @@ public static class MauiProgram
 
             // Alabama — unique filing statuses, dependents, federal withholding
             registry.Register(new AlabamaWithholdingCalculator());
+
+            // Arkansas — DFA formula method with transitional zone brackets
+            var arCalc = sp.GetRequiredService<ArkansasFormulaCalculator>();
+            registry.Register(new ArkansasWithholdingCalculator(arCalc));
 
             // California — Method B (EDD DE 44)
             var caCalc = sp.GetRequiredService<CaliforniaPercentageCalculator>();

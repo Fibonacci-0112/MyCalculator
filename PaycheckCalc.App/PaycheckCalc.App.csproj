@@ -27,6 +27,7 @@
 	<MauiAsset Include="..\PaycheckCalc.Core\Data\ok_ow2_2026_percentage.json" LogicalName="ok_ow2_2026_percentage.json" />
 	<MauiAsset Include="..\PaycheckCalc.Core\Data\us_irs_15t_2026_percentage_automated.json" LogicalName="us_irs_15t_2026_percentage_automated.json" />
 	<MauiAsset Include="..\PaycheckCalc.Core\Data\ca_method_b_2026.json" LogicalName="ca_method_b_2026.json" />
+	<MauiAsset Include="..\PaycheckCalc.Core\Data\ar_withholding_2026.json" LogicalName="ar_withholding_2026.json" />
   </ItemGroup>
 
   <ItemGroup>

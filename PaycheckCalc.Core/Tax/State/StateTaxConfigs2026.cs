@@ -128,28 +128,7 @@ public static class StateTaxConfigs2026
 
             // ── Graduated-bracket states ─────────────────────────────────
 
-            [UsState.AR] = new()
-            {
-                StandardDeductionSingle = 2_470m,
-                StandardDeductionMarried = 2_470m,
-                AllowanceCreditAmount = 29m,
-                BracketsSingle =
-                [
-                    B(0, 5_500m, 0m),
-                    B(5_500m, 10_900m, 0.02m),
-                    B(10_900m, 15_600m, 0.03m),
-                    B(15_600m, 25_700m, 0.034m),
-                    B(25_700m, null, 0.039m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 5_500m, 0m),
-                    B(5_500m, 10_900m, 0.02m),
-                    B(10_900m, 15_600m, 0.03m),
-                    B(15_600m, 25_700m, 0.034m),
-                    B(25_700m, null, 0.039m)
-                ]
-            },
+            // Arkansas — handled by ArkansasWithholdingCalculator (DFA formula method)
 
             // California — handled by CaliforniaWithholdingCalculator (Method B)
 
