@@ -678,7 +678,9 @@ public class FullRegistryIntegrationTest
 
         registry.Register(new PennsylvaniaWithholdingCalculator());
 
-        registry.Register(new ColoradoWithholdingCalculator());
+        var coDataPath = Path.Combine(AppContext.BaseDirectory, "co_dr0004_2026.json");
+        var coJson = File.ReadAllText(coDataPath);
+        registry.Register(new ColoradoWithholdingCalculator(coJson));
 
         UsState[] noTaxStates = [UsState.AK, UsState.FL, UsState.NV, UsState.NH, UsState.SD, UsState.TN, UsState.TX, UsState.WA, UsState.WY];
         foreach (var state in noTaxStates)

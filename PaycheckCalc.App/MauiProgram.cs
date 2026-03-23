@@ -59,6 +59,14 @@ public static class MauiProgram
 
             return new CaliforniaPercentageCalculator(json);
         });
+        builder.Services.AddSingleton<ColoradoWithholdingCalculator>(sp =>
+        {
+            using var stream = FileSystem.OpenAppPackageFileAsync("co_dr0004_2026.json").Result;
+            using var reader = new StreamReader(stream);
+            var json = reader.ReadToEnd();
+
+            return new ColoradoWithholdingCalculator(json);
+        });
 
         builder.Services.AddSingleton(new FicaCalculator());
 
@@ -78,8 +86,9 @@ public static class MauiProgram
             var caCalc = sp.GetRequiredService<CaliforniaPercentageCalculator>();
             registry.Register(new CaliforniaWithholdingCalculator(caCalc));
 
-            // Colorado — flat 4.4% with withholding allowance + FMLI
-            registry.Register(new ColoradoWithholdingCalculator());
+            // Colorado — flat 4.4% with DR 0004 Table 1 allowance + FMLI
+            var coCalc = sp.GetRequiredService<ColoradoWithholdingCalculator>();
+            registry.Register(coCalc);
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

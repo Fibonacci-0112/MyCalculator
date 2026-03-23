@@ -37,5 +37,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Link>ar_withholding_2026.json</Link>
     </None>
+    <None Include="..\PaycheckCalc.Core\Data\co_dr0004_2026.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>co_dr0004_2026.json</Link>
+    </None>
   </ItemGroup>
 </Project>
