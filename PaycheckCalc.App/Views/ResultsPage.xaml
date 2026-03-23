@@ -204,6 +204,27 @@
                         Padding="16,12"
                         HorizontalOptions="FillAndExpand" />
 
+                <!-- Export buttons -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="8"
+                      IsVisible="{Binding CanExport}">
+                    <Button Grid.Column="0"
+                            Text="Export CSV"
+                            Command="{Binding ExportCsvCommand}"
+                            BackgroundColor="#2E7D32"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            CornerRadius="12"
+                            Padding="16,12" />
+                    <Button Grid.Column="1"
+                            Text="Export PDF"
+                            Command="{Binding ExportPdfCommand}"
+                            BackgroundColor="#C62828"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            CornerRadius="12"
+                            Padding="16,12" />
+                </Grid>
+
                 <!-- Doughnut Chart -->
                 <Border BackgroundColor="White" StrokeThickness="0"
                         StrokeShape="RoundRectangle 12" Padding="12">
