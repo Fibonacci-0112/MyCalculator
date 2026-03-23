@@ -31,6 +31,8 @@ public class DecimalFormatBehavior : Behavior<Entry>
         _entry = entry;
         entry.Unfocused += OnUnfocused;
         entry.Focused += OnFocused;
+        entry.BindingContextChanged += OnEntryBindingContextChanged;
+        BindingContext = entry.BindingContext;
         base.OnAttachedTo(entry);
     }
 
@@ -38,8 +40,15 @@ public class DecimalFormatBehavior : Behavior<Entry>
     {
         entry.Unfocused -= OnUnfocused;
         entry.Focused -= OnFocused;
+        entry.BindingContextChanged -= OnEntryBindingContextChanged;
         _entry = null;
         base.OnDetachingFrom(entry);
+    }
+
+    private void OnEntryBindingContextChanged(object? sender, EventArgs e)
+    {
+        if (sender is Entry entry)
+            BindingContext = entry.BindingContext;
     }
 
     private static void OnIsCurrencyChanged(BindableObject bindable, object oldValue, object newValue)
