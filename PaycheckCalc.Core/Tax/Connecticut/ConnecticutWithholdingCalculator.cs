@@ -1,21 +1,46 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Tax.State;
 
 namespace PaycheckCalc.Core.Tax.Connecticut;
 
+/// <summary>
+/// Connecticut state income tax withholding calculator implementing the
+/// TPG-211, 2026 Withholding Calculation Rules.
+///
+/// Connecticut does not provide a separate percentage method.  Withholding
+/// is determined by the table-driven algorithm using five lookup tables
+/// keyed by the employee's CT-W4 withholding code (A–F):
+///
+///   1. Annualize wages:  S = wagesPerPeriod × payPeriodsPerYear
+///   2. Table A → personal exemption (keyed by code + S)
+///   3. Taxable income:   TI = max(S − exemption, 0)
+///   4. Table B → initial tax (keyed by code + TI)
+///   5. Table C → phase-out add-back (keyed by code + S)
+///   6. Table D → tax recapture (keyed by code + S)
+///   7. Table E → personal tax credit decimal (keyed by code + S)
+///   8. Annual = (initialTax + addBack + recapture) × (1 − credit)
+///   9. PerPeriod = max(Annual / periods + additional − reduced, 0)
+///
+/// Special rules:
+///   • Code D: exemption = 0, credit = 0.00, shares Table B/C/D with A.
+///   • Code E: base withholding is always 0 (additional withholding still applies).
+///   • Table B uses taxable income; Tables C/D/E use annualized salary.
+/// </summary>
 public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculator
 {
-    private static readonly IReadOnlyList<string> FilingStatusOptions =
-    [   
-        "Single",
-        "Married Filing Jointly",
-        "Married Filing Separately",
-        "Head of Household",
-        "Qualifying Surviving Spouse"
-    ];
+    // ── Lookup tables loaded from JSON ───────────────────────────────
 
-    private static readonly IReadOnlyList<string> WithholdingCodeOptions = 
+    private readonly Dictionary<string, List<ExemptionEntry>> _personalExemptions;
+    private readonly Dictionary<string, List<BracketEntry>> _initialTax;
+    private readonly Dictionary<string, List<AddBackEntry>> _phaseOutAddBack;
+    private readonly Dictionary<string, List<RecaptureEntry>> _taxRecapture;
+    private readonly Dictionary<string, List<CreditEntry>> _personalTaxCredits;
+
+    // ── Schema / UI definitions ─────────────────────────────────────
+
+    private static readonly IReadOnlyList<string> WithholdingCodeOptions =
     [
         "Code A",
         "Code B",
@@ -25,22 +50,13 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
         "Code F",
         "No Form CT-W4"
     ];
-    
+
     private static readonly IReadOnlyList<StateFieldDefinition> Schema =
     [
         new()
         {
-            Key = "FilingStatus",
-            Label = "Filing Status (from CT Form W-4P Step 1c)",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = "Single",
-            Options = FilingStatusOptions
-        },
-        new()
-        {
             Key = "WithholdingCode",
-            Label = "Withholding Code (from CT Form W-4P Step 2b)",
+            Label = "Withholding Code (CT-W4 Line 1)",
             FieldType = StateFieldType.Picker,
             IsRequired = true,
             DefaultValue = "Code A",
@@ -49,35 +65,358 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
         new()
         {
             Key = "AdditionalWithholding",
-            Label = "Additional Withholding",
+            Label = "Additional Withholding (CT-W4 Line 2)",
             FieldType = StateFieldType.Decimal,
             DefaultValue = 0m
         },
         new()
         {
             Key = "ReducedWithholding",
-            Label = "Reduced Withholding",
+            Label = "Reduced Withholding (CT-W4 Line 3)",
             FieldType = StateFieldType.Decimal,
             DefaultValue = 0m
         }
     ];
-    
+
+    // ── Construction ────────────────────────────────────────────────
+
+    public ConnecticutWithholdingCalculator(string json)
+    {
+        var root = JsonSerializer.Deserialize<CtWithholdingRoot>(json,
+                       new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                   ?? throw new InvalidOperationException(
+                       "Failed to deserialize Connecticut withholding JSON data.");
+
+        var tables = root.Tables;
+
+        _personalExemptions = DeserializeTable<ExemptionEntry>(tables.PersonalExemptions);
+        _initialTax = DeserializeTable<BracketEntry>(tables.InitialTaxCalculation);
+        _phaseOutAddBack = DeserializeTable<AddBackEntry>(tables.PhaseOutAddBack);
+        _taxRecapture = DeserializeTable<RecaptureEntry>(tables.TaxRecapture);
+        _personalTaxCredits = DeserializeTable<CreditEntry>(tables.PersonalTaxCredits);
+
+        // Resolve "same_as_A" references after initial deserialization
+        ResolveReferences(_initialTax);
+        ResolveReferences(_phaseOutAddBack);
+        ResolveReferences(_taxRecapture);
+    }
+
+    // ── IStateWithholdingCalculator ─────────────────────────────────
+
     public UsState State => UsState.CT;
-    
-    public IReadOnlyList<StateFieldDefinition> GetSchema() => Schema;
+
+    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {
         var errors = new List<string>();
-        
-        var status = values.GetValueOrDefault<string>("FilingStatus", "");
-        if (!FilingStatusOptions.Contains(status))
-            errors.Add($"Invalid Filing Status. Valid options are: {string.Join(", ", FilingStatusOptions)}.");
-        
+
         var code = values.GetValueOrDefault<string>("WithholdingCode", "");
         if (!WithholdingCodeOptions.Contains(code))
             errors.Add($"Invalid Withholding Code. Valid options are: {string.Join(", ", WithholdingCodeOptions)}.");
-        
+
         return errors;
+    }
+
+    public StateWithholdingResult Calculate(CommonWithholdingContext context, StateInputValues values)
+    {
+        var taxableWages = Math.Max(0m,
+            context.GrossWages - context.PreTaxDeductionsReducingStateWages);
+
+        int periods = GetPayPeriods(context.PayPeriod);
+
+        var codeDisplay = values.GetValueOrDefault("WithholdingCode", "Code A");
+        // "No Form CT-W4" is treated as Code D per CT instructions
+        var code = codeDisplay == "No Form CT-W4" ? "D" : codeDisplay.Replace("Code ", "");
+
+        var additionalWithholding = values.GetValueOrDefault("AdditionalWithholding", 0m);
+        var reducedWithholding = values.GetValueOrDefault("ReducedWithholding", 0m);
+
+        // Code E: no withholding unless additional withholding is specified
+        if (code == "E")
+        {
+            var perPeriod = Math.Max(additionalWithholding - reducedWithholding, 0m);
+            return new StateWithholdingResult
+            {
+                TaxableWages = taxableWages,
+                Withholding = Math.Round(perPeriod, 2, MidpointRounding.AwayFromZero),
+                Description = perPeriod == 0m
+                    ? "Code E — no Connecticut withholding required"
+                    : null
+            };
+        }
+
+        // Step 3: Annualize wages
+        var annualizedSalary = taxableWages * periods;
+
+        // Step 5: Table A — personal exemption (keyed by annualizedSalary)
+        var personalExemption = LookupExemption(code, annualizedSalary);
+
+        // Step 6: Taxable income
+        var annualizedTaxableIncome = Math.Max(annualizedSalary - personalExemption, 0m);
+
+        decimal basePerPeriodWithholding;
+
+        if (annualizedTaxableIncome <= 0m)
+        {
+            // No tax due — skip to final adjustment
+            basePerPeriodWithholding = 0m;
+        }
+        else
+        {
+            // Step 7: Table B — initial tax (keyed by annualizedTaxableIncome)
+            var initialTax = LookupInitialTax(code, annualizedTaxableIncome);
+
+            // Step 8: Table C — phase-out add-back (keyed by annualizedSalary)
+            var phaseOutAddBack = LookupAddBack(code, annualizedSalary);
+
+            // Step 9: Table D — tax recapture (keyed by annualizedSalary)
+            var recapture = LookupRecapture(code, annualizedSalary);
+
+            // Step 10: pre-credit annual tax
+            var preCreditAnnualTax = initialTax + phaseOutAddBack + recapture;
+
+            // Step 11: Table E — personal tax credit decimal (keyed by annualizedSalary)
+            var personalTaxCredit = LookupCredit(code, annualizedSalary);
+
+            // Step 12: annualized withholding
+            var annualizedWithholding = preCreditAnnualTax * (1m - personalTaxCredit);
+
+            // Step 13: per-period base withholding
+            basePerPeriodWithholding = annualizedWithholding / periods;
+        }
+
+        // Step 14: final adjustment
+        var finalWithholding = Math.Max(
+            basePerPeriodWithholding + additionalWithholding - reducedWithholding, 0m);
+
+        return new StateWithholdingResult
+        {
+            TaxableWages = taxableWages,
+            Withholding = Math.Round(finalWithholding, 2, MidpointRounding.AwayFromZero)
+        };
+    }
+
+    // ── Table lookups ───────────────────────────────────────────────
+
+    private decimal LookupExemption(string code, decimal annualizedSalary)
+    {
+        if (!_personalExemptions.TryGetValue(code, out var entries))
+            return 0m;
+
+        foreach (var e in entries)
+        {
+            if (annualizedSalary > e.Gt && (e.Lte is null || annualizedSalary <= e.Lte))
+                return e.Exemption;
+        }
+
+        return 0m;
+    }
+
+    private decimal LookupInitialTax(string code, decimal taxableIncome)
+    {
+        if (!_initialTax.TryGetValue(code, out var entries))
+            return 0m;
+
+        foreach (var b in entries)
+        {
+            if (taxableIncome > b.Gt && (b.Lte is null || taxableIncome <= b.Lte))
+                return b.BaseTax + b.Rate * (taxableIncome - b.ExcessOver);
+        }
+
+        return 0m;
+    }
+
+    private decimal LookupAddBack(string code, decimal annualizedSalary)
+    {
+        if (!_phaseOutAddBack.TryGetValue(code, out var entries))
+            return 0m;
+
+        foreach (var e in entries)
+        {
+            if (annualizedSalary > e.Gt && (e.Lte is null || annualizedSalary <= e.Lte))
+                return e.AddBack;
+        }
+
+        return 0m;
+    }
+
+    private decimal LookupRecapture(string code, decimal annualizedSalary)
+    {
+        if (!_taxRecapture.TryGetValue(code, out var entries))
+            return 0m;
+
+        foreach (var e in entries)
+        {
+            if (annualizedSalary > e.Gt && (e.Lte is null || annualizedSalary <= e.Lte))
+                return e.Recapture;
+        }
+
+        return 0m;
+    }
+
+    private decimal LookupCredit(string code, decimal annualizedSalary)
+    {
+        if (!_personalTaxCredits.TryGetValue(code, out var entries))
+            return 0m;
+
+        foreach (var e in entries)
+        {
+            if (annualizedSalary > e.Gt && (e.Lte is null || annualizedSalary <= e.Lte))
+                return e.Credit;
+        }
+
+        return 0m;
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────
+
+    private static int GetPayPeriods(PayFrequency frequency) => frequency switch
+    {
+        PayFrequency.Daily => 260,
+        PayFrequency.Weekly => 52,
+        PayFrequency.Biweekly => 26,
+        PayFrequency.Semimonthly => 24,
+        PayFrequency.Monthly => 12,
+        PayFrequency.Quarterly => 4,
+        PayFrequency.Semiannual => 2,
+        PayFrequency.Annual => 1,
+        _ => throw new ArgumentOutOfRangeException(nameof(frequency), frequency,
+            "Unsupported pay frequency")
+    };
+
+    /// <summary>
+    /// Deserializes a table section from the JSON where each code key may be
+    /// either a JSON array of objects or the string "same_as_A".
+    /// </summary>
+    private static Dictionary<string, List<T>> DeserializeTable<T>(
+        Dictionary<string, JsonElement> rawTable)
+    {
+        var result = new Dictionary<string, List<T>>(StringComparer.OrdinalIgnoreCase);
+        var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        foreach (var (code, element) in rawTable)
+        {
+            if (element.ValueKind == JsonValueKind.Array)
+            {
+                result[code] = element.Deserialize<List<T>>(opts) ?? [];
+            }
+            // "same_as_X" references are resolved after all codes are loaded
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Resolves "same_as_A" (or any "same_as_X") string references in a
+    /// table by pointing the referencing code at the referenced code's list.
+    /// Must be called after <see cref="DeserializeTable{T}"/>.
+    /// </summary>
+    private static void ResolveReferences<T>(Dictionary<string, List<T>> table)
+    {
+        // Collect codes that need resolution (those present in the JSON
+        // but absent from the deserialized dictionary because they were strings).
+        var allCodes = new[] { "A", "B", "C", "D", "F" };
+
+        foreach (var code in allCodes)
+        {
+            if (!table.ContainsKey(code) && table.TryGetValue("A", out var aList))
+            {
+                // Default fallback: "same_as_A"
+                table[code] = aList;
+            }
+        }
+    }
+
+    // ── JSON deserialization models ─────────────────────────────────
+
+    private sealed class CtWithholdingRoot
+    {
+        [JsonPropertyName("tables")]
+        public CtTables Tables { get; set; } = new();
+    }
+
+    private sealed class CtTables
+    {
+        [JsonPropertyName("personal_exemptions")]
+        public Dictionary<string, JsonElement> PersonalExemptions { get; set; } = new();
+
+        [JsonPropertyName("initial_tax_calculation")]
+        public Dictionary<string, JsonElement> InitialTaxCalculation { get; set; } = new();
+
+        [JsonPropertyName("phase_out_add_back")]
+        public Dictionary<string, JsonElement> PhaseOutAddBack { get; set; } = new();
+
+        [JsonPropertyName("tax_recapture")]
+        public Dictionary<string, JsonElement> TaxRecapture { get; set; } = new();
+
+        [JsonPropertyName("personal_tax_credits")]
+        public Dictionary<string, JsonElement> PersonalTaxCredits { get; set; } = new();
+    }
+
+    private sealed class ExemptionEntry
+    {
+        [JsonPropertyName("gt")]
+        public decimal Gt { get; set; }
+
+        [JsonPropertyName("lte")]
+        public decimal? Lte { get; set; }
+
+        [JsonPropertyName("exemption")]
+        public decimal Exemption { get; set; }
+    }
+
+    private sealed class BracketEntry
+    {
+        [JsonPropertyName("gt")]
+        public decimal Gt { get; set; }
+
+        [JsonPropertyName("lte")]
+        public decimal? Lte { get; set; }
+
+        [JsonPropertyName("base_tax")]
+        public decimal BaseTax { get; set; }
+
+        [JsonPropertyName("rate")]
+        public decimal Rate { get; set; }
+
+        [JsonPropertyName("excess_over")]
+        public decimal ExcessOver { get; set; }
+    }
+
+    private sealed class AddBackEntry
+    {
+        [JsonPropertyName("gt")]
+        public decimal Gt { get; set; }
+
+        [JsonPropertyName("lte")]
+        public decimal? Lte { get; set; }
+
+        [JsonPropertyName("add_back")]
+        public decimal AddBack { get; set; }
+    }
+
+    private sealed class RecaptureEntry
+    {
+        [JsonPropertyName("gt")]
+        public decimal Gt { get; set; }
+
+        [JsonPropertyName("lte")]
+        public decimal? Lte { get; set; }
+
+        [JsonPropertyName("recapture")]
+        public decimal Recapture { get; set; }
+    }
+
+    private sealed class CreditEntry
+    {
+        [JsonPropertyName("gt")]
+        public decimal Gt { get; set; }
+
+        [JsonPropertyName("lte")]
+        public decimal? Lte { get; set; }
+
+        [JsonPropertyName("credit")]
+        public decimal Credit { get; set; }
     }
 }

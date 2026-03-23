@@ -9,6 +9,7 @@ using PaycheckCalc.Core.Tax.Alabama;
 using PaycheckCalc.Core.Tax.Arkansas;
 using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Colorado;
+using PaycheckCalc.Core.Tax.Connecticut;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.Federal;
@@ -67,6 +68,14 @@ public static class MauiProgram
 
             return new ColoradoWithholdingCalculator(json);
         });
+        builder.Services.AddSingleton<ConnecticutWithholdingCalculator>(sp =>
+        {
+            using var stream = FileSystem.OpenAppPackageFileAsync("connecticut_withholding_2026.json").Result;
+            using var reader = new StreamReader(stream);
+            var json = reader.ReadToEnd();
+
+            return new ConnecticutWithholdingCalculator(json);
+        });
 
         builder.Services.AddSingleton(new FicaCalculator());
 
@@ -89,6 +98,10 @@ public static class MauiProgram
             // Colorado — flat 4.4% with DR 0004 Table 1 allowance + FMLI
             var coCalc = sp.GetRequiredService<ColoradoWithholdingCalculator>();
             registry.Register(coCalc);
+
+            // Connecticut — TPG-211 table-driven withholding calculation rules
+            var ctCalc = sp.GetRequiredService<ConnecticutWithholdingCalculator>();
+            registry.Register(ctCalc);
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
