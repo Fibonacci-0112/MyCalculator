@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using PaycheckCalc.App.Helpers;
 using PaycheckCalc.App.Mappers;
 using PaycheckCalc.App.Models;
+using PaycheckCalc.Core.Export;
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Pay;
 using PaycheckCalc.Core.Tax.Federal;
@@ -280,9 +281,17 @@ public partial class CalculatorViewModel : ObservableObject
     [ObservableProperty] public partial decimal FederalStep4cExtraWithholding { get; set; }
 
     /// <summary>
+    /// The last computed domain result, retained for export (CSV / PDF).
+    /// </summary>
+    private PaycheckResult? _lastResult;
+
+    /// <summary>
     /// Presentation-ready result card for the UI — never the raw domain PaycheckResult.
     /// </summary>
     [ObservableProperty] public partial ResultCardModel? ResultCard { get; set; }
+
+    /// <summary>True when a result has been calculated and export is possible.</summary>
+    public bool CanExport => _lastResult is not null;
 
     /// <summary>
     /// Presentation-ready annual projection for the UI.
@@ -292,6 +301,7 @@ public partial class CalculatorViewModel : ObservableObject
     partial void OnResultCardChanged(ResultCardModel? value)
     {
         OnPropertyChanged(nameof(NetPayDifference));
+        OnPropertyChanged(nameof(CanExport));
     }
 
     /// <summary>
@@ -364,6 +374,7 @@ public partial class CalculatorViewModel : ObservableObject
 
         // Run domain calculation
         var domainResult = _calc.Calculate(input);
+        _lastResult = domainResult;
 
         // Map domain result → presentation model via mapper
         ResultCard = ResultCardMapper.Map(domainResult);
@@ -371,5 +382,41 @@ public partial class CalculatorViewModel : ObservableObject
         // Compute annual projections
         var domainProjection = _projectionCalc.Calculate(input, domainResult);
         Projection = AnnualProjectionMapper.Map(domainProjection);
+    }
+
+    // ── Export commands ──────────────────────────────────────
+
+    [RelayCommand]
+    private async Task ExportCsv()
+    {
+        if (_lastResult is null) return;
+
+        var csv = CsvPaycheckExporter.Generate(_lastResult);
+        var fileName = $"paycheck_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+        var filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
+        await File.WriteAllTextAsync(filePath, csv);
+
+        await Share.Default.RequestAsync(new ShareFileRequest
+        {
+            Title = "Export Paycheck CSV",
+            File = new ShareFile(filePath)
+        });
+    }
+
+    [RelayCommand]
+    private async Task ExportPdf()
+    {
+        if (_lastResult is null) return;
+
+        var pdf = PdfPaycheckExporter.Generate(_lastResult);
+        var fileName = $"paycheck_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+        var filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
+        await File.WriteAllBytesAsync(filePath, pdf);
+
+        await Share.Default.RequestAsync(new ShareFileRequest
+        {
+            Title = "Export Paycheck PDF",
+            File = new ShareFile(filePath)
+        });
     }
 }
