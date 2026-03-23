@@ -15,9 +15,9 @@ public static class EnumDisplay
 
     public static string PayFrequency(string name) => name switch
     {
-        "BiWeekly" => "Bi-Weekly",
-        "SemiMonthly" => "Semi-Monthly",
-        "SemiAnnual" => "Semi-Annual",
+        "Biweekly" => "Bi-Weekly",
+        "Semimonthly" => "Semi-Monthly",
+        "Semiannual" => "Semi-Annual",
         _ => SplitPascalCase(name)
     };
 

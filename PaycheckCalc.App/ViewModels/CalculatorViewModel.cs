@@ -29,6 +29,7 @@ public partial class CalculatorViewModel : ObservableObject
         _projectionCalc = projectionCalc;
         _stateRegistry = stateRegistry;
         Frequency = PayFrequency.Biweekly;
+        SelectedFrequencyPickerItem = Frequencies.FirstOrDefault(f => f.Value == Frequency);
         OvertimeMultiplier = 1.5m;
         SelectedState = UsState.OK;
         _previousState = SelectedState;
@@ -86,6 +87,15 @@ public partial class CalculatorViewModel : ObservableObject
     {
         if (value != null)
             FederalFilingStatus = value.Value;
+    }
+
+    [ObservableProperty]
+    public partial PickerItem<PayFrequency>? SelectedFrequencyPickerItem { get; set; }
+
+    partial void OnSelectedFrequencyPickerItemChanged(PickerItem<PayFrequency>? value)
+    {
+        if (value != null)
+            Frequency = value.Value;
     }
 
     [ObservableProperty] public partial PayFrequency Frequency { get; set; }
@@ -308,7 +318,10 @@ public partial class CalculatorViewModel : ObservableObject
         SavedScenario = ScenarioMapper.Capture(this);
     }
 
-    public IReadOnlyList<PayFrequency> Frequencies { get; } = Enum.GetValues(typeof(PayFrequency)).Cast<PayFrequency>().ToList();
+    public IReadOnlyList<PickerItem<PayFrequency>> Frequencies { get; } =
+        Enum.GetValues<PayFrequency>()
+            .Select(f => new PickerItem<PayFrequency>(f, EnumDisplay.PayFrequency(f.ToString())))
+            .ToList();
     public IReadOnlyList<UsState> SupportedStates => _stateRegistry.SupportedStates;
 
     private IReadOnlyList<PickerItem<UsState>>? _statePickerItems;

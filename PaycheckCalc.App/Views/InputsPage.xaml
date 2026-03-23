@@ -142,7 +142,7 @@
                           ColumnSpacing="12" RowSpacing="14">
                         <Label Text="Pay Frequency" Grid.Row="0" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
-                        <Picker ItemsSource="{Binding Frequencies}" SelectedItem="{Binding Frequency}"
+                        <Picker ItemsSource="{Binding Frequencies}" SelectedItem="{Binding SelectedFrequencyPickerItem}"
                                 Grid.Row="0" Grid.Column="1" TextColor="Black" />
                         <Label Text="Hourly Rate" Grid.Row="1" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
