@@ -1,0 +1,2229 @@
+{
+  "state": "Connecticut",
+  "tax_year": 2026,
+  "effective_date": "2026-01-01",
+  "source_documents": {
+    "withholding_rules_pdf": "TPG-211, 2026 Withholding Calculation Rules (Rev. 12/25)",
+    "employee_form_pdf": "Form CT-W4 (Rev. 12/25)"
+  },
+  "notes": [
+    "Connecticut instructs employers to use either the withholding calculation rules or the withholding tables.",
+    "There is no separate percentage method available; withholding is determined by the table-driven algorithm below.",
+    "Withholding Code D uses a personal exemption of 0 and a personal tax credit of 0.00.",
+    "Withholding Code E means no withholding is necessary unless overridden by employer or taxpayer circumstances outside the form logic."
+  ],
+  "withholding_code_reference": {
+    "MarriedFilingJointly": [
+      {
+        "condition": "combined_annual_gross_income <= 24000 OR msrra_exempt",
+        "code": "E"
+      },
+      {
+        "condition": "spouse_employed AND combined_annual_gross_income > 24000 AND combined_annual_gross_income <= 100500",
+        "code": "A"
+      },
+      {
+        "condition": "NOT spouse_employed AND combined_annual_gross_income > 24000",
+        "code": "C"
+      },
+      {
+        "condition": "spouse_employed AND combined_annual_gross_income > 100500",
+        "code": "D"
+      },
+      {
+        "condition": "significant_nonwage_income",
+        "code": "D"
+      },
+      {
+        "condition": "nonresident_with_substantial_other_income",
+        "code": "D"
+      }
+    ],
+    "QualifyingSurvivingSpouse": [
+      {
+        "condition": "annual_gross_income <= 24000 OR msrra_exempt",
+        "code": "E"
+      },
+      {
+        "condition": "annual_gross_income > 24000",
+        "code": "C"
+      },
+      {
+        "condition": "significant_nonwage_income",
+        "code": "D"
+      },
+      {
+        "condition": "nonresident_with_substantial_other_income",
+        "code": "D"
+      }
+    ],
+    "MarriedFilingSeparately": [
+      {
+        "condition": "annual_gross_income <= 12000 OR msrra_exempt",
+        "code": "E"
+      },
+      {
+        "condition": "annual_gross_income > 12000",
+        "code": "A"
+      },
+      {
+        "condition": "significant_nonwage_income",
+        "code": "D"
+      },
+      {
+        "condition": "nonresident_with_substantial_other_income",
+        "code": "D"
+      }
+    ],
+    "Single": [
+      {
+        "condition": "annual_gross_income <= 15000",
+        "code": "E"
+      },
+      {
+        "condition": "annual_gross_income > 15000",
+        "code": "F"
+      },
+      {
+        "condition": "significant_nonwage_income",
+        "code": "D"
+      },
+      {
+        "condition": "nonresident_with_substantial_other_income",
+        "code": "D"
+      }
+    ],
+    "HeadOfHousehold": [
+      {
+        "condition": "annual_gross_income <= 19000",
+        "code": "E"
+      },
+      {
+        "condition": "annual_gross_income > 19000",
+        "code": "B"
+      },
+      {
+        "condition": "significant_nonwage_income",
+        "code": "D"
+      },
+      {
+        "condition": "nonresident_with_substantial_other_income",
+        "code": "D"
+      }
+    ]
+  },
+  "tables": {
+    "personal_exemptions": {
+      "A": [
+        {
+          "gt": 0,
+          "lte": 24000,
+          "exemption": 12000
+        },
+        {
+          "gt": 24000,
+          "lte": 25000,
+          "exemption": 11000
+        },
+        {
+          "gt": 25000,
+          "lte": 26000,
+          "exemption": 10000
+        },
+        {
+          "gt": 26000,
+          "lte": 27000,
+          "exemption": 9000
+        },
+        {
+          "gt": 27000,
+          "lte": 28000,
+          "exemption": 8000
+        },
+        {
+          "gt": 28000,
+          "lte": 29000,
+          "exemption": 7000
+        },
+        {
+          "gt": 29000,
+          "lte": 30000,
+          "exemption": 6000
+        },
+        {
+          "gt": 30000,
+          "lte": 31000,
+          "exemption": 5000
+        },
+        {
+          "gt": 31000,
+          "lte": 32000,
+          "exemption": 4000
+        },
+        {
+          "gt": 32000,
+          "lte": 33000,
+          "exemption": 3000
+        },
+        {
+          "gt": 33000,
+          "lte": 34000,
+          "exemption": 2000
+        },
+        {
+          "gt": 34000,
+          "lte": 35000,
+          "exemption": 1000
+        },
+        {
+          "gt": 35000,
+          "lte": null,
+          "exemption": 0
+        }
+      ],
+      "B": [
+        {
+          "gt": 0,
+          "lte": 38000,
+          "exemption": 19000
+        },
+        {
+          "gt": 38000,
+          "lte": 39000,
+          "exemption": 18000
+        },
+        {
+          "gt": 39000,
+          "lte": 40000,
+          "exemption": 17000
+        },
+        {
+          "gt": 40000,
+          "lte": 41000,
+          "exemption": 16000
+        },
+        {
+          "gt": 41000,
+          "lte": 42000,
+          "exemption": 15000
+        },
+        {
+          "gt": 42000,
+          "lte": 43000,
+          "exemption": 14000
+        },
+        {
+          "gt": 43000,
+          "lte": 44000,
+          "exemption": 13000
+        },
+        {
+          "gt": 44000,
+          "lte": 45000,
+          "exemption": 12000
+        },
+        {
+          "gt": 45000,
+          "lte": 46000,
+          "exemption": 11000
+        },
+        {
+          "gt": 46000,
+          "lte": 47000,
+          "exemption": 10000
+        },
+        {
+          "gt": 47000,
+          "lte": 48000,
+          "exemption": 9000
+        },
+        {
+          "gt": 48000,
+          "lte": 49000,
+          "exemption": 8000
+        },
+        {
+          "gt": 49000,
+          "lte": 50000,
+          "exemption": 7000
+        },
+        {
+          "gt": 50000,
+          "lte": 51000,
+          "exemption": 6000
+        },
+        {
+          "gt": 51000,
+          "lte": 52000,
+          "exemption": 5000
+        },
+        {
+          "gt": 52000,
+          "lte": 53000,
+          "exemption": 4000
+        },
+        {
+          "gt": 53000,
+          "lte": 54000,
+          "exemption": 3000
+        },
+        {
+          "gt": 54000,
+          "lte": 55000,
+          "exemption": 2000
+        },
+        {
+          "gt": 55000,
+          "lte": 56000,
+          "exemption": 1000
+        },
+        {
+          "gt": 56000,
+          "lte": null,
+          "exemption": 0
+        }
+      ],
+      "C": [
+        {
+          "gt": 0,
+          "lte": 48000,
+          "exemption": 24000
+        },
+        {
+          "gt": 48000,
+          "lte": 49000,
+          "exemption": 23000
+        },
+        {
+          "gt": 49000,
+          "lte": 50000,
+          "exemption": 22000
+        },
+        {
+          "gt": 50000,
+          "lte": 51000,
+          "exemption": 21000
+        },
+        {
+          "gt": 51000,
+          "lte": 52000,
+          "exemption": 20000
+        },
+        {
+          "gt": 52000,
+          "lte": 53000,
+          "exemption": 19000
+        },
+        {
+          "gt": 53000,
+          "lte": 54000,
+          "exemption": 18000
+        },
+        {
+          "gt": 54000,
+          "lte": 55000,
+          "exemption": 17000
+        },
+        {
+          "gt": 55000,
+          "lte": 56000,
+          "exemption": 16000
+        },
+        {
+          "gt": 56000,
+          "lte": 57000,
+          "exemption": 15000
+        },
+        {
+          "gt": 57000,
+          "lte": 58000,
+          "exemption": 14000
+        },
+        {
+          "gt": 58000,
+          "lte": 59000,
+          "exemption": 13000
+        },
+        {
+          "gt": 59000,
+          "lte": 60000,
+          "exemption": 12000
+        },
+        {
+          "gt": 60000,
+          "lte": 61000,
+          "exemption": 11000
+        },
+        {
+          "gt": 61000,
+          "lte": 62000,
+          "exemption": 10000
+        },
+        {
+          "gt": 62000,
+          "lte": 63000,
+          "exemption": 9000
+        },
+        {
+          "gt": 63000,
+          "lte": 64000,
+          "exemption": 8000
+        },
+        {
+          "gt": 64000,
+          "lte": 65000,
+          "exemption": 7000
+        },
+        {
+          "gt": 65000,
+          "lte": 66000,
+          "exemption": 6000
+        },
+        {
+          "gt": 66000,
+          "lte": 67000,
+          "exemption": 5000
+        },
+        {
+          "gt": 67000,
+          "lte": 68000,
+          "exemption": 4000
+        },
+        {
+          "gt": 68000,
+          "lte": 69000,
+          "exemption": 3000
+        },
+        {
+          "gt": 69000,
+          "lte": 70000,
+          "exemption": 2000
+        },
+        {
+          "gt": 70000,
+          "lte": 71000,
+          "exemption": 1000
+        },
+        {
+          "gt": 71000,
+          "lte": null,
+          "exemption": 0
+        }
+      ],
+      "D": [
+        {
+          "gt": 0,
+          "lte": null,
+          "exemption": 0
+        }
+      ],
+      "F": [
+        {
+          "gt": 0,
+          "lte": 30000,
+          "exemption": 15000
+        },
+        {
+          "gt": 30000,
+          "lte": 31000,
+          "exemption": 14000
+        },
+        {
+          "gt": 31000,
+          "lte": 32000,
+          "exemption": 13000
+        },
+        {
+          "gt": 32000,
+          "lte": 33000,
+          "exemption": 12000
+        },
+        {
+          "gt": 33000,
+          "lte": 34000,
+          "exemption": 11000
+        },
+        {
+          "gt": 34000,
+          "lte": 35000,
+          "exemption": 10000
+        },
+        {
+          "gt": 35000,
+          "lte": 36000,
+          "exemption": 9000
+        },
+        {
+          "gt": 36000,
+          "lte": 37000,
+          "exemption": 8000
+        },
+        {
+          "gt": 37000,
+          "lte": 38000,
+          "exemption": 7000
+        },
+        {
+          "gt": 38000,
+          "lte": 39000,
+          "exemption": 6000
+        },
+        {
+          "gt": 39000,
+          "lte": 40000,
+          "exemption": 5000
+        },
+        {
+          "gt": 40000,
+          "lte": 41000,
+          "exemption": 4000
+        },
+        {
+          "gt": 41000,
+          "lte": 42000,
+          "exemption": 3000
+        },
+        {
+          "gt": 42000,
+          "lte": 43000,
+          "exemption": 2000
+        },
+        {
+          "gt": 43000,
+          "lte": 44000,
+          "exemption": 1000
+        },
+        {
+          "gt": 44000,
+          "lte": null,
+          "exemption": 0
+        }
+      ]
+    },
+    "initial_tax_calculation": {
+      "A": [
+        {
+          "gt": 0,
+          "lte": 10000,
+          "base_tax": 0,
+          "rate": 0.02,
+          "excess_over": 0
+        },
+        {
+          "gt": 10000,
+          "lte": 50000,
+          "base_tax": 200,
+          "rate": 0.045,
+          "excess_over": 10000
+        },
+        {
+          "gt": 50000,
+          "lte": 100000,
+          "base_tax": 2000,
+          "rate": 0.055,
+          "excess_over": 50000
+        },
+        {
+          "gt": 100000,
+          "lte": 200000,
+          "base_tax": 4750,
+          "rate": 0.06,
+          "excess_over": 100000
+        },
+        {
+          "gt": 200000,
+          "lte": 250000,
+          "base_tax": 10750,
+          "rate": 0.065,
+          "excess_over": 200000
+        },
+        {
+          "gt": 250000,
+          "lte": 500000,
+          "base_tax": 14000,
+          "rate": 0.069,
+          "excess_over": 250000
+        },
+        {
+          "gt": 500000,
+          "lte": null,
+          "base_tax": 31250,
+          "rate": 0.0699,
+          "excess_over": 500000
+        }
+      ],
+      "B": [
+        {
+          "gt": 0,
+          "lte": 16000,
+          "base_tax": 0,
+          "rate": 0.02,
+          "excess_over": 0
+        },
+        {
+          "gt": 16000,
+          "lte": 80000,
+          "base_tax": 320,
+          "rate": 0.045,
+          "excess_over": 16000
+        },
+        {
+          "gt": 80000,
+          "lte": 160000,
+          "base_tax": 3200,
+          "rate": 0.055,
+          "excess_over": 80000
+        },
+        {
+          "gt": 160000,
+          "lte": 320000,
+          "base_tax": 7600,
+          "rate": 0.06,
+          "excess_over": 160000
+        },
+        {
+          "gt": 320000,
+          "lte": 400000,
+          "base_tax": 17200,
+          "rate": 0.065,
+          "excess_over": 320000
+        },
+        {
+          "gt": 400000,
+          "lte": 800000,
+          "base_tax": 22400,
+          "rate": 0.069,
+          "excess_over": 400000
+        },
+        {
+          "gt": 800000,
+          "lte": null,
+          "base_tax": 50000,
+          "rate": 0.0699,
+          "excess_over": 800000
+        }
+      ],
+      "C": [
+        {
+          "gt": 0,
+          "lte": 20000,
+          "base_tax": 0,
+          "rate": 0.02,
+          "excess_over": 0
+        },
+        {
+          "gt": 20000,
+          "lte": 100000,
+          "base_tax": 400,
+          "rate": 0.045,
+          "excess_over": 20000
+        },
+        {
+          "gt": 100000,
+          "lte": 200000,
+          "base_tax": 4000,
+          "rate": 0.055,
+          "excess_over": 100000
+        },
+        {
+          "gt": 200000,
+          "lte": 400000,
+          "base_tax": 9500,
+          "rate": 0.06,
+          "excess_over": 200000
+        },
+        {
+          "gt": 400000,
+          "lte": 500000,
+          "base_tax": 21500,
+          "rate": 0.065,
+          "excess_over": 400000
+        },
+        {
+          "gt": 500000,
+          "lte": 1000000,
+          "base_tax": 28000,
+          "rate": 0.069,
+          "excess_over": 500000
+        },
+        {
+          "gt": 1000000,
+          "lte": null,
+          "base_tax": 62500,
+          "rate": 0.0699,
+          "excess_over": 1000000
+        }
+      ],
+      "D": "same_as_A",
+      "F": "same_as_A"
+    },
+    "phase_out_add_back": {
+      "A": [
+        {
+          "gt": 0,
+          "lte": 50250,
+          "add_back": 0
+        },
+        {
+          "gt": 50250,
+          "lte": 52750,
+          "add_back": 25
+        },
+        {
+          "gt": 52750,
+          "lte": 55250,
+          "add_back": 50
+        },
+        {
+          "gt": 55250,
+          "lte": 57750,
+          "add_back": 75
+        },
+        {
+          "gt": 57750,
+          "lte": 60250,
+          "add_back": 100
+        },
+        {
+          "gt": 60250,
+          "lte": 62750,
+          "add_back": 125
+        },
+        {
+          "gt": 62750,
+          "lte": 65250,
+          "add_back": 150
+        },
+        {
+          "gt": 65250,
+          "lte": 67750,
+          "add_back": 175
+        },
+        {
+          "gt": 67750,
+          "lte": 70250,
+          "add_back": 200
+        },
+        {
+          "gt": 70250,
+          "lte": 72750,
+          "add_back": 225
+        },
+        {
+          "gt": 72750,
+          "lte": null,
+          "add_back": 250
+        }
+      ],
+      "B": [
+        {
+          "gt": 0,
+          "lte": 78500,
+          "add_back": 0
+        },
+        {
+          "gt": 78500,
+          "lte": 82500,
+          "add_back": 40
+        },
+        {
+          "gt": 82500,
+          "lte": 86500,
+          "add_back": 80
+        },
+        {
+          "gt": 86500,
+          "lte": 90500,
+          "add_back": 120
+        },
+        {
+          "gt": 90500,
+          "lte": 94500,
+          "add_back": 160
+        },
+        {
+          "gt": 94500,
+          "lte": 98500,
+          "add_back": 200
+        },
+        {
+          "gt": 98500,
+          "lte": 102500,
+          "add_back": 240
+        },
+        {
+          "gt": 102500,
+          "lte": 106500,
+          "add_back": 280
+        },
+        {
+          "gt": 106500,
+          "lte": 110500,
+          "add_back": 320
+        },
+        {
+          "gt": 110500,
+          "lte": 114500,
+          "add_back": 360
+        },
+        {
+          "gt": 114500,
+          "lte": null,
+          "add_back": 400
+        }
+      ],
+      "C": [
+        {
+          "gt": 0,
+          "lte": 100500,
+          "add_back": 0
+        },
+        {
+          "gt": 100500,
+          "lte": 105500,
+          "add_back": 50
+        },
+        {
+          "gt": 105500,
+          "lte": 110500,
+          "add_back": 100
+        },
+        {
+          "gt": 110500,
+          "lte": 115500,
+          "add_back": 150
+        },
+        {
+          "gt": 115500,
+          "lte": 120500,
+          "add_back": 200
+        },
+        {
+          "gt": 120500,
+          "lte": 125500,
+          "add_back": 250
+        },
+        {
+          "gt": 125500,
+          "lte": 130500,
+          "add_back": 300
+        },
+        {
+          "gt": 130500,
+          "lte": 135500,
+          "add_back": 350
+        },
+        {
+          "gt": 135500,
+          "lte": 140500,
+          "add_back": 400
+        },
+        {
+          "gt": 140500,
+          "lte": 145500,
+          "add_back": 450
+        },
+        {
+          "gt": 145500,
+          "lte": null,
+          "add_back": 500
+        }
+      ],
+      "D": "same_as_A",
+      "F": [
+        {
+          "gt": 0,
+          "lte": 56500,
+          "add_back": 0
+        },
+        {
+          "gt": 56500,
+          "lte": 61500,
+          "add_back": 25
+        },
+        {
+          "gt": 61500,
+          "lte": 66500,
+          "add_back": 50
+        },
+        {
+          "gt": 66500,
+          "lte": 71500,
+          "add_back": 75
+        },
+        {
+          "gt": 71500,
+          "lte": 76500,
+          "add_back": 100
+        },
+        {
+          "gt": 76500,
+          "lte": 81500,
+          "add_back": 125
+        },
+        {
+          "gt": 81500,
+          "lte": 86500,
+          "add_back": 150
+        },
+        {
+          "gt": 86500,
+          "lte": 91500,
+          "add_back": 175
+        },
+        {
+          "gt": 91500,
+          "lte": 96500,
+          "add_back": 200
+        },
+        {
+          "gt": 96500,
+          "lte": 101500,
+          "add_back": 225
+        },
+        {
+          "gt": 101500,
+          "lte": null,
+          "add_back": 250
+        }
+      ]
+    },
+    "tax_recapture": {
+      "A": [
+        {
+          "gt": 0,
+          "lte": 105000,
+          "recapture": 0
+        },
+        {
+          "gt": 105000,
+          "lte": 110000,
+          "recapture": 25
+        },
+        {
+          "gt": 110000,
+          "lte": 115000,
+          "recapture": 50
+        },
+        {
+          "gt": 115000,
+          "lte": 120000,
+          "recapture": 75
+        },
+        {
+          "gt": 120000,
+          "lte": 125000,
+          "recapture": 100
+        },
+        {
+          "gt": 125000,
+          "lte": 130000,
+          "recapture": 125
+        },
+        {
+          "gt": 130000,
+          "lte": 135000,
+          "recapture": 150
+        },
+        {
+          "gt": 135000,
+          "lte": 140000,
+          "recapture": 175
+        },
+        {
+          "gt": 140000,
+          "lte": 145000,
+          "recapture": 200
+        },
+        {
+          "gt": 145000,
+          "lte": 150000,
+          "recapture": 225
+        },
+        {
+          "gt": 150000,
+          "lte": 200000,
+          "recapture": 250
+        },
+        {
+          "gt": 200000,
+          "lte": 205000,
+          "recapture": 340
+        },
+        {
+          "gt": 205000,
+          "lte": 210000,
+          "recapture": 430
+        },
+        {
+          "gt": 210000,
+          "lte": 215000,
+          "recapture": 520
+        },
+        {
+          "gt": 215000,
+          "lte": 220000,
+          "recapture": 610
+        },
+        {
+          "gt": 220000,
+          "lte": 225000,
+          "recapture": 700
+        },
+        {
+          "gt": 225000,
+          "lte": 230000,
+          "recapture": 790
+        },
+        {
+          "gt": 230000,
+          "lte": 235000,
+          "recapture": 880
+        },
+        {
+          "gt": 235000,
+          "lte": 240000,
+          "recapture": 970
+        },
+        {
+          "gt": 240000,
+          "lte": 245000,
+          "recapture": 1060
+        },
+        {
+          "gt": 245000,
+          "lte": 250000,
+          "recapture": 1150
+        },
+        {
+          "gt": 250000,
+          "lte": 255000,
+          "recapture": 1240
+        },
+        {
+          "gt": 255000,
+          "lte": 260000,
+          "recapture": 1330
+        },
+        {
+          "gt": 260000,
+          "lte": 265000,
+          "recapture": 1420
+        },
+        {
+          "gt": 265000,
+          "lte": 270000,
+          "recapture": 1510
+        },
+        {
+          "gt": 270000,
+          "lte": 275000,
+          "recapture": 1600
+        },
+        {
+          "gt": 275000,
+          "lte": 280000,
+          "recapture": 1690
+        },
+        {
+          "gt": 280000,
+          "lte": 285000,
+          "recapture": 1780
+        },
+        {
+          "gt": 285000,
+          "lte": 290000,
+          "recapture": 1870
+        },
+        {
+          "gt": 290000,
+          "lte": 295000,
+          "recapture": 1960
+        },
+        {
+          "gt": 295000,
+          "lte": 300000,
+          "recapture": 2050
+        },
+        {
+          "gt": 300000,
+          "lte": 305000,
+          "recapture": 2140
+        },
+        {
+          "gt": 305000,
+          "lte": 310000,
+          "recapture": 2230
+        },
+        {
+          "gt": 310000,
+          "lte": 315000,
+          "recapture": 2320
+        },
+        {
+          "gt": 315000,
+          "lte": 320000,
+          "recapture": 2410
+        },
+        {
+          "gt": 320000,
+          "lte": 325000,
+          "recapture": 2500
+        },
+        {
+          "gt": 325000,
+          "lte": 330000,
+          "recapture": 2590
+        },
+        {
+          "gt": 330000,
+          "lte": 335000,
+          "recapture": 2680
+        },
+        {
+          "gt": 335000,
+          "lte": 340000,
+          "recapture": 2770
+        },
+        {
+          "gt": 340000,
+          "lte": 345000,
+          "recapture": 2860
+        },
+        {
+          "gt": 345000,
+          "lte": 500000,
+          "recapture": 2950
+        },
+        {
+          "gt": 500000,
+          "lte": 505000,
+          "recapture": 3000
+        },
+        {
+          "gt": 505000,
+          "lte": 510000,
+          "recapture": 3050
+        },
+        {
+          "gt": 510000,
+          "lte": 515000,
+          "recapture": 3100
+        },
+        {
+          "gt": 515000,
+          "lte": 520000,
+          "recapture": 3150
+        },
+        {
+          "gt": 520000,
+          "lte": 525000,
+          "recapture": 3200
+        },
+        {
+          "gt": 525000,
+          "lte": 530000,
+          "recapture": 3250
+        },
+        {
+          "gt": 530000,
+          "lte": 535000,
+          "recapture": 3300
+        },
+        {
+          "gt": 535000,
+          "lte": 540000,
+          "recapture": 3350
+        },
+        {
+          "gt": 540000,
+          "lte": null,
+          "recapture": 3400
+        }
+      ],
+      "B": [
+        {
+          "gt": 0,
+          "lte": 168000,
+          "recapture": 0
+        },
+        {
+          "gt": 168000,
+          "lte": 176000,
+          "recapture": 40
+        },
+        {
+          "gt": 176000,
+          "lte": 184000,
+          "recapture": 80
+        },
+        {
+          "gt": 184000,
+          "lte": 192000,
+          "recapture": 120
+        },
+        {
+          "gt": 192000,
+          "lte": 200000,
+          "recapture": 160
+        },
+        {
+          "gt": 200000,
+          "lte": 208000,
+          "recapture": 200
+        },
+        {
+          "gt": 208000,
+          "lte": 216000,
+          "recapture": 240
+        },
+        {
+          "gt": 216000,
+          "lte": 224000,
+          "recapture": 280
+        },
+        {
+          "gt": 224000,
+          "lte": 232000,
+          "recapture": 320
+        },
+        {
+          "gt": 232000,
+          "lte": 240000,
+          "recapture": 360
+        },
+        {
+          "gt": 240000,
+          "lte": 320000,
+          "recapture": 400
+        },
+        {
+          "gt": 320000,
+          "lte": 328000,
+          "recapture": 540
+        },
+        {
+          "gt": 328000,
+          "lte": 336000,
+          "recapture": 680
+        },
+        {
+          "gt": 336000,
+          "lte": 344000,
+          "recapture": 820
+        },
+        {
+          "gt": 344000,
+          "lte": 352000,
+          "recapture": 960
+        },
+        {
+          "gt": 352000,
+          "lte": 360000,
+          "recapture": 1100
+        },
+        {
+          "gt": 360000,
+          "lte": 368000,
+          "recapture": 1240
+        },
+        {
+          "gt": 368000,
+          "lte": 376000,
+          "recapture": 1380
+        },
+        {
+          "gt": 376000,
+          "lte": 384000,
+          "recapture": 1520
+        },
+        {
+          "gt": 384000,
+          "lte": 392000,
+          "recapture": 1660
+        },
+        {
+          "gt": 392000,
+          "lte": 400000,
+          "recapture": 1800
+        },
+        {
+          "gt": 400000,
+          "lte": 408000,
+          "recapture": 1940
+        },
+        {
+          "gt": 408000,
+          "lte": 416000,
+          "recapture": 2080
+        },
+        {
+          "gt": 416000,
+          "lte": 424000,
+          "recapture": 2220
+        },
+        {
+          "gt": 424000,
+          "lte": 432000,
+          "recapture": 2360
+        },
+        {
+          "gt": 432000,
+          "lte": 440000,
+          "recapture": 2500
+        },
+        {
+          "gt": 440000,
+          "lte": 448000,
+          "recapture": 2640
+        },
+        {
+          "gt": 448000,
+          "lte": 456000,
+          "recapture": 2780
+        },
+        {
+          "gt": 456000,
+          "lte": 464000,
+          "recapture": 2920
+        },
+        {
+          "gt": 464000,
+          "lte": 472000,
+          "recapture": 3060
+        },
+        {
+          "gt": 472000,
+          "lte": 480000,
+          "recapture": 3200
+        },
+        {
+          "gt": 480000,
+          "lte": 488000,
+          "recapture": 3340
+        },
+        {
+          "gt": 488000,
+          "lte": 496000,
+          "recapture": 3480
+        },
+        {
+          "gt": 496000,
+          "lte": 504000,
+          "recapture": 3620
+        },
+        {
+          "gt": 504000,
+          "lte": 512000,
+          "recapture": 3760
+        },
+        {
+          "gt": 512000,
+          "lte": 520000,
+          "recapture": 3900
+        },
+        {
+          "gt": 520000,
+          "lte": 528000,
+          "recapture": 4040
+        },
+        {
+          "gt": 528000,
+          "lte": 536000,
+          "recapture": 4180
+        },
+        {
+          "gt": 536000,
+          "lte": 544000,
+          "recapture": 4320
+        },
+        {
+          "gt": 544000,
+          "lte": 552000,
+          "recapture": 4460
+        },
+        {
+          "gt": 552000,
+          "lte": 800000,
+          "recapture": 4600
+        },
+        {
+          "gt": 800000,
+          "lte": 808000,
+          "recapture": 4680
+        },
+        {
+          "gt": 808000,
+          "lte": 816000,
+          "recapture": 4760
+        },
+        {
+          "gt": 816000,
+          "lte": 824000,
+          "recapture": 4840
+        },
+        {
+          "gt": 824000,
+          "lte": 832000,
+          "recapture": 4920
+        },
+        {
+          "gt": 832000,
+          "lte": 840000,
+          "recapture": 5000
+        },
+        {
+          "gt": 840000,
+          "lte": 848000,
+          "recapture": 5080
+        },
+        {
+          "gt": 848000,
+          "lte": 856000,
+          "recapture": 5160
+        },
+        {
+          "gt": 856000,
+          "lte": 864000,
+          "recapture": 5240
+        },
+        {
+          "gt": 864000,
+          "lte": null,
+          "recapture": 5320
+        }
+      ],
+      "C": [
+        {
+          "gt": 0,
+          "lte": 210000,
+          "recapture": 0
+        },
+        {
+          "gt": 210000,
+          "lte": 220000,
+          "recapture": 50
+        },
+        {
+          "gt": 220000,
+          "lte": 230000,
+          "recapture": 100
+        },
+        {
+          "gt": 230000,
+          "lte": 240000,
+          "recapture": 150
+        },
+        {
+          "gt": 240000,
+          "lte": 250000,
+          "recapture": 200
+        },
+        {
+          "gt": 250000,
+          "lte": 260000,
+          "recapture": 250
+        },
+        {
+          "gt": 260000,
+          "lte": 270000,
+          "recapture": 300
+        },
+        {
+          "gt": 270000,
+          "lte": 280000,
+          "recapture": 350
+        },
+        {
+          "gt": 280000,
+          "lte": 290000,
+          "recapture": 400
+        },
+        {
+          "gt": 290000,
+          "lte": 300000,
+          "recapture": 450
+        },
+        {
+          "gt": 300000,
+          "lte": 400000,
+          "recapture": 500
+        },
+        {
+          "gt": 400000,
+          "lte": 410000,
+          "recapture": 680
+        },
+        {
+          "gt": 410000,
+          "lte": 420000,
+          "recapture": 860
+        },
+        {
+          "gt": 420000,
+          "lte": 430000,
+          "recapture": 1040
+        },
+        {
+          "gt": 430000,
+          "lte": 440000,
+          "recapture": 1220
+        },
+        {
+          "gt": 440000,
+          "lte": 450000,
+          "recapture": 1400
+        },
+        {
+          "gt": 450000,
+          "lte": 460000,
+          "recapture": 1580
+        },
+        {
+          "gt": 460000,
+          "lte": 470000,
+          "recapture": 1760
+        },
+        {
+          "gt": 470000,
+          "lte": 480000,
+          "recapture": 1940
+        },
+        {
+          "gt": 480000,
+          "lte": 490000,
+          "recapture": 2120
+        },
+        {
+          "gt": 490000,
+          "lte": 500000,
+          "recapture": 2300
+        },
+        {
+          "gt": 500000,
+          "lte": 510000,
+          "recapture": 2480
+        },
+        {
+          "gt": 510000,
+          "lte": 520000,
+          "recapture": 2660
+        },
+        {
+          "gt": 520000,
+          "lte": 530000,
+          "recapture": 2840
+        },
+        {
+          "gt": 530000,
+          "lte": 540000,
+          "recapture": 3020
+        },
+        {
+          "gt": 540000,
+          "lte": 550000,
+          "recapture": 3200
+        },
+        {
+          "gt": 550000,
+          "lte": 560000,
+          "recapture": 3380
+        },
+        {
+          "gt": 560000,
+          "lte": 570000,
+          "recapture": 3560
+        },
+        {
+          "gt": 570000,
+          "lte": 580000,
+          "recapture": 3740
+        },
+        {
+          "gt": 580000,
+          "lte": 590000,
+          "recapture": 3920
+        },
+        {
+          "gt": 590000,
+          "lte": 600000,
+          "recapture": 4100
+        },
+        {
+          "gt": 600000,
+          "lte": 610000,
+          "recapture": 4280
+        },
+        {
+          "gt": 610000,
+          "lte": 620000,
+          "recapture": 4460
+        },
+        {
+          "gt": 620000,
+          "lte": 630000,
+          "recapture": 4640
+        },
+        {
+          "gt": 630000,
+          "lte": 640000,
+          "recapture": 4820
+        },
+        {
+          "gt": 640000,
+          "lte": 650000,
+          "recapture": 5000
+        },
+        {
+          "gt": 650000,
+          "lte": 660000,
+          "recapture": 5180
+        },
+        {
+          "gt": 660000,
+          "lte": 670000,
+          "recapture": 5360
+        },
+        {
+          "gt": 670000,
+          "lte": 680000,
+          "recapture": 5540
+        },
+        {
+          "gt": 680000,
+          "lte": 690000,
+          "recapture": 5720
+        },
+        {
+          "gt": 690000,
+          "lte": 1000000,
+          "recapture": 5900
+        },
+        {
+          "gt": 1000000,
+          "lte": 1010000,
+          "recapture": 6000
+        },
+        {
+          "gt": 1010000,
+          "lte": 1020000,
+          "recapture": 6100
+        },
+        {
+          "gt": 1020000,
+          "lte": 1030000,
+          "recapture": 6200
+        },
+        {
+          "gt": 1030000,
+          "lte": 1040000,
+          "recapture": 6300
+        },
+        {
+          "gt": 1040000,
+          "lte": 1050000,
+          "recapture": 6400
+        },
+        {
+          "gt": 1050000,
+          "lte": 1060000,
+          "recapture": 6500
+        },
+        {
+          "gt": 1060000,
+          "lte": 1070000,
+          "recapture": 6600
+        },
+        {
+          "gt": 1070000,
+          "lte": 1080000,
+          "recapture": 6700
+        },
+        {
+          "gt": 1080000,
+          "lte": null,
+          "recapture": 6800
+        }
+      ],
+      "D": "same_as_A",
+      "F": "same_as_A"
+    },
+    "personal_tax_credits": {
+      "A": [
+        {
+          "gt": 12000,
+          "lte": 15000,
+          "credit": 0.75
+        },
+        {
+          "gt": 15000,
+          "lte": 15500,
+          "credit": 0.7
+        },
+        {
+          "gt": 15500,
+          "lte": 16000,
+          "credit": 0.65
+        },
+        {
+          "gt": 16000,
+          "lte": 16500,
+          "credit": 0.6
+        },
+        {
+          "gt": 16500,
+          "lte": 17000,
+          "credit": 0.55
+        },
+        {
+          "gt": 17000,
+          "lte": 17500,
+          "credit": 0.5
+        },
+        {
+          "gt": 17500,
+          "lte": 18000,
+          "credit": 0.45
+        },
+        {
+          "gt": 18000,
+          "lte": 18500,
+          "credit": 0.4
+        },
+        {
+          "gt": 18500,
+          "lte": 20000,
+          "credit": 0.35
+        },
+        {
+          "gt": 20000,
+          "lte": 20500,
+          "credit": 0.3
+        },
+        {
+          "gt": 20500,
+          "lte": 21000,
+          "credit": 0.25
+        },
+        {
+          "gt": 21000,
+          "lte": 21500,
+          "credit": 0.2
+        },
+        {
+          "gt": 21500,
+          "lte": 25000,
+          "credit": 0.15
+        },
+        {
+          "gt": 25000,
+          "lte": 25500,
+          "credit": 0.14
+        },
+        {
+          "gt": 25500,
+          "lte": 26000,
+          "credit": 0.13
+        },
+        {
+          "gt": 26000,
+          "lte": 26500,
+          "credit": 0.12
+        },
+        {
+          "gt": 26500,
+          "lte": 27000,
+          "credit": 0.11
+        },
+        {
+          "gt": 27000,
+          "lte": 48000,
+          "credit": 0.1
+        },
+        {
+          "gt": 48000,
+          "lte": 48500,
+          "credit": 0.09
+        },
+        {
+          "gt": 48500,
+          "lte": 49000,
+          "credit": 0.08
+        },
+        {
+          "gt": 49000,
+          "lte": 49500,
+          "credit": 0.07
+        },
+        {
+          "gt": 49500,
+          "lte": 50000,
+          "credit": 0.06
+        },
+        {
+          "gt": 50000,
+          "lte": 50500,
+          "credit": 0.05
+        },
+        {
+          "gt": 50500,
+          "lte": 51000,
+          "credit": 0.04
+        },
+        {
+          "gt": 51000,
+          "lte": 51500,
+          "credit": 0.03
+        },
+        {
+          "gt": 51500,
+          "lte": 52000,
+          "credit": 0.02
+        },
+        {
+          "gt": 52000,
+          "lte": 52500,
+          "credit": 0.01
+        },
+        {
+          "gt": 52500,
+          "lte": null,
+          "credit": 0.0
+        }
+      ],
+      "B": [
+        {
+          "gt": 19000,
+          "lte": 24000,
+          "credit": 0.75
+        },
+        {
+          "gt": 24000,
+          "lte": 24500,
+          "credit": 0.7
+        },
+        {
+          "gt": 24500,
+          "lte": 25000,
+          "credit": 0.65
+        },
+        {
+          "gt": 25000,
+          "lte": 25500,
+          "credit": 0.6
+        },
+        {
+          "gt": 25500,
+          "lte": 26000,
+          "credit": 0.55
+        },
+        {
+          "gt": 26000,
+          "lte": 26500,
+          "credit": 0.5
+        },
+        {
+          "gt": 26500,
+          "lte": 27000,
+          "credit": 0.45
+        },
+        {
+          "gt": 27000,
+          "lte": 27500,
+          "credit": 0.4
+        },
+        {
+          "gt": 27500,
+          "lte": 34000,
+          "credit": 0.35
+        },
+        {
+          "gt": 34000,
+          "lte": 34500,
+          "credit": 0.3
+        },
+        {
+          "gt": 34500,
+          "lte": 35000,
+          "credit": 0.25
+        },
+        {
+          "gt": 35000,
+          "lte": 35500,
+          "credit": 0.2
+        },
+        {
+          "gt": 35500,
+          "lte": 44000,
+          "credit": 0.15
+        },
+        {
+          "gt": 44000,
+          "lte": 44500,
+          "credit": 0.14
+        },
+        {
+          "gt": 44500,
+          "lte": 45000,
+          "credit": 0.13
+        },
+        {
+          "gt": 45000,
+          "lte": 45500,
+          "credit": 0.12
+        },
+        {
+          "gt": 45500,
+          "lte": 46000,
+          "credit": 0.11
+        },
+        {
+          "gt": 46000,
+          "lte": 74000,
+          "credit": 0.1
+        },
+        {
+          "gt": 74000,
+          "lte": 74500,
+          "credit": 0.09
+        },
+        {
+          "gt": 74500,
+          "lte": 75000,
+          "credit": 0.08
+        },
+        {
+          "gt": 75000,
+          "lte": 75500,
+          "credit": 0.07
+        },
+        {
+          "gt": 75500,
+          "lte": 76000,
+          "credit": 0.06
+        },
+        {
+          "gt": 76000,
+          "lte": 76500,
+          "credit": 0.05
+        },
+        {
+          "gt": 76500,
+          "lte": 77000,
+          "credit": 0.04
+        },
+        {
+          "gt": 77000,
+          "lte": 77500,
+          "credit": 0.03
+        },
+        {
+          "gt": 77500,
+          "lte": 78000,
+          "credit": 0.02
+        },
+        {
+          "gt": 78000,
+          "lte": 78500,
+          "credit": 0.01
+        },
+        {
+          "gt": 78500,
+          "lte": null,
+          "credit": 0.0
+        }
+      ],
+      "C": [
+        {
+          "gt": 24000,
+          "lte": 30000,
+          "credit": 0.75
+        },
+        {
+          "gt": 30000,
+          "lte": 30500,
+          "credit": 0.7
+        },
+        {
+          "gt": 30500,
+          "lte": 31000,
+          "credit": 0.65
+        },
+        {
+          "gt": 31000,
+          "lte": 31500,
+          "credit": 0.6
+        },
+        {
+          "gt": 31500,
+          "lte": 32000,
+          "credit": 0.55
+        },
+        {
+          "gt": 32000,
+          "lte": 32500,
+          "credit": 0.5
+        },
+        {
+          "gt": 32500,
+          "lte": 33000,
+          "credit": 0.45
+        },
+        {
+          "gt": 33000,
+          "lte": 33500,
+          "credit": 0.4
+        },
+        {
+          "gt": 33500,
+          "lte": 40000,
+          "credit": 0.35
+        },
+        {
+          "gt": 40000,
+          "lte": 40500,
+          "credit": 0.3
+        },
+        {
+          "gt": 40500,
+          "lte": 41000,
+          "credit": 0.25
+        },
+        {
+          "gt": 41000,
+          "lte": 41500,
+          "credit": 0.2
+        },
+        {
+          "gt": 41500,
+          "lte": 50000,
+          "credit": 0.15
+        },
+        {
+          "gt": 50000,
+          "lte": 50500,
+          "credit": 0.14
+        },
+        {
+          "gt": 50500,
+          "lte": 51000,
+          "credit": 0.13
+        },
+        {
+          "gt": 51000,
+          "lte": 51500,
+          "credit": 0.12
+        },
+        {
+          "gt": 51500,
+          "lte": 52000,
+          "credit": 0.11
+        },
+        {
+          "gt": 52000,
+          "lte": 96000,
+          "credit": 0.1
+        },
+        {
+          "gt": 96000,
+          "lte": 96500,
+          "credit": 0.09
+        },
+        {
+          "gt": 96500,
+          "lte": 97000,
+          "credit": 0.08
+        },
+        {
+          "gt": 97000,
+          "lte": 97500,
+          "credit": 0.07
+        },
+        {
+          "gt": 97500,
+          "lte": 98000,
+          "credit": 0.06
+        },
+        {
+          "gt": 98000,
+          "lte": 98500,
+          "credit": 0.05
+        },
+        {
+          "gt": 98500,
+          "lte": 99000,
+          "credit": 0.04
+        },
+        {
+          "gt": 99000,
+          "lte": 99500,
+          "credit": 0.03
+        },
+        {
+          "gt": 99500,
+          "lte": 100000,
+          "credit": 0.02
+        },
+        {
+          "gt": 100000,
+          "lte": 100500,
+          "credit": 0.01
+        },
+        {
+          "gt": 100500,
+          "lte": null,
+          "credit": 0.0
+        }
+      ],
+      "D": [
+        {
+          "gt": 0,
+          "lte": null,
+          "credit": 0.0
+        }
+      ],
+      "F": [
+        {
+          "gt": 15000,
+          "lte": 18800,
+          "credit": 0.75
+        },
+        {
+          "gt": 18800,
+          "lte": 19300,
+          "credit": 0.7
+        },
+        {
+          "gt": 19300,
+          "lte": 19800,
+          "credit": 0.65
+        },
+        {
+          "gt": 19800,
+          "lte": 20300,
+          "credit": 0.6
+        },
+        {
+          "gt": 20300,
+          "lte": 20800,
+          "credit": 0.55
+        },
+        {
+          "gt": 20800,
+          "lte": 21300,
+          "credit": 0.5
+        },
+        {
+          "gt": 21300,
+          "lte": 21800,
+          "credit": 0.45
+        },
+        {
+          "gt": 21800,
+          "lte": 22300,
+          "credit": 0.4
+        },
+        {
+          "gt": 22300,
+          "lte": 25000,
+          "credit": 0.35
+        },
+        {
+          "gt": 25000,
+          "lte": 25500,
+          "credit": 0.3
+        },
+        {
+          "gt": 25500,
+          "lte": 26000,
+          "credit": 0.25
+        },
+        {
+          "gt": 26000,
+          "lte": 26500,
+          "credit": 0.2
+        },
+        {
+          "gt": 26500,
+          "lte": 31300,
+          "credit": 0.15
+        },
+        {
+          "gt": 31300,
+          "lte": 31800,
+          "credit": 0.14
+        },
+        {
+          "gt": 31800,
+          "lte": 32300,
+          "credit": 0.13
+        },
+        {
+          "gt": 32300,
+          "lte": 32800,
+          "credit": 0.12
+        },
+        {
+          "gt": 32800,
+          "lte": 33300,
+          "credit": 0.11
+        },
+        {
+          "gt": 33300,
+          "lte": 60000,
+          "credit": 0.1
+        },
+        {
+          "gt": 60000,
+          "lte": 60500,
+          "credit": 0.09
+        },
+        {
+          "gt": 60500,
+          "lte": 61000,
+          "credit": 0.08
+        },
+        {
+          "gt": 61000,
+          "lte": 61500,
+          "credit": 0.07
+        },
+        {
+          "gt": 61500,
+          "lte": 62000,
+          "credit": 0.06
+        },
+        {
+          "gt": 62000,
+          "lte": 62500,
+          "credit": 0.05
+        },
+        {
+          "gt": 62500,
+          "lte": 63000,
+          "credit": 0.04
+        },
+        {
+          "gt": 63000,
+          "lte": 63500,
+          "credit": 0.03
+        },
+        {
+          "gt": 63500,
+          "lte": 64000,
+          "credit": 0.02
+        },
+        {
+          "gt": 64000,
+          "lte": 64500,
+          "credit": 0.01
+        },
+        {
+          "gt": 64500,
+          "lte": null,
+          "credit": 0.0
+        }
+      ]
+    }
+  }
+}
