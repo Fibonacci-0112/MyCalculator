@@ -373,7 +373,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     {
         UsState[] expectedStates =
         [
-            UsState.AZ, UsState.CT,
+            UsState.AZ,
             UsState.DC, UsState.DE, UsState.GA, UsState.HI, UsState.IA,
             UsState.ID, UsState.IL, UsState.IN, UsState.KS, UsState.KY,
             UsState.LA, UsState.MA, UsState.MD, UsState.ME, UsState.MI,

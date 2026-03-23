@@ -126,31 +126,7 @@ public static class StateTaxConfigs2026
 
             // California — handled by CaliforniaWithholdingCalculator (Method B)
 
-            [UsState.CT] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                BracketsSingle =
-                [
-                    B(0, 10_000m, 0.02m),
-                    B(10_000m, 50_000m, 0.045m),
-                    B(50_000m, 100_000m, 0.055m),
-                    B(100_000m, 200_000m, 0.06m),
-                    B(200_000m, 250_000m, 0.065m),
-                    B(250_000m, 500_000m, 0.069m),
-                    B(500_000m, null, 0.0699m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 20_000m, 0.02m),
-                    B(20_000m, 100_000m, 0.045m),
-                    B(100_000m, 200_000m, 0.055m),
-                    B(200_000m, 400_000m, 0.06m),
-                    B(400_000m, 500_000m, 0.065m),
-                    B(500_000m, 1_000_000m, 0.069m),
-                    B(1_000_000m, null, 0.0699m)
-                ]
-            },
+            // Connecticut — handled by ConnecticutWithholdingCalculator (TPG-211 table-driven)
 
             [UsState.DC] = new()
             {
