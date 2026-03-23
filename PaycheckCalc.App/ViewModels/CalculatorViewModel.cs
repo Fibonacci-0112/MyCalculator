@@ -60,6 +60,21 @@ public partial class CalculatorViewModel : ObservableObject
     [RelayCommand]
     private void SelectTab(string tab) => SelectedInputTab = int.Parse(tab);
 
+    // ── Results-page tab state ──────────────────────────────
+    [ObservableProperty] public partial int SelectedResultTab { get; set; } = 0;
+
+    public bool IsResultTab0Visible => SelectedResultTab == 0;
+    public bool IsResultTab1Visible => SelectedResultTab == 1;
+
+    partial void OnSelectedResultTabChanged(int value)
+    {
+        OnPropertyChanged(nameof(IsResultTab0Visible));
+        OnPropertyChanged(nameof(IsResultTab1Visible));
+    }
+
+    [RelayCommand]
+    private void SelectResultTab(string tab) => SelectedResultTab = int.Parse(tab);
+
     public ObservableCollection<PickerItem<FederalFilingStatus>> FederalStatuses { get; } = new(
         Enum.GetValues<FederalFilingStatus>()
             .Select(s => new PickerItem<FederalFilingStatus>(s, EnumDisplay.FederalFilingStatus(s.ToString()))));

@@ -11,7 +11,7 @@
         <helpers:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*">
 
         <!-- Page Header -->
         <Grid Grid.Row="0" BackgroundColor="#1565C0" Padding="16,20,16,20">
@@ -22,8 +22,70 @@
                    HorizontalTextAlignment="Center" />
         </Grid>
 
-        <ScrollView Grid.Row="1">
+        <!-- Results Tab Bar -->
+        <Grid Grid.Row="1" BackgroundColor="#1976D2" Padding="10,8,10,8"
+              ColumnDefinitions="*,*" ColumnSpacing="6">
+            <Border Grid.Column="0" StrokeThickness="0"
+                    StrokeShape="RoundRectangle 20">
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsResultTab0Visible}" Value="True">
+                        <Setter Property="BackgroundColor" Value="White" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsResultTab0Visible}" Value="False">
+                        <Setter Property="BackgroundColor" Value="Transparent" />
+                    </DataTrigger>
+                </Border.Triggers>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectResultTabCommand}" CommandParameter="0" />
+                </Border.GestureRecognizers>
+                <Label Text="Period" Padding="4,8"
+                       FontSize="13" FontAttributes="Bold"
+                       HorizontalTextAlignment="Center">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsResultTab0Visible}" Value="True">
+                            <Setter Property="TextColor" Value="#1565C0" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsResultTab0Visible}" Value="False">
+                            <Setter Property="TextColor" Value="White" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </Border>
+            <Border Grid.Column="1" StrokeThickness="0"
+                    StrokeShape="RoundRectangle 20">
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsResultTab1Visible}" Value="True">
+                        <Setter Property="BackgroundColor" Value="White" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsResultTab1Visible}" Value="False">
+                        <Setter Property="BackgroundColor" Value="Transparent" />
+                    </DataTrigger>
+                </Border.Triggers>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectResultTabCommand}" CommandParameter="1" />
+                </Border.GestureRecognizers>
+                <Label Text="Annual" Padding="4,8"
+                       FontSize="13" FontAttributes="Bold"
+                       HorizontalTextAlignment="Center">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsResultTab1Visible}" Value="True">
+                            <Setter Property="TextColor" Value="#1565C0" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsResultTab1Visible}" Value="False">
+                            <Setter Property="TextColor" Value="White" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </Border>
+        </Grid>
+
+        <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="16" Spacing="12">
+
+                <!-- ═══════════════════════════════════════════════════ -->
+                <!-- Period Tab Content                                 -->
+                <!-- ═══════════════════════════════════════════════════ -->
+                <VerticalStackLayout Spacing="12" IsVisible="{Binding IsResultTab0Visible}">
 
                 <!-- Income card: Gross Pay, Federal Taxable Income, State Taxable Income -->
                 <Border BackgroundColor="White" StrokeThickness="0"
@@ -142,9 +204,21 @@
                         Padding="16,12"
                         HorizontalOptions="FillAndExpand" />
 
+                <!-- Doughnut Chart -->
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="12">
+                    <GraphicsView x:Name="DoughnutChart"
+                                  HeightRequest="380"
+                                  HorizontalOptions="FillAndExpand" />
+                </Border>
+
+                </VerticalStackLayout>
+                <!-- End Period Tab -->
+
                 <!-- ═══════════════════════════════════════════════════ -->
-                <!-- Annual Projections Section                         -->
+                <!-- Annual Tab Content                                 -->
                 <!-- ═══════════════════════════════════════════════════ -->
+                <VerticalStackLayout Spacing="12" IsVisible="{Binding IsResultTab1Visible}">
 
                 <!-- Projection Header -->
                 <Label Text="ANNUAL PROJECTIONS" TextColor="#78909C"
@@ -393,13 +467,8 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Doughnut Chart -->
-                <Border BackgroundColor="White" StrokeThickness="0"
-                        StrokeShape="RoundRectangle 12" Padding="12">
-                    <GraphicsView x:Name="DoughnutChart"
-                                  HeightRequest="380"
-                                  HorizontalOptions="FillAndExpand" />
-                </Border>
+                </VerticalStackLayout>
+                <!-- End Annual Tab -->
 
             </VerticalStackLayout>
         </ScrollView>
