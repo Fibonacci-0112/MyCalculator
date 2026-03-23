@@ -200,8 +200,8 @@
                                 Grid.Row="0" Grid.Column="1" TextColor="Black" />
                         <Label Text="Step 2 checked?" Grid.Row="1" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
-                        <Switch IsToggled="{Binding FederalStep2Checked}" Grid.Row="1" Grid.Column="1"
-                                OnColor="#1565C0" />
+                        <CheckBox IsChecked="{Binding FederalStep2Checked}" Grid.Row="1" Grid.Column="1"
+                                  Color="#1565C0" />
                         <Label Text="Step 3 credits (annual)" Grid.Row="2" Grid.Column="0"
                                VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                         <Entry Text="{Binding FederalStep3Credits}" Keyboard="Numeric" Grid.Row="2" Grid.Column="1"
