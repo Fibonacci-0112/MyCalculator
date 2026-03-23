@@ -278,10 +278,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void PreTaxDeductions_ReduceTaxableWages()
     {
-        var calc = CreateCalculator(UsState.CO);
+        var calc = CreateCalculator(UsState.AZ);
 
         var context = new CommonWithholdingContext(
-            UsState.CO,
+            UsState.AZ,
             GrossWages: 5000m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026,
@@ -297,10 +297,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         // taxable wages = 5000 - 1000 = 4000
         // annual = 4000 * 26 = 104,000
-        // 104000 * 4.4% = 4576
-        // per period = 4576 / 26 = 176.00
+        // 104000 * 2.5% = 2600
+        // per period = 2600 / 26 = 100.00
         Assert.Equal(4000m, result.TaxableWages);
-        Assert.Equal(176.00m, result.Withholding);
+        Assert.Equal(100.00m, result.Withholding);
     }
 
     // ── Zero wages edge case ─────────────────────────────────────────
@@ -308,10 +308,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void ZeroGrossWages_ReturnsZeroWithholding()
     {
-        var calc = CreateCalculator(UsState.CO);
+        var calc = CreateCalculator(UsState.AZ);
 
         var context = new CommonWithholdingContext(
-            UsState.CO,
+            UsState.AZ,
             GrossWages: 0m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026);
@@ -332,7 +332,6 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
     [Theory]
     [InlineData(UsState.AZ)]
-    [InlineData(UsState.CO)]
     [InlineData(UsState.NY)]
     [InlineData(UsState.VA)]
     [InlineData(UsState.OH)]
@@ -374,7 +373,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     {
         UsState[] expectedStates =
         [
-            UsState.AZ, UsState.CO, UsState.CT,
+            UsState.AZ, UsState.CT,
             UsState.DC, UsState.DE, UsState.GA, UsState.HI, UsState.IA,
             UsState.ID, UsState.IL, UsState.IN, UsState.KS, UsState.KY,
             UsState.LA, UsState.MA, UsState.MD, UsState.ME, UsState.MI,

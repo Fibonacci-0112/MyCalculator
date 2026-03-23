@@ -8,6 +8,7 @@ using PaycheckCalc.Core.Tax.Fica;
 using PaycheckCalc.Core.Tax.Alabama;
 using PaycheckCalc.Core.Tax.Arkansas;
 using PaycheckCalc.Core.Tax.California;
+using PaycheckCalc.Core.Tax.Colorado;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.Federal;
@@ -76,6 +77,9 @@ public static class MauiProgram
             // California — Method B (EDD DE 44)
             var caCalc = sp.GetRequiredService<CaliforniaPercentageCalculator>();
             registry.Register(new CaliforniaWithholdingCalculator(caCalc));
+
+            // Colorado — flat 4.4% with withholding allowance + FMLI
+            registry.Register(new ColoradoWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
