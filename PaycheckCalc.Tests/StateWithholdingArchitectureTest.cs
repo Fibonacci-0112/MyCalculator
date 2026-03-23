@@ -2,6 +2,7 @@ using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Tax.Alabama;
 using PaycheckCalc.Core.Tax.Arkansas;
 using PaycheckCalc.Core.Tax.California;
+using PaycheckCalc.Core.Tax.Colorado;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.State;
@@ -231,8 +232,8 @@ public class PercentageMethodWithholdingAdapterTest
     [Fact]
     public void PreTaxDeductions_ReduceTaxableWages()
     {
-        var adapter = CreateAdapter(UsState.CO);
-        var context = new CommonWithholdingContext(UsState.CO, 5000m, PayFrequency.Biweekly, 2026,
+        var adapter = CreateAdapter(UsState.AZ);
+        var context = new CommonWithholdingContext(UsState.AZ, 5000m, PayFrequency.Biweekly, 2026,
             PreTaxDeductionsReducingStateWages: 1000m);
         var values = new StateInputValues
         {
@@ -244,7 +245,7 @@ public class PercentageMethodWithholdingAdapterTest
         var result = adapter.Calculate(context, values);
 
         Assert.Equal(4000m, result.TaxableWages);
-        Assert.Equal(176.00m, result.Withholding);
+        Assert.Equal(100.00m, result.Withholding);
     }
 
     [Fact]
@@ -676,6 +677,8 @@ public class FullRegistryIntegrationTest
         registry.Register(new OklahomaWithholdingCalculator(new OklahomaOw2PercentageCalculator(okJson)));
 
         registry.Register(new PennsylvaniaWithholdingCalculator());
+
+        registry.Register(new ColoradoWithholdingCalculator());
 
         UsState[] noTaxStates = [UsState.AK, UsState.FL, UsState.NV, UsState.NH, UsState.SD, UsState.TN, UsState.TX, UsState.WA, UsState.WY];
         foreach (var state in noTaxStates)

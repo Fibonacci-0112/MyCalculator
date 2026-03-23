@@ -25,13 +25,7 @@ public static class StateTaxConfigs2026
                 BracketsMarried = [B(0, null, 0.025m)]
             },
 
-            [UsState.CO] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                BracketsSingle = [B(0, null, 0.044m)],
-                BracketsMarried = [B(0, null, 0.044m)]
-            },
+            // Colorado uses a dedicated calculator (ColoradoWithholdingCalculator)
 
             [UsState.GA] = new()
             {
