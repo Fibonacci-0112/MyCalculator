@@ -89,16 +89,16 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
 
         var tables = root.Tables;
 
-        _personalExemptions = DeserializeTable<ExemptionEntry>(tables.PersonalExemptions);
-        _initialTax = DeserializeTable<BracketEntry>(tables.InitialTaxCalculation);
-        _phaseOutAddBack = DeserializeTable<AddBackEntry>(tables.PhaseOutAddBack);
-        _taxRecapture = DeserializeTable<RecaptureEntry>(tables.TaxRecapture);
-        _personalTaxCredits = DeserializeTable<CreditEntry>(tables.PersonalTaxCredits);
+        _personalExemptions = DeserializeTable<ExemptionEntry>(tables.PersonalExemptions, out _);
+        _initialTax = DeserializeTable<BracketEntry>(tables.InitialTaxCalculation, out var itRefs);
+        _phaseOutAddBack = DeserializeTable<AddBackEntry>(tables.PhaseOutAddBack, out var abRefs);
+        _taxRecapture = DeserializeTable<RecaptureEntry>(tables.TaxRecapture, out var rcRefs);
+        _personalTaxCredits = DeserializeTable<CreditEntry>(tables.PersonalTaxCredits, out _);
 
-        // Resolve "same_as_A" references after initial deserialization
-        ResolveReferences(_initialTax);
-        ResolveReferences(_phaseOutAddBack);
-        ResolveReferences(_taxRecapture);
+        // Resolve "same_as_X" string references after initial deserialization
+        ResolveReferences(_initialTax, itRefs);
+        ResolveReferences(_phaseOutAddBack, abRefs);
+        ResolveReferences(_taxRecapture, rcRefs);
     }
 
     // ── IStateWithholdingCalculator ─────────────────────────────────
@@ -286,13 +286,18 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
     };
 
     /// <summary>
-    /// Deserializes a table section from the JSON where each code key may be
-    /// either a JSON array of objects or the string "same_as_A".
+    /// Deserializes a table section from the JSON where each code key is
+    /// either a JSON array of entry objects or a "same_as_X" string reference.
+    /// Array entries are deserialized directly; string references are collected
+    /// into <paramref name="references"/> for later resolution by
+    /// <see cref="ResolveReferences{T}"/>.
     /// </summary>
     private static Dictionary<string, List<T>> DeserializeTable<T>(
-        Dictionary<string, JsonElement> rawTable)
+        Dictionary<string, JsonElement> rawTable,
+        out Dictionary<string, string> references)
     {
         var result = new Dictionary<string, List<T>>(StringComparer.OrdinalIgnoreCase);
+        references = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         foreach (var (code, element) in rawTable)
@@ -301,30 +306,32 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
             {
                 result[code] = element.Deserialize<List<T>>(opts) ?? [];
             }
-            // "same_as_X" references are resolved after all codes are loaded
+            else if (element.ValueKind == JsonValueKind.String)
+            {
+                // e.g. "same_as_A" → target code "A"
+                var raw = element.GetString() ?? "";
+                var target = raw.StartsWith("same_as_", StringComparison.OrdinalIgnoreCase)
+                    ? raw["same_as_".Length..]
+                    : "A";
+                references[code] = target;
+            }
         }
 
         return result;
     }
 
     /// <summary>
-    /// Resolves "same_as_A" (or any "same_as_X") string references in a
-    /// table by pointing the referencing code at the referenced code's list.
-    /// Must be called after <see cref="DeserializeTable{T}"/>.
+    /// Resolves string references (e.g. "same_as_A") collected during
+    /// deserialization by pointing each referencing code at the target code's list.
     /// </summary>
-    private static void ResolveReferences<T>(Dictionary<string, List<T>> table)
+    private static void ResolveReferences<T>(
+        Dictionary<string, List<T>> table,
+        Dictionary<string, string> references)
     {
-        // Collect codes that need resolution (those present in the JSON
-        // but absent from the deserialized dictionary because they were strings).
-        var allCodes = new[] { "A", "B", "C", "D", "F" };
-
-        foreach (var code in allCodes)
+        foreach (var (code, target) in references)
         {
-            if (!table.ContainsKey(code) && table.TryGetValue("A", out var aList))
-            {
-                // Default fallback: "same_as_A"
-                table[code] = aList;
-            }
+            if (table.TryGetValue(target, out var targetList))
+                table[code] = targetList;
         }
     }
 
