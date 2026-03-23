@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "name": "Colorado Department of Revenue – DR 0004 Employee Withholding Certificate",
+    "year": 2026,
+    "table": "Table 1 – Annual Withholding Allowance (page 3)"
+  },
+  "allowances": [
+    {
+      "filingStatus": "Single or Married Filing Separately",
+      "jobs1": 14000,
+      "jobs2": 7000,
+      "jobs3": 4500,
+      "jobs4OrMore": 3500
+    },
+    {
+      "filingStatus": "Head of Household",
+      "jobs1": 22000,
+      "jobs2": 11000,
+      "jobs3": 7500,
+      "jobs4OrMore": 5500
+    },
+    {
+      "filingStatus": "Married Filing Jointly or Qualifying Surviving Spouse",
+      "jobs1": 30000,
+      "jobs2": 15000,
+      "jobs3": 10000,
+      "jobs4OrMore": 7500
+    }
+  ]
+}
