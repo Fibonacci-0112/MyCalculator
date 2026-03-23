@@ -26,6 +26,7 @@ namespace PaycheckCalc.Core.Tax.Connecticut;
 /// Special rules:
 ///   • Code D: exemption = 0, credit = 0.00, shares Table B/C/D with A.
 ///   • Code E: base withholding is always 0 (additional withholding still applies).
+///   • No Form CT-W4: flat 6.99% of taxable wages per period (no tables used).
 ///   • Table B uses taxable income; Tables C/D/E use annualized salary.
 /// </summary>
 public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculator
@@ -37,6 +38,11 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
     private readonly Dictionary<string, List<AddBackEntry>> _phaseOutAddBack;
     private readonly Dictionary<string, List<RecaptureEntry>> _taxRecapture;
     private readonly Dictionary<string, List<CreditEntry>> _personalTaxCredits;
+
+    /// <summary>
+    /// Flat rate applied to taxable wages when no CT-W4 form is on file (6.99%).
+    /// </summary>
+    private const decimal NoFormFlatRate = 0.0699m;
 
     // ── Schema / UI definitions ─────────────────────────────────────
 
@@ -126,11 +132,23 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
         int periods = GetPayPeriods(context.PayPeriod);
 
         var codeDisplay = values.GetValueOrDefault("WithholdingCode", "Code A");
-        // "No Form CT-W4" is treated as Code D per CT instructions
-        var code = codeDisplay == "No Form CT-W4" ? "D" : codeDisplay.Replace("Code ", "");
+        var code = codeDisplay.Replace("Code ", "");
 
         var additionalWithholding = values.GetValueOrDefault("AdditionalWithholding", 0m);
         var reducedWithholding = values.GetValueOrDefault("ReducedWithholding", 0m);
+
+        // No Form CT-W4: flat 6.99% of taxable wages per period
+        if (codeDisplay == "No Form CT-W4")
+        {
+            var flatTax = taxableWages * NoFormFlatRate;
+            var perPeriod = Math.Max(flatTax + additionalWithholding - reducedWithholding, 0m);
+            return new StateWithholdingResult
+            {
+                TaxableWages = taxableWages,
+                Withholding = Math.Round(perPeriod, 2, MidpointRounding.AwayFromZero),
+                Description = "No Form CT-W4 — taxable wages taxed at 6.99%"
+            };
+        }
 
         // Code E: no withholding unless additional withholding is specified
         if (code == "E")

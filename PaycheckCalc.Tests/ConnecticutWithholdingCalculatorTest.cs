@@ -328,11 +328,82 @@ public class ConnecticutWithholdingCalculatorTest
         Assert.Equal(3.53m, result.Withholding);
     }
 
-    // ── No Form CT-W4 (treated as Code D) ───────────────────────────
+    // ── No Form CT-W4 (flat 6.99% of taxable wages) ───────────────────
 
     [Fact]
-    public void NoFormCTW4_TreatedAsCodeD()
+    public void NoFormCTW4_Biweekly_5000_FlatRate()
     {
+        // No Form CT-W4: flat 6.99% of taxable wages per period
+        // 5000 * 0.0699 = 349.50
+        var calc = LoadCalculator();
+        var context = new CommonWithholdingContext(
+            UsState.CT, GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026);
+        var values = new StateInputValues { ["WithholdingCode"] = "No Form CT-W4" };
+
+        var result = calc.Calculate(context, values);
+
+        Assert.Equal(5000m, result.TaxableWages);
+        Assert.Equal(349.50m, result.Withholding);
+        Assert.Contains("6.99%", result.Description!);
+    }
+
+    [Fact]
+    public void NoFormCTW4_WithAdditionalWithholding()
+    {
+        // 5000 * 0.0699 = 349.50 + 25 additional = 374.50
+        var calc = LoadCalculator();
+        var context = new CommonWithholdingContext(
+            UsState.CT, GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026);
+        var values = new StateInputValues
+        {
+            ["WithholdingCode"] = "No Form CT-W4",
+            ["AdditionalWithholding"] = 25m
+        };
+
+        var result = calc.Calculate(context, values);
+
+        Assert.Equal(374.50m, result.Withholding);
+    }
+
+    [Fact]
+    public void NoFormCTW4_WithPreTaxDeductions()
+    {
+        // taxable wages = 5000 - 1000 = 4000
+        // 4000 * 0.0699 = 279.60
+        var calc = LoadCalculator();
+        var context = new CommonWithholdingContext(
+            UsState.CT, GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026,
+            PreTaxDeductionsReducingStateWages: 1000m);
+        var values = new StateInputValues { ["WithholdingCode"] = "No Form CT-W4" };
+
+        var result = calc.Calculate(context, values);
+
+        Assert.Equal(4000m, result.TaxableWages);
+        Assert.Equal(279.60m, result.Withholding);
+    }
+
+    [Fact]
+    public void NoFormCTW4_ZeroWages_ReturnsZero()
+    {
+        var calc = LoadCalculator();
+        var context = new CommonWithholdingContext(
+            UsState.CT, GrossWages: 0m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026);
+        var values = new StateInputValues { ["WithholdingCode"] = "No Form CT-W4" };
+
+        var result = calc.Calculate(context, values);
+
+        Assert.Equal(0m, result.TaxableWages);
+        Assert.Equal(0m, result.Withholding);
+    }
+
+    [Fact]
+    public void NoFormCTW4_DiffersFromCodeD()
+    {
+        // No Form CT-W4 (flat 6.99%) should produce different results than Code D (table-driven)
         var calc = LoadCalculator();
         var context = new CommonWithholdingContext(
             UsState.CT, GrossWages: 5000m,
@@ -343,7 +414,9 @@ public class ConnecticutWithholdingCalculatorTest
         var resultD = calc.Calculate(context, valuesD);
         var resultNoForm = calc.Calculate(context, valuesNoForm);
 
-        Assert.Equal(resultD.Withholding, resultNoForm.Withholding);
+        Assert.NotEqual(resultD.Withholding, resultNoForm.Withholding);
+        // No Form = 5000 * 0.0699 = 349.50
+        Assert.Equal(349.50m, resultNoForm.Withholding);
     }
 
     // ── Additional and reduced withholding ──────────────────────────
