@@ -602,4 +602,42 @@ public class ConnecticutWithholdingCalculatorTest
         Assert.True(result.Withholding > 0m,
             $"{code}: expected non-zero withholding for $3,000 biweekly but got {result.Withholding}");
     }
+
+    // ── Regression: null / empty WithholdingCode must fall back to Code A ──
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void NullOrEmptyWithholdingCode_FallsBackToCodeA(string? code)
+    {
+        // When the MAUI Picker binding resets SelectedItem during initialization
+        // inside a BindableLayout DataTemplate, the value can reach the calculator
+        // as null or empty. The calculator must fall back to Code A rather than
+        // returning $0.00.
+        var calc = LoadCalculator();
+        var context = new CommonWithholdingContext(
+            UsState.CT, GrossWages: 3000m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026);
+
+        var values = new StateInputValues { ["WithholdingCode"] = code };
+        var result = calc.Calculate(context, values);
+
+        // Same as CodeA_Biweekly_3000 = 145.77
+        Assert.Equal(145.77m, result.Withholding);
+    }
+
+    [Fact]
+    public void Validate_NullWithholdingCode_PassesWithDefaultFallback()
+    {
+        // When WithholdingCode is null or missing, Validate should not produce
+        // an error because the calculator falls back to Code A.
+        var calc = LoadCalculator();
+
+        var valuesNull = new StateInputValues { ["WithholdingCode"] = (string?)null };
+        Assert.Empty(calc.Validate(valuesNull));
+
+        var valuesEmpty = new StateInputValues();
+        Assert.Empty(calc.Validate(valuesEmpty));
+    }
 }
