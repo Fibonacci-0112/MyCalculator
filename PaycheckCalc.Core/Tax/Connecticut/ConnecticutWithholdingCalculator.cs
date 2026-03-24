@@ -44,6 +44,12 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
     /// </summary>
     private const decimal NoFormFlatRate = 0.0699m;
 
+    /// <summary>
+    /// Connecticut Paid Family and Medical Leave Insurance (PFMLI) employee
+    /// contribution rate (0.5%) applied to all gross wages per period.
+    /// </summary>
+    private const decimal PfmliRate = 0.005m;
+
     // ── Schema / UI definitions ─────────────────────────────────────
 
     private static readonly IReadOnlyList<string> WithholdingCodeOptions =
@@ -146,6 +152,9 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
         var additionalWithholding = values.GetValueOrDefault("AdditionalWithholding", 0m);
         var reducedWithholding = values.GetValueOrDefault("ReducedWithholding", 0m);
 
+        // CT PFMLI: 0.5% of ALL gross wages (not reduced by pre-tax deductions)
+        var pfmli = Math.Round(Math.Max(0m, context.GrossWages) * PfmliRate, 2, MidpointRounding.AwayFromZero);
+
         // No Form CT-W4: flat 6.99% of taxable wages per period
         if (codeDisplay == "No Form CT-W4")
         {
@@ -155,6 +164,7 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
             {
                 TaxableWages = taxableWages,
                 Withholding = Math.Round(perPeriod, 2, MidpointRounding.AwayFromZero),
+                DisabilityInsurance = pfmli,
                 Description = "No Form CT-W4 — taxable wages taxed at 6.99%"
             };
         }
@@ -167,6 +177,7 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
             {
                 TaxableWages = taxableWages,
                 Withholding = Math.Round(perPeriod, 2, MidpointRounding.AwayFromZero),
+                DisabilityInsurance = pfmli,
                 Description = perPeriod == 0m
                     ? "Code E — no Connecticut withholding required"
                     : null
@@ -220,7 +231,8 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
         return new StateWithholdingResult
         {
             TaxableWages = taxableWages,
-            Withholding = Math.Round(finalWithholding, 2, MidpointRounding.AwayFromZero)
+            Withholding = Math.Round(finalWithholding, 2, MidpointRounding.AwayFromZero),
+            DisabilityInsurance = pfmli
         };
     }
 
