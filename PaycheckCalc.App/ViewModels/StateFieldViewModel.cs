@@ -82,7 +82,14 @@ public partial class StateFieldViewModel : ObservableObject
 
     private string? ValidatePicker()
     {
-        if (Definition.IsRequired && string.IsNullOrWhiteSpace(SelectedOption))
+        // When a Picker is inside a BindableLayout DataTemplate, MAUI may
+        // temporarily set SelectedItem to null during binding initialization.
+        // Use the schema default when SelectedOption is null so that the
+        // default selection doesn't block the calculation with a spurious error.
+        var effective = SelectedOption
+            ?? Definition.DefaultValue?.ToString()
+            ?? Definition.Options?.FirstOrDefault();
+        if (Definition.IsRequired && string.IsNullOrWhiteSpace(effective))
             return $"{Label} is required.";
         return null;
     }
@@ -114,10 +121,15 @@ public partial class StateFieldViewModel : ObservableObject
 
     /// <summary>
     /// Returns the resolved typed value to store in <see cref="StateInputValues"/>.
+    /// For Picker fields, falls back to the schema default when <see cref="SelectedOption"/>
+    /// is null (which can happen when the MAUI Picker resets SelectedItem during
+    /// binding initialization inside a BindableLayout DataTemplate).
     /// </summary>
     public object? GetResolvedValue() => Definition.FieldType switch
     {
-        StateFieldType.Picker => SelectedOption,
+        StateFieldType.Picker => SelectedOption
+            ?? Definition.DefaultValue?.ToString()
+            ?? Definition.Options?.FirstOrDefault(),
         StateFieldType.Toggle => BoolValue,
         StateFieldType.Integer => int.TryParse(StringValue, out var i) ? i : 0,
         StateFieldType.Decimal => decimal.TryParse(StringValue, out var d) ? d : 0m,

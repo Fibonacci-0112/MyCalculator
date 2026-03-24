@@ -117,7 +117,10 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
     {
         var errors = new List<string>();
 
-        var code = values.GetValueOrDefault<string>("WithholdingCode", "");
+        // Use the schema default ("Code A") as fallback so that a null/missing
+        // value (e.g., from MAUI Picker binding initialization) doesn't produce
+        // a spurious validation error that blocks the calculation.
+        var code = values.GetValueOrDefault<string>("WithholdingCode", "Code A");
         if (!WithholdingCodeOptions.Contains(code))
             errors.Add($"Invalid Withholding Code. Valid options are: {string.Join(", ", WithholdingCodeOptions)}.");
 
@@ -132,6 +135,12 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
         int periods = GetPayPeriods(context.PayPeriod);
 
         var codeDisplay = values.GetValueOrDefault("WithholdingCode", "Code A");
+
+        // Defensive: the dictionary value itself may be an empty or whitespace string
+        // (as opposed to null/missing, which GetValueOrDefault already handles).
+        if (string.IsNullOrWhiteSpace(codeDisplay))
+            codeDisplay = "Code A";
+
         var code = codeDisplay.Replace("Code ", "");
 
         var additionalWithholding = values.GetValueOrDefault("AdditionalWithholding", 0m);

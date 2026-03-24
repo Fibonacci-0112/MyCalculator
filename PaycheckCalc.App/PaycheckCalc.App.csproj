@@ -29,6 +29,7 @@
 	<MauiAsset Include="..\PaycheckCalc.Core\Data\ca_method_b_2026.json" LogicalName="ca_method_b_2026.json" />
 	<MauiAsset Include="..\PaycheckCalc.Core\Data\ar_withholding_2026.json" LogicalName="ar_withholding_2026.json" />
 	<MauiAsset Include="..\PaycheckCalc.Core\Data\co_dr0004_2026.json" LogicalName="co_dr0004_2026.json" />
+	<MauiAsset Include="..\PaycheckCalc.Core\Data\connecticut_withholding_2026.json" LogicalName="connecticut_withholding_2026.json" />
   </ItemGroup>
 
   <ItemGroup>
