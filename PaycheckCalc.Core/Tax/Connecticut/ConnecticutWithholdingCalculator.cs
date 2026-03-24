@@ -136,8 +136,8 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
 
         var codeDisplay = values.GetValueOrDefault("WithholdingCode", "Code A");
 
-        // Defensive: if the UI passes null or empty (e.g., MAUI Picker binding
-        // cleared the value during initialization), fall back to Code A.
+        // Defensive: the dictionary value itself may be an empty or whitespace string
+        // (as opposed to null/missing, which GetValueOrDefault already handles).
         if (string.IsNullOrWhiteSpace(codeDisplay))
             codeDisplay = "Code A";
 

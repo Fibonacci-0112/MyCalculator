@@ -611,10 +611,8 @@ public class ConnecticutWithholdingCalculatorTest
     [InlineData("  ")]
     public void NullOrEmptyWithholdingCode_FallsBackToCodeA(string? code)
     {
-        // When the MAUI Picker binding resets SelectedItem during initialization
-        // inside a BindableLayout DataTemplate, the value can reach the calculator
-        // as null or empty. The calculator must fall back to Code A rather than
-        // returning $0.00.
+        // The calculator must handle null/empty WithholdingCode by falling
+        // back to Code A rather than returning $0.00.
         var calc = LoadCalculator();
         var context = new CommonWithholdingContext(
             UsState.CT, GrossWages: 3000m,
