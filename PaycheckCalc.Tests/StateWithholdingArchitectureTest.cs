@@ -659,6 +659,28 @@ public class FullRegistryIntegrationTest
         Assert.Equal("AdditionalWithholding", schema[0].Key);
     }
 
+    [Fact]
+    public void Connecticut_ViaRegistry_CodesAF_ProduceNonZeroWithholding()
+    {
+        // Regression: CT must use the dedicated ConnecticutWithholdingCalculator
+        // (not a generic adapter) and produce non-zero withholding for codes A–F.
+        var registry = BuildFullRegistry();
+        var calc = registry.GetCalculator(UsState.CT);
+
+        var context = new CommonWithholdingContext(
+            UsState.CT, GrossWages: 3000m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026);
+
+        foreach (var code in new[] { "Code A", "Code B", "Code C", "Code D", "Code F" })
+        {
+            var values = new StateInputValues { ["WithholdingCode"] = code };
+            var result = calc.Calculate(context, values);
+
+            Assert.True(result.Withholding > 0m,
+                $"{code}: expected non-zero withholding for $3,000 biweekly via registry but got {result.Withholding}");
+        }
+    }
+
     private static StateCalculatorRegistry BuildFullRegistry()
     {
         var registry = new StateCalculatorRegistry();

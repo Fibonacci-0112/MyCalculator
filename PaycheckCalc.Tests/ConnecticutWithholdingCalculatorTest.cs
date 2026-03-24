@@ -577,4 +577,29 @@ public class ConnecticutWithholdingCalculatorTest
         // Same as CodeA_Biweekly_3000 = 145.77
         Assert.Equal(145.77m, result.Withholding);
     }
+
+    // ── Regression: all codes A–F must produce non-zero withholding for typical wages ──
+
+    [Theory]
+    [InlineData("Code A")]
+    [InlineData("Code B")]
+    [InlineData("Code C")]
+    [InlineData("Code D")]
+    [InlineData("Code F")]
+    public void AllTableDrivenCodes_Biweekly3000_ProduceNonZeroWithholding(string code)
+    {
+        // Regression: codes A–F must not return $0.00 for typical wages.
+        // Each code uses the table-driven path with 5 lookup tables.
+        // S = 3000 * 26 = 78,000 — well above exemption thresholds for every code.
+        var calc = LoadCalculator();
+        var context = new CommonWithholdingContext(
+            UsState.CT, GrossWages: 3000m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026);
+        var values = new StateInputValues { ["WithholdingCode"] = code };
+
+        var result = calc.Calculate(context, values);
+
+        Assert.True(result.Withholding > 0m,
+            $"{code}: expected non-zero withholding for $3,000 biweekly but got {result.Withholding}");
+    }
 }
