@@ -497,4 +497,28 @@ public class CaliforniaPercentageCalculatorTest
 
         Assert.Equal(0m, result.Withholding);
     }
+
+    [Fact]
+    public void DisabilityInsuranceLabel_IsStateDisabilityInsuranceSdi()
+    {
+        // California SDI should be labeled "State Disability Insurance (SDI)",
+        // not the generic "State Disability Insurance" used as the default.
+        var inner = LoadCalculator();
+        var calc = new CaliforniaWithholdingCalculator(inner);
+
+        var context = new CommonWithholdingContext(
+            UsState.CA, GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026);
+        var values = new StateInputValues
+        {
+            ["FilingStatus"] = "Single",
+            ["RegularAllowances"] = 1,
+            ["EstimatedDeductionAllowances"] = 0,
+            ["AdditionalWithholding"] = 0m
+        };
+
+        var result = calc.Calculate(context, values);
+
+        Assert.Equal("State Disability Insurance (SDI)", result.DisabilityInsuranceLabel);
+    }
 }
