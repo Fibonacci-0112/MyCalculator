@@ -64,7 +64,7 @@ public static class PdfPaycheckExporter
                     ResultRow(col, "State Income Tax (" + result.State + ")", result.StateWithholding);
 
                     if (result.StateDisabilityInsurance > 0)
-                        ResultRow(col, "State Disability Insurance", result.StateDisabilityInsurance);
+                        ResultRow(col, result.StateDisabilityInsuranceLabel, result.StateDisabilityInsurance);
 
                     // Totals section
                     SectionHeader(col, "Totals");

@@ -32,7 +32,7 @@ public static class CsvPaycheckExporter
         AppendRow(sb, "State", result.State.ToString());
         AppendRow(sb, "State Taxable Wages", result.StateTaxableWages);
         AppendRow(sb, "State Withholding", result.StateWithholding);
-        AppendRow(sb, "State Disability Insurance", result.StateDisabilityInsurance);
+        AppendRow(sb, result.StateDisabilityInsuranceLabel, result.StateDisabilityInsurance);
         AppendRow(sb, "Total Taxes", result.TotalTaxes);
         AppendRow(sb, "Net Pay", result.NetPay);
 

@@ -56,6 +56,7 @@ public sealed class PayCalculator
             StateTaxableWages = RoundMoney(stateResult.TaxableWages),
             StateWithholding = RoundMoney(stateResult.Withholding),
             StateDisabilityInsurance = RoundMoney(stateResult.DisabilityInsurance),
+            StateDisabilityInsuranceLabel = stateResult.DisabilityInsuranceLabel,
             SocialSecurityWithholding = RoundMoney(ss),
             MedicareWithholding = RoundMoney(medicare),
             AdditionalMedicareWithholding = RoundMoney(addl),

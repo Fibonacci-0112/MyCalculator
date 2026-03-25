@@ -609,6 +609,25 @@ public class ConnecticutWithholdingCalculatorTest
         Assert.Equal(30.00m, result.DisabilityInsurance);
     }
 
+    [Theory]
+    [InlineData("Code A")]
+    [InlineData("Code E")]
+    [InlineData("No Form CT-W4")]
+    public void DisabilityInsuranceLabel_IsFamilyLeaveInsurance(string code)
+    {
+        // Connecticut PFMLI should be labeled "Family Leave Insurance",
+        // not the generic "State Disability Insurance" used by California.
+        var calc = LoadCalculator();
+        var context = new CommonWithholdingContext(
+            UsState.CT, GrossWages: 5000m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026);
+        var values = new StateInputValues { ["WithholdingCode"] = code };
+
+        var result = calc.Calculate(context, values);
+
+        Assert.Equal("Family Leave Insurance", result.DisabilityInsuranceLabel);
+    }
+
     // ── Default inputs ──────────────────────────────────────────────
 
     [Fact]

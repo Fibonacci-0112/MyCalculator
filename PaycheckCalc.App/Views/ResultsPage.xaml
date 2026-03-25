@@ -171,7 +171,7 @@
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10"
                               IsVisible="{Binding ResultCard.StateDisabilityInsurance, Converter={StaticResource GreaterThanZeroConverter}}">
-                            <Label Text="State Disability Insurance" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding ResultCard.StateDisabilityInsuranceLabel}" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
                             <Label Text="{Binding ResultCard.StateDisabilityInsurance, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#C62828" FontAttributes="Bold"

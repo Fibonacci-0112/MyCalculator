@@ -39,7 +39,7 @@ public sealed class DoughnutChartDrawable : IDrawable
         if (Result.StateWithholding > 0)
             slices.Add(("State Income Tax", (float)Result.StateWithholding, SliceColors[3]));
         if (Result.StateDisabilityInsurance > 0)
-            slices.Add(("State Disability Ins.", (float)Result.StateDisabilityInsurance, SliceColors[4]));
+            slices.Add((Result.StateDisabilityInsuranceLabel, (float)Result.StateDisabilityInsurance, SliceColors[4]));
         if (Result.NetPay > 0)
             slices.Add(("Net Pay", (float)Result.NetPay, SliceColors[5]));
 
