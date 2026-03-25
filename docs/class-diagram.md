@@ -46,7 +46,7 @@ classDiagram
         AK
         AL
         AR
-        …
+        ...
         WV
         WY
     }
