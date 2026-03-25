@@ -545,10 +545,10 @@ public class ConnecticutWithholdingCalculatorTest
         Assert.Equal(0m, result.Withholding);
     }
 
-    // ── No disability insurance ─────────────────────────────────────
+    // ── CT PFMLI (Paid Family and Medical Leave Insurance) ─────────
 
     [Fact]
-    public void NoDisabilityInsurance()
+    public void Pfmli_SimpleGrossWages()
     {
         var calc = LoadCalculator();
         var context = new CommonWithholdingContext(
@@ -558,7 +558,55 @@ public class ConnecticutWithholdingCalculatorTest
 
         var result = calc.Calculate(context, values);
 
-        Assert.Equal(0m, result.DisabilityInsurance);
+        // PFMLI = 5000 × 0.005 = 25.00
+        Assert.Equal(25.00m, result.DisabilityInsurance);
+    }
+
+    [Fact]
+    public void Pfmli_UsesGrossWages_NotReducedByPreTaxDeductions()
+    {
+        var calc = LoadCalculator();
+        var context = new CommonWithholdingContext(
+            UsState.CT, GrossWages: 10000m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026,
+            PreTaxDeductionsReducingStateWages: 2000m);
+        var values = new StateInputValues { ["WithholdingCode"] = "Code A" };
+
+        var result = calc.Calculate(context, values);
+
+        // PFMLI uses gross wages (10000), not reduced wages (8000)
+        // PFMLI = 10000 × 0.005 = 50.00
+        Assert.Equal(50.00m, result.DisabilityInsurance);
+    }
+
+    [Fact]
+    public void Pfmli_CodeE_StillApplied()
+    {
+        var calc = LoadCalculator();
+        var context = new CommonWithholdingContext(
+            UsState.CT, GrossWages: 4000m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026);
+        var values = new StateInputValues { ["WithholdingCode"] = "Code E" };
+
+        var result = calc.Calculate(context, values);
+
+        // PFMLI = 4000 × 0.005 = 20.00 (applies even with Code E)
+        Assert.Equal(20.00m, result.DisabilityInsurance);
+    }
+
+    [Fact]
+    public void Pfmli_NoFormCtW4_StillApplied()
+    {
+        var calc = LoadCalculator();
+        var context = new CommonWithholdingContext(
+            UsState.CT, GrossWages: 6000m,
+            PayPeriod: PayFrequency.Biweekly, Year: 2026);
+        var values = new StateInputValues { ["WithholdingCode"] = "No Form CT-W4" };
+
+        var result = calc.Calculate(context, values);
+
+        // PFMLI = 6000 × 0.005 = 30.00 (applies regardless of withholding code)
+        Assert.Equal(30.00m, result.DisabilityInsurance);
     }
 
     // ── Default inputs ──────────────────────────────────────────────
