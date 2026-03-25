@@ -107,6 +107,7 @@ public class CsvPaycheckExporterTest
             StateTaxableWages = 3000m,
             StateWithholding = 150m,
             StateDisabilityInsurance = 33m,
+            StateDisabilityInsuranceLabel = "State Disability Insurance (SDI)",
             SocialSecurityWithholding = 186m,
             MedicareWithholding = 43.50m,
             AdditionalMedicareWithholding = 0m,
@@ -117,7 +118,7 @@ public class CsvPaycheckExporterTest
 
         var csv = CsvPaycheckExporter.Generate(result);
 
-        Assert.Contains("State Disability Insurance,33", csv);
+        Assert.Contains("State Disability Insurance (SDI),33", csv);
         Assert.Contains("State,CA", csv);
     }
 
@@ -133,7 +134,7 @@ public class CsvPaycheckExporterTest
             StateTaxableWages = 5000m,
             StateWithholding = 200m,
             StateDisabilityInsurance = 25m,
-            StateDisabilityInsuranceLabel = "Family Leave Insurance",
+            StateDisabilityInsuranceLabel = "Family Leave Insurance (FLI)",
             SocialSecurityWithholding = 310m,
             MedicareWithholding = 72.50m,
             AdditionalMedicareWithholding = 0m,
@@ -144,7 +145,7 @@ public class CsvPaycheckExporterTest
 
         var csv = CsvPaycheckExporter.Generate(result);
 
-        Assert.Contains("Family Leave Insurance,25", csv);
+        Assert.Contains("Family Leave Insurance (FLI),25", csv);
         Assert.DoesNotContain("State Disability Insurance", csv);
     }
 

@@ -625,7 +625,7 @@ public class ConnecticutWithholdingCalculatorTest
 
         var result = calc.Calculate(context, values);
 
-        Assert.Equal("Family Leave Insurance", result.DisabilityInsuranceLabel);
+        Assert.Equal("Family Leave Insurance (FLI)", result.DisabilityInsuranceLabel);
     }
 
     // ── Default inputs ──────────────────────────────────────────────

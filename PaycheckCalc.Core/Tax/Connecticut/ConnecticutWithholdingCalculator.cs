@@ -51,7 +51,7 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
     private const decimal PfmliRate = 0.005m;
 
     /// <summary>Display label used for PFMLI on the results screen and exports.</summary>
-    private const string PfmliLabel = "Family Leave Insurance";
+    private const string PfmliLabel = "Family Leave Insurance (FLI)";
 
     // ── Schema / UI definitions ─────────────────────────────────────
 

@@ -95,7 +95,8 @@ public sealed class CaliforniaWithholdingCalculator : IStateWithholdingCalculato
         {
             TaxableWages = grossWages,
             Withholding = withholding + additionalWithholding,
-            DisabilityInsurance = sdi
+            DisabilityInsurance = sdi,
+            DisabilityInsuranceLabel = "State Disability Insurance (SDI)"
         };
     }
 
