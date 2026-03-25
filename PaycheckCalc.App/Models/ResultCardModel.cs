@@ -32,6 +32,12 @@ public sealed class ResultCardModel
     /// <summary>True when state disability insurance is non-zero and should be shown.</summary>
     public bool ShowStateDisabilityInsurance => StateDisabilityInsurance > 0;
 
+    /// <summary>
+    /// Display label for the disability-insurance line item.
+    /// Varies by state (e.g., "State Disability Insurance" for CA, "Family Leave Insurance" for CT).
+    /// </summary>
+    public string StateDisabilityInsuranceLabel { get; init; } = "State Disability Insurance";
+
     /// <summary>Human-readable state name for display (e.g., "California").</summary>
     public string StateName { get; init; } = "";
 }

@@ -20,6 +20,13 @@ public sealed class StateWithholdingResult
     public decimal DisabilityInsurance { get; init; }
 
     /// <summary>
+    /// Display label for the disability-insurance line item.
+    /// Defaults to "State Disability Insurance" when not set by the calculator.
+    /// States may override (e.g., Connecticut → "Family Leave Insurance").
+    /// </summary>
+    public string DisabilityInsuranceLabel { get; init; } = "State Disability Insurance";
+
+    /// <summary>
     /// Optional human-readable note (e.g., "Exempt — no tax due", 
     /// "Includes local tax surcharge").
     /// </summary>

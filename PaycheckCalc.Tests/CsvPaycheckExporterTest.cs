@@ -121,6 +121,33 @@ public class CsvPaycheckExporterTest
         Assert.Contains("State,CA", csv);
     }
 
+    [Fact]
+    public void Generate_ConnecticutResult_UsesFamilyLeaveInsuranceLabel()
+    {
+        var result = new PaycheckResult
+        {
+            GrossPay = 5000m,
+            PreTaxDeductions = 0m,
+            PostTaxDeductions = 0m,
+            State = UsState.CT,
+            StateTaxableWages = 5000m,
+            StateWithholding = 200m,
+            StateDisabilityInsurance = 25m,
+            StateDisabilityInsuranceLabel = "Family Leave Insurance",
+            SocialSecurityWithholding = 310m,
+            MedicareWithholding = 72.50m,
+            AdditionalMedicareWithholding = 0m,
+            FederalTaxableIncome = 5000m,
+            FederalWithholding = 400m,
+            NetPay = 3992.50m
+        };
+
+        var csv = CsvPaycheckExporter.Generate(result);
+
+        Assert.Contains("Family Leave Insurance,25", csv);
+        Assert.DoesNotContain("State Disability Insurance", csv);
+    }
+
     private static PaycheckResult CreateSampleResult() => new()
     {
         GrossPay = 2187.50m,

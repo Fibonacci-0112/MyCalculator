@@ -23,6 +23,7 @@ public static class ResultCardMapper
             AdditionalMedicareWithholding = result.AdditionalMedicareWithholding,
             StateWithholding = result.StateWithholding,
             StateDisabilityInsurance = result.StateDisabilityInsurance,
+            StateDisabilityInsuranceLabel = result.StateDisabilityInsuranceLabel,
             PreTaxDeductions = result.PreTaxDeductions,
             PostTaxDeductions = result.PostTaxDeductions,
             TotalTaxes = result.TotalTaxes,

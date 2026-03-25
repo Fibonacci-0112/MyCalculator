@@ -10,6 +10,7 @@ public sealed class PaycheckResult
     public decimal StateTaxableWages { get; init; }
     public decimal StateWithholding { get; init; }
     public decimal StateDisabilityInsurance { get; init; }
+    public string StateDisabilityInsuranceLabel { get; init; } = "State Disability Insurance";
 
     public decimal SocialSecurityWithholding { get; init; }
     public decimal MedicareWithholding { get; init; }

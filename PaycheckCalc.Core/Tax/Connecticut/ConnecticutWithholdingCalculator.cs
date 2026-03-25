@@ -50,6 +50,9 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
     /// </summary>
     private const decimal PfmliRate = 0.005m;
 
+    /// <summary>Display label used for PFMLI on the results screen and exports.</summary>
+    private const string PfmliLabel = "Family Leave Insurance";
+
     // ── Schema / UI definitions ─────────────────────────────────────
 
     private static readonly IReadOnlyList<string> WithholdingCodeOptions =
@@ -165,6 +168,7 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
                 TaxableWages = taxableWages,
                 Withholding = Math.Round(perPeriod, 2, MidpointRounding.AwayFromZero),
                 DisabilityInsurance = pfmli,
+                DisabilityInsuranceLabel = PfmliLabel,
                 Description = "No Form CT-W4 — taxable wages taxed at 6.99%"
             };
         }
@@ -178,6 +182,7 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
                 TaxableWages = taxableWages,
                 Withholding = Math.Round(perPeriod, 2, MidpointRounding.AwayFromZero),
                 DisabilityInsurance = pfmli,
+                DisabilityInsuranceLabel = PfmliLabel,
                 Description = perPeriod == 0m
                     ? "Code E — no Connecticut withholding required"
                     : null
@@ -232,7 +237,8 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
         {
             TaxableWages = taxableWages,
             Withholding = Math.Round(finalWithholding, 2, MidpointRounding.AwayFromZero),
-            DisabilityInsurance = pfmli
+            DisabilityInsurance = pfmli,
+            DisabilityInsuranceLabel = PfmliLabel
         };
     }
 
