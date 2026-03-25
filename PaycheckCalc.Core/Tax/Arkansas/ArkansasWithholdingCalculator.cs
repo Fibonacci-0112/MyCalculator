@@ -11,20 +11,8 @@ public sealed class ArkansasWithholdingCalculator : IStateWithholdingCalculator
 {
     private readonly ArkansasFormulaCalculator _inner;
 
-    private static readonly IReadOnlyList<string> FilingStatusOptions =
-        ["Single", "Married Filing Jointly", "Head of Household"];
-
     private static readonly IReadOnlyList<StateFieldDefinition> Schema =
     [
-        new()
-        {
-            Key = "FilingStatus",
-            Label = "Filing Status",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = "Single",
-            Options = FilingStatusOptions
-        },
         new()
         {
             Key = "Exemptions",
@@ -49,13 +37,7 @@ public sealed class ArkansasWithholdingCalculator : IStateWithholdingCalculator
     public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
-    {
-        var errors = new List<string>();
-        var status = values.GetValueOrDefault<string>("FilingStatus", "");
-        if (!FilingStatusOptions.Contains(status))
-            errors.Add($"Filing Status must be one of: {string.Join(", ", FilingStatusOptions)}.");
-        return errors;
-    }
+        => [];
 
     public StateWithholdingResult Calculate(CommonWithholdingContext context, StateInputValues values)
     {
