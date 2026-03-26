@@ -12,7 +12,10 @@
        Shell.TitleColor="White">
     <TabBar>
         <Tab Title="Inputs">
-            <ShellContent ContentTemplate="{DataTemplate views:InputsPage}" />
+            <ShellContent Title="Pay &amp; Hours" ContentTemplate="{DataTemplate views:PayHoursPage}" />
+            <ShellContent Title="Federal" ContentTemplate="{DataTemplate views:FederalPage}" />
+            <ShellContent Title="State" ContentTemplate="{DataTemplate views:StatePage}" />
+            <ShellContent Title="Deductions" ContentTemplate="{DataTemplate views:DeductionsPage}" />
         </Tab>
         <Tab Title="Results">
             <ShellContent ContentTemplate="{DataTemplate views:ResultsPage}" />
