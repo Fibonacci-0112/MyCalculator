@@ -44,24 +44,6 @@ public partial class CalculatorViewModel : ObservableObject
         Deductions.CollectionChanged += OnDeductionsCollectionChanged;
     }
 
-    [ObservableProperty] public partial int SelectedInputTab { get; set; } = 0;
-
-    public bool IsTab0Visible => SelectedInputTab == 0;
-    public bool IsTab1Visible => SelectedInputTab == 1;
-    public bool IsTab2Visible => SelectedInputTab == 2;
-    public bool IsTab3Visible => SelectedInputTab == 3;
-
-    partial void OnSelectedInputTabChanged(int value)
-    {
-        OnPropertyChanged(nameof(IsTab0Visible));
-        OnPropertyChanged(nameof(IsTab1Visible));
-        OnPropertyChanged(nameof(IsTab2Visible));
-        OnPropertyChanged(nameof(IsTab3Visible));
-    }
-
-    [RelayCommand]
-    private void SelectTab(string tab) => SelectedInputTab = int.Parse(tab);
-
     // ── Results-page tab state ──────────────────────────────
     [ObservableProperty] public partial int SelectedResultTab { get; set; } = 0;
 
