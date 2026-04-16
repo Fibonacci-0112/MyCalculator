@@ -8,6 +8,18 @@ public partial class InputsPage : ContentPage
     private readonly ScrollView[] _contentPanels;
     private readonly Button[] _tabButtons;
 
+    // Per-tab accent colors: Pay & Hours = Teal, Federal = Indigo, State = Purple, Deductions = Deep Orange
+    private static readonly Color[] TabAccentColors =
+    {
+        Color.FromArgb("#00897B"),
+        Color.FromArgb("#3949AB"),
+        Color.FromArgb("#7B1FA2"),
+        Color.FromArgb("#E64A19"),
+    };
+
+    private static readonly Color InactiveTabBackground = Color.FromArgb("#455A64");
+    private static readonly Color InactiveTabText = Color.FromArgb("#B0BEC5");
+
     public InputsPage(CalculatorViewModel vm)
     {
         InitializeComponent();
@@ -30,13 +42,13 @@ public partial class InputsPage : ContentPage
         // Reset all tabs to inactive style
         foreach (var tab in _tabButtons)
         {
-            tab.BackgroundColor = Color.FromArgb("#1565C0");
-            tab.TextColor = Color.FromArgb("#90CAF9");
+            tab.BackgroundColor = InactiveTabBackground;
+            tab.TextColor = InactiveTabText;
             tab.FontAttributes = FontAttributes.None;
         }
 
-        // Activate selected tab
-        tapped.BackgroundColor = Color.FromArgb("#1976D2");
+        // Activate selected tab with its accent color
+        tapped.BackgroundColor = TabAccentColors[index];
         tapped.TextColor = Colors.White;
         tapped.FontAttributes = FontAttributes.Bold;
 

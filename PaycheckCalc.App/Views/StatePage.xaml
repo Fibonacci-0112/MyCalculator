@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PaycheckCalc.App.Views.StatePage"
              Title="State"
-             BackgroundColor="#F0F4FF">
+             BackgroundColor="#FAFAFA">
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="10">
             <Border BackgroundColor="White" StrokeThickness="0"
@@ -43,18 +43,18 @@
                                                Text="{Binding StringValue}"
                                                Keyboard="Numeric"
                                                Grid.Column="1"
-                                               TextColor="Black" BackgroundColor="#EEF2FF" />
+                                               TextColor="Black" BackgroundColor="#F3E5F5" />
                                         <!-- Entry control for Text fields -->
                                         <Entry IsVisible="{Binding IsText}"
                                                Text="{Binding StringValue}"
                                                Keyboard="Default"
                                                Grid.Column="1"
-                                               TextColor="Black" BackgroundColor="#EEF2FF" />
+                                               TextColor="Black" BackgroundColor="#F3E5F5" />
                                         <!-- Switch control for Toggle fields -->
                                         <Switch IsVisible="{Binding IsToggle}"
                                                 IsToggled="{Binding BoolValue}"
                                                 Grid.Column="1"
-                                                OnColor="#1565C0" />
+                                                OnColor="#7B1FA2" />
                                     </Grid>
                                     <!-- Field-level error message -->
                                     <Label Text="{Binding ErrorMessage}"
@@ -78,7 +78,7 @@
                     </VerticalStackLayout>
 
                     <Button Text="Calculate" Command="{Binding CalculateCommand}"
-                            BackgroundColor="#1565C0" TextColor="White"
+                            BackgroundColor="#7B1FA2" TextColor="White"
                             FontAttributes="Bold" CornerRadius="8"
                             Margin="0,6,0,0" />
                 </VerticalStackLayout>

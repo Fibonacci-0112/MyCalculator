@@ -5,7 +5,7 @@
              xmlns:helpers="clr-namespace:PaycheckCalc.App.Helpers"
              x:Class="PaycheckCalc.App.Views.ResultsPage"
              Title="Results"
-             BackgroundColor="#F0F4FF">
+             BackgroundColor="#FAFAFA">
 
     <ContentPage.Resources>
         <helpers:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
