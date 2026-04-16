@@ -43,14 +43,7 @@ public static class StateTaxConfigs2026
                 BracketsMarried = [B(0, null, 0.058m)]
             },
 
-            [UsState.IL] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                AllowanceAmount = 2_775m,
-                BracketsSingle = [B(0, null, 0.0495m)],
-                BracketsMarried = [B(0, null, 0.0495m)]
-            },
+            // Illinois uses a dedicated calculator (IllinoisWithholdingCalculator)
 
             [UsState.IN] = new()
             {
