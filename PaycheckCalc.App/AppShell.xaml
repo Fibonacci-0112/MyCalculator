@@ -25,4 +25,10 @@
     <FlyoutItem Title="Saved Paychecks" Route="Saved">
         <ShellContent ContentTemplate="{DataTemplate views:SavedPaychecksPage}" />
     </FlyoutItem>
+    <FlyoutItem Title="Self-Employment" Route="SelfEmployment">
+        <ShellContent ContentTemplate="{DataTemplate views:SelfEmploymentPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="SE Results" Route="SEResults">
+        <ShellContent ContentTemplate="{DataTemplate views:SelfEmploymentResultsPage}" />
+    </FlyoutItem>
 </Shell>

@@ -17,6 +17,7 @@ using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.Federal;
 using PaycheckCalc.Core.Tax.State;
+using PaycheckCalc.Core.Tax.SelfEmployment;
 
 namespace PaycheckCalc.App;
 
@@ -142,8 +143,20 @@ public static class MauiProgram
         builder.Services.AddSingleton<IPaycheckRepository>(
             new JsonPaycheckRepository(FileSystem.AppDataDirectory));
 
+        // ── Self-Employment calculators ─────────────────────
+        builder.Services.AddSingleton<SelfEmploymentTaxCalculator>(sp =>
+            new SelfEmploymentTaxCalculator(sp.GetRequiredService<FicaCalculator>()));
+        builder.Services.AddSingleton<QbiDeductionCalculator>();
+        builder.Services.AddSingleton<SelfEmploymentCalculator>(sp =>
+            new SelfEmploymentCalculator(
+                sp.GetRequiredService<SelfEmploymentTaxCalculator>(),
+                sp.GetRequiredService<QbiDeductionCalculator>(),
+                sp.GetRequiredService<Irs15TPercentageCalculator>(),
+                sp.GetRequiredService<StateCalculatorRegistry>()));
+
         builder.Services.AddSingleton<CalculatorViewModel>();
         builder.Services.AddSingleton<SavedPaychecksViewModel>();
+        builder.Services.AddSingleton<SelfEmploymentViewModel>();
         builder.Services.AddSingleton<InputsPage>();
         builder.Services.AddSingleton<PayHoursPage>();
         builder.Services.AddSingleton<FederalPage>();
@@ -152,6 +165,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<ResultsPage>();
         builder.Services.AddSingleton<ComparePage>();
         builder.Services.AddSingleton<SavedPaychecksPage>();
+        builder.Services.AddSingleton<SelfEmploymentPage>();
+        builder.Services.AddSingleton<SelfEmploymentResultsPage>();
         builder.Services.AddSingleton<AppShell>();
 
         return builder.Build();
