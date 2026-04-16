@@ -138,6 +138,7 @@ public static class MauiProgram
                 sp.GetRequiredService<FicaCalculator>()));
 
         builder.Services.AddSingleton<CalculatorViewModel>();
+        builder.Services.AddSingleton<InputsPage>();
         builder.Services.AddSingleton<PayHoursPage>();
         builder.Services.AddSingleton<FederalPage>();
         builder.Services.AddSingleton<StatePage>();
