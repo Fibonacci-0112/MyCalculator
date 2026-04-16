@@ -98,7 +98,7 @@ public class CsvSelfEmploymentExporterTest
     {
         var csv = CsvSelfEmploymentExporter.Generate(SampleResult());
         var lines = csv.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-        // Header + 24 data rows = 25
-        Assert.Equal(25, lines.Length);
+        // Header + 26 data rows = 27 (includes W-2 SS Wages and W-2 Medicare Wages)
+        Assert.Equal(27, lines.Length);
     }
 }
