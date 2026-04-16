@@ -25,6 +25,10 @@ public static class CsvSelfEmploymentExporter
         AppendRow(sb, "Business Expenses", result.TotalExpenses);
         AppendRow(sb, "Net Profit", result.NetProfit);
 
+        // W-2 FICA Coordination
+        AppendRow(sb, "W-2 Social Security Wages", result.W2SocialSecurityWages);
+        AppendRow(sb, "W-2 Medicare Wages", result.W2MedicareWages);
+
         // SE Tax
         AppendRow(sb, "SE Taxable Earnings (92.35%)", result.SeTaxableEarnings);
         AppendRow(sb, "Social Security Tax", result.SocialSecurityTax);

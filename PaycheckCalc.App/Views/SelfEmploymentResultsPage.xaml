@@ -108,6 +108,22 @@
                         <Label Text="Self-Employment Tax" FontSize="15" FontAttributes="Bold"
                                TextColor="#E65100" />
                         <BoxView HeightRequest="1" Color="#E0E0E0" />
+
+                        <!-- W-2 FICA coordination note (shown only when W-2 wages were entered) -->
+                        <VerticalStackLayout Spacing="4" IsVisible="{Binding ShowW2Wages}">
+                            <Label Text="W-2 FICA Coordination" FontSize="13" FontAttributes="Bold"
+                                   TextColor="#1565C0" />
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="4">
+                                <Label Text="W-2 SS Wages (Box 3)" Grid.Row="0" TextColor="#546E7A" FontSize="13" />
+                                <Label Text="{Binding W2SocialSecurityWages, StringFormat='{0:C}'}" Grid.Row="0" Grid.Column="1"
+                                       TextColor="#546E7A" FontSize="13" />
+                                <Label Text="W-2 Medicare Wages (Box 5)" Grid.Row="1" TextColor="#546E7A" FontSize="13" />
+                                <Label Text="{Binding W2MedicareWages, StringFormat='{0:C}'}" Grid.Row="1" Grid.Column="1"
+                                       TextColor="#546E7A" FontSize="13" />
+                            </Grid>
+                            <BoxView HeightRequest="1" Color="#E0E0E0" Margin="0,4,0,0" />
+                        </VerticalStackLayout>
+
                         <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6">
                             <Label Text="SE Taxable (92.35%)" Grid.Row="0" TextColor="#37474F" />
                             <Label Text="{Binding SeTaxableEarnings, StringFormat='{0:C}'}" Grid.Row="0" Grid.Column="1" TextColor="Black" />

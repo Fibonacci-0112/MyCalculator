@@ -307,4 +307,114 @@ public class SelfEmploymentCalculatorTest
         var expectedQuarterly = Math.Round(result.TotalTax / 4m, 2, MidpointRounding.AwayFromZero);
         Assert.Equal(expectedQuarterly, result.EstimatedQuarterlyPayment);
     }
+
+    [Fact]
+    public void W2PlusSelfEmployed_SsWageBaseCoordinated()
+    {
+        // Scenario: freelancer with $100K SE net profit who also has a W-2 job
+        // paying $150K (W-2 SS wages = $150K, W-2 Medicare wages = $150K).
+        // The SS wage base ($184,500) is shared — only $34,500 of SE taxable
+        // earnings should be subject to SE Social Security tax.
+        var input = new SelfEmploymentInput
+        {
+            GrossRevenue = 120_000m,
+            TotalBusinessExpenses = 20_000m,
+            OtherIncome = 150_000m, // W-2 wages for income tax bracket
+            W2SocialSecurityWages = 150_000m, // W-2 Box 3
+            W2MedicareWages = 150_000m, // W-2 Box 5
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            State = UsState.TX
+        };
+
+        var result = _calc.Calculate(input);
+
+        // Net profit = $120K − $20K = $100K
+        Assert.Equal(100_000m, result.NetProfit);
+
+        // SE taxable = $100K × 0.9235 = $92,350
+        Assert.Equal(92_350.00m, result.SeTaxableEarnings);
+
+        // Remaining SS base = $184,500 − $150,000 = $34,500
+        // SS tax = $34,500 × 0.124 = $4,278.00 (reduced from $11,451.40 without W-2)
+        Assert.Equal(4_278.00m, result.SocialSecurityTax);
+
+        // Medicare is not capped: $92,350 × 0.029 = $2,678.15
+        Assert.Equal(2_678.15m, result.MedicareTax);
+
+        // Additional Medicare: threshold reduced by W-2 Medicare wages
+        // Reduced threshold = max(0, $200K − $150K) = $50K
+        // Additional Medicare = max(0, $92,350 − $50,000) × 0.009 = $42,350 × 0.009 = $381.15
+        Assert.Equal(381.15m, result.AdditionalMedicareTax);
+
+        // W-2 wages recorded in result
+        Assert.Equal(150_000m, result.W2SocialSecurityWages);
+        Assert.Equal(150_000m, result.W2MedicareWages);
+
+        // Total SE tax should be lower than without W-2 coordination
+        var totalSeTax = 4_278.00m + 2_678.15m + 381.15m;
+        Assert.Equal(totalSeTax, result.TotalSeTax);
+    }
+
+    [Fact]
+    public void W2PlusSelfEmployed_HighW2Wages_ZeroSeSocialSecurity()
+    {
+        // Scenario: W-2 wages exceed the SS wage base entirely.
+        // No SE Social Security tax owed at all.
+        var input = new SelfEmploymentInput
+        {
+            GrossRevenue = 80_000m,
+            TotalBusinessExpenses = 10_000m,
+            OtherIncome = 200_000m,
+            W2SocialSecurityWages = 190_000m, // exceeds $184,500 cap
+            W2MedicareWages = 200_000m, // at the threshold
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            State = UsState.TX
+        };
+
+        var result = _calc.Calculate(input);
+
+        // Net profit = $70K, SE taxable = $70K × 0.9235 = $64,645
+        Assert.Equal(70_000m, result.NetProfit);
+        Assert.Equal(64_645.00m, result.SeTaxableEarnings);
+
+        // SS tax = $0 (W-2 wages exceed wage base)
+        Assert.Equal(0m, result.SocialSecurityTax);
+
+        // Additional Medicare: threshold reduced by W-2 Medicare wages
+        // Reduced threshold = max(0, $200K − $200K) = $0
+        // All SE taxable earnings get Additional Medicare: $64,645 × 0.009 = $581.81
+        Assert.Equal(581.81m, result.AdditionalMedicareTax);
+    }
+
+    [Fact]
+    public void W2PlusSelfEmployed_NoW2Wages_SameAsBaseline()
+    {
+        // Providing zero W-2 wages should produce the same result as not providing them
+        var baseInput = new SelfEmploymentInput
+        {
+            GrossRevenue = 120_000m,
+            TotalBusinessExpenses = 20_000m,
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            State = UsState.TX
+        };
+
+        var w2Input = new SelfEmploymentInput
+        {
+            GrossRevenue = 120_000m,
+            TotalBusinessExpenses = 20_000m,
+            W2SocialSecurityWages = 0m,
+            W2MedicareWages = 0m,
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            State = UsState.TX
+        };
+
+        var baseResult = _calc.Calculate(baseInput);
+        var w2Result = _calc.Calculate(w2Input);
+
+        Assert.Equal(baseResult.SocialSecurityTax, w2Result.SocialSecurityTax);
+        Assert.Equal(baseResult.MedicareTax, w2Result.MedicareTax);
+        Assert.Equal(baseResult.AdditionalMedicareTax, w2Result.AdditionalMedicareTax);
+        Assert.Equal(baseResult.TotalSeTax, w2Result.TotalSeTax);
+        Assert.Equal(baseResult.TotalTax, w2Result.TotalTax);
+    }
 }

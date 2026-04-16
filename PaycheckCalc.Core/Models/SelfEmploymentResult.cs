@@ -15,6 +15,13 @@ public sealed class SelfEmploymentResult
     /// <summary>Schedule C Line 31: net profit (or loss).</summary>
     public decimal NetProfit { get; init; }
 
+    // ── W-2 FICA coordination ──────────────────────────────
+    /// <summary>W-2 Social Security wages used for SS wage base coordination.</summary>
+    public decimal W2SocialSecurityWages { get; init; }
+
+    /// <summary>W-2 Medicare wages used for Additional Medicare threshold coordination.</summary>
+    public decimal W2MedicareWages { get; init; }
+
     // ── Self-Employment Tax (Schedule SE) ───────────────────
     /// <summary>Net profit × 0.9235 — the taxable base for SE tax.</summary>
     public decimal SeTaxableEarnings { get; init; }

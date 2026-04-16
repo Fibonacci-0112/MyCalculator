@@ -66,6 +66,13 @@ public partial class SelfEmploymentViewModel : ObservableObject
     [ObservableProperty] public partial decimal TotalBusinessExpenses { get; set; }
     [ObservableProperty] public partial decimal OtherIncome { get; set; }
 
+    // ── W-2 FICA coordination ───────────────────────────────
+    /// <summary>W-2 Box 3: Social Security wages for SS wage base coordination.</summary>
+    [ObservableProperty] public partial decimal W2SocialSecurityWages { get; set; }
+
+    /// <summary>W-2 Box 5: Medicare wages for Additional Medicare threshold coordination.</summary>
+    [ObservableProperty] public partial decimal W2MedicareWages { get; set; }
+
     // ── Deduction / QBI inputs ──────────────────────────────
     [ObservableProperty] public partial decimal ItemizedDeductionsOverStandard { get; set; }
     [ObservableProperty] public partial bool IsSpecifiedServiceBusiness { get; set; }

@@ -45,7 +45,9 @@ public sealed class SelfEmploymentCalculator
         var netProfit = R(input.GrossRevenue - input.CostOfGoodsSold - input.TotalBusinessExpenses);
 
         // ── Step 2: Self-Employment Tax ─────────────────────
-        var seResult = _seTax.Calculate(netProfit);
+        // Coordinate FICA with W-2 wages to respect the shared SS wage
+        // base cap and Additional Medicare threshold.
+        var seResult = _seTax.Calculate(netProfit, input.W2SocialSecurityWages, input.W2MedicareWages);
 
         // ── Step 3: Adjusted Gross Income ───────────────────
         // AGI = other income + net profit − deductible half of SE tax
@@ -103,6 +105,10 @@ public sealed class SelfEmploymentCalculator
             CostOfGoodsSold = R(input.CostOfGoodsSold),
             TotalExpenses = R(input.TotalBusinessExpenses),
             NetProfit = R(netProfit),
+
+            // W-2 FICA coordination
+            W2SocialSecurityWages = R(Math.Max(0m, input.W2SocialSecurityWages)),
+            W2MedicareWages = R(Math.Max(0m, input.W2MedicareWages)),
 
             // SE Tax
             SeTaxableEarnings = seResult.SeTaxableEarnings,

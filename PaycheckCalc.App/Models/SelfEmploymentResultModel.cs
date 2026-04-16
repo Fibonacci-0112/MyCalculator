@@ -12,6 +12,10 @@ public sealed class SelfEmploymentResultModel
     public decimal TotalExpenses { get; init; }
     public decimal NetProfit { get; init; }
 
+    // ── W-2 FICA coordination ───────────────────────────────
+    public decimal W2SocialSecurityWages { get; init; }
+    public decimal W2MedicareWages { get; init; }
+
     // ── SE Tax ──────────────────────────────────────────────
     public decimal SeTaxableEarnings { get; init; }
     public decimal SocialSecurityTax { get; init; }
@@ -41,6 +45,7 @@ public sealed class SelfEmploymentResultModel
     // ── Display helpers ─────────────────────────────────────
     public bool ShowCogs => CostOfGoodsSold > 0;
     public bool ShowOtherIncome => OtherIncome > 0;
+    public bool ShowW2Wages => W2SocialSecurityWages > 0 || W2MedicareWages > 0;
     public bool ShowAdditionalMedicare => AdditionalMedicareTax > 0;
     public bool ShowQbi => QbiDeduction > 0;
     public bool ShowStateTax => StateIncomeTax > 0;

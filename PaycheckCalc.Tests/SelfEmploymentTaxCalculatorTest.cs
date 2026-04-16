@@ -155,4 +155,102 @@ public class SelfEmploymentTaxCalculatorTest
         // Half = $706.48
         Assert.Equal(706.48m, result.DeductibleHalfOfSeTax);
     }
+
+    // ── W-2 FICA coordination tests (Schedule SE Section B) ──
+
+    [Fact]
+    public void W2Wages_PartialSsWageBase_ReducesSeSocialSecurity()
+    {
+        // Scenario: $100K net SE profit + $150K W-2 SS wages.
+        // SE taxable = $100K × 0.9235 = $92,350.
+        // Remaining SS base = $184,500 − $150,000 = $34,500.
+        // SS tax = min($92,350, $34,500) × 0.124 = $34,500 × 0.124 = $4,278.00
+        var result = _calc.Calculate(100_000m, w2SocialSecurityWages: 150_000m);
+
+        Assert.Equal(92_350.00m, result.SeTaxableEarnings);
+        Assert.Equal(4_278.00m, result.SocialSecurityTax);
+
+        // Medicare is not affected by W-2 SS wages
+        Assert.Equal(2_678.15m, result.MedicareTax);
+
+        // No Additional Medicare (SE taxable $92,350 < $200K threshold,
+        // and no W-2 Medicare wages were supplied to reduce the threshold)
+        Assert.Equal(0m, result.AdditionalMedicareTax);
+    }
+
+    [Fact]
+    public void W2Wages_ExceedsSsWageBase_ZeroSeSocialSecurity()
+    {
+        // Scenario: $80K net SE profit + $190K W-2 SS wages (exceeds $184,500 cap).
+        // Remaining SS base = max(0, $184,500 − $190,000) = $0.
+        // SS tax = $0 (no room under the cap).
+        var result = _calc.Calculate(80_000m, w2SocialSecurityWages: 190_000m);
+
+        Assert.Equal(73_880.00m, result.SeTaxableEarnings);
+        Assert.Equal(0m, result.SocialSecurityTax);
+
+        // Medicare still applies
+        Assert.Equal(2_142.52m, result.MedicareTax);
+    }
+
+    [Fact]
+    public void W2MedicareWages_ReducesAdditionalMedicareThreshold()
+    {
+        // Scenario: $220K net SE profit + $180K W-2 Medicare wages.
+        // SE taxable = $220K × 0.9235 = $203,170.
+        // Reduced Additional Medicare threshold = max(0, $200K − $180K) = $20K.
+        // Additional Medicare = ($203,170 − $20,000) × 0.009 = $183,170 × 0.009 = $1,648.53
+        var result = _calc.Calculate(220_000m, w2MedicareWages: 180_000m);
+
+        Assert.Equal(203_170.00m, result.SeTaxableEarnings);
+        Assert.Equal(1_648.53m, result.AdditionalMedicareTax);
+    }
+
+    [Fact]
+    public void W2MedicareWages_ExceedsThreshold_AllSeEarningsGetAdditionalMedicare()
+    {
+        // Scenario: $100K net SE profit + $250K W-2 Medicare wages (exceeds $200K threshold).
+        // Reduced threshold = max(0, $200K − $250K) = $0.
+        // All SE taxable earnings subject to Additional Medicare:
+        // SE taxable = $92,350. Additional Medicare = $92,350 × 0.009 = $831.15
+        var result = _calc.Calculate(100_000m, w2MedicareWages: 250_000m);
+
+        Assert.Equal(92_350.00m, result.SeTaxableEarnings);
+        Assert.Equal(831.15m, result.AdditionalMedicareTax);
+    }
+
+    [Fact]
+    public void W2BothWages_FullCoordination()
+    {
+        // Scenario: $60K net SE profit + $170K W-2 SS wages + $170K W-2 Medicare wages.
+        // SE taxable = $60K × 0.9235 = $55,410.
+        // Remaining SS base = $184,500 − $170,000 = $14,500.
+        // SS tax = min($55,410, $14,500) × 0.124 = $14,500 × 0.124 = $1,798.00
+        // Medicare = $55,410 × 0.029 = $1,606.89
+        // Reduced Additional Medicare threshold = $200K − $170K = $30K.
+        // Additional Medicare = max(0, $55,410 − $30,000) × 0.009 = $25,410 × 0.009 = $228.69
+        var result = _calc.Calculate(60_000m, w2SocialSecurityWages: 170_000m, w2MedicareWages: 170_000m);
+
+        Assert.Equal(55_410.00m, result.SeTaxableEarnings);
+        Assert.Equal(1_798.00m, result.SocialSecurityTax);
+        Assert.Equal(1_606.89m, result.MedicareTax);
+        Assert.Equal(228.69m, result.AdditionalMedicareTax);
+
+        var expectedTotal = 1_798.00m + 1_606.89m + 228.69m; // = $3,633.58
+        Assert.Equal(expectedTotal, result.TotalSeTax);
+        Assert.Equal(Math.Round(expectedTotal * 0.5m, 2, MidpointRounding.AwayFromZero), result.DeductibleHalfOfSeTax);
+    }
+
+    [Fact]
+    public void W2Wages_ZeroValues_SameAsNoW2()
+    {
+        // Passing zero W-2 wages should produce the same result as the default (no W-2)
+        var resultNoW2 = _calc.Calculate(100_000m);
+        var resultZeroW2 = _calc.Calculate(100_000m, w2SocialSecurityWages: 0m, w2MedicareWages: 0m);
+
+        Assert.Equal(resultNoW2.SocialSecurityTax, resultZeroW2.SocialSecurityTax);
+        Assert.Equal(resultNoW2.MedicareTax, resultZeroW2.MedicareTax);
+        Assert.Equal(resultNoW2.AdditionalMedicareTax, resultZeroW2.AdditionalMedicareTax);
+        Assert.Equal(resultNoW2.TotalSeTax, resultZeroW2.TotalSeTax);
+    }
 }

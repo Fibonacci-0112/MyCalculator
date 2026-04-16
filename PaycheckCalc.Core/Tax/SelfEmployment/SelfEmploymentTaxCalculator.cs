@@ -44,23 +44,43 @@ public sealed class SelfEmploymentTaxCalculator
     /// <param name="netSelfEmploymentEarnings">
     /// Schedule C net profit (Line 31). Negative values produce zero tax.
     /// </param>
-    public SelfEmploymentTaxResult Calculate(decimal netSelfEmploymentEarnings)
+    /// <param name="w2SocialSecurityWages">
+    /// W-2 Social Security wages (Box 3) already subject to employer
+    /// withholding. Reduces the remaining SS wage base available for SE tax.
+    /// Per Schedule SE Section B, lines 8a–11.
+    /// </param>
+    /// <param name="w2MedicareWages">
+    /// W-2 Medicare wages (Box 5) already subject to employer withholding.
+    /// Shifts the Additional Medicare Tax threshold so the 0.9% surtax
+    /// applies to combined wages + SE earnings above the filing-status
+    /// threshold. Per Schedule SE Section B, lines 14–18.
+    /// </param>
+    public SelfEmploymentTaxResult Calculate(
+        decimal netSelfEmploymentEarnings,
+        decimal w2SocialSecurityWages = 0m,
+        decimal w2MedicareWages = 0m)
     {
         if (netSelfEmploymentEarnings <= 0m)
             return SelfEmploymentTaxResult.Zero;
 
-        // Step 1: 92.35% of net earnings
+        // Step 1: 92.35% of net earnings (Schedule SE line 4a)
         var seTaxable = R(netSelfEmploymentEarnings * SelfEmploymentTaxableRate);
 
-        // Step 2: Social Security — capped at the wage base
-        var ssTaxable = Math.Min(seTaxable, _socialSecurityWageBase);
+        // Step 2: Social Security — capped at the remaining wage base
+        // after subtracting W-2 SS wages (Schedule SE lines 8a–11)
+        var remainingSsBase = Math.Max(0m, _socialSecurityWageBase - w2SocialSecurityWages);
+        var ssTaxable = Math.Min(seTaxable, remainingSsBase);
         var ssTax = R(ssTaxable * CombinedSocialSecurityRate);
 
-        // Step 3: Medicare — on all SE taxable earnings
+        // Step 3: Medicare — on all SE taxable earnings (no cap)
         var medicareTax = R(seTaxable * CombinedMedicareRate);
 
-        // Step 4: Additional Medicare — only on earnings above threshold
-        var additionalMedicare = R(Math.Max(0m, seTaxable - _additionalMedicareThreshold) * AdditionalMedicareRate);
+        // Step 4: Additional Medicare — only on SE earnings above the
+        // threshold reduced by W-2 Medicare wages (Schedule SE lines 14–18).
+        // The threshold for the employee-only 0.9% Additional Medicare Tax
+        // is effectively: max(0, threshold − W-2 Medicare wages).
+        var reducedThreshold = Math.Max(0m, _additionalMedicareThreshold - w2MedicareWages);
+        var additionalMedicare = R(Math.Max(0m, seTaxable - reducedThreshold) * AdditionalMedicareRate);
 
         // Step 5: Total SE tax
         var totalSeTax = R(ssTax + medicareTax + additionalMedicare);
