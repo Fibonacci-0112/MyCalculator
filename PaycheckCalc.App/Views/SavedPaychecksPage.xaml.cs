@@ -42,7 +42,7 @@ public partial class SavedPaychecksPage : ContentPage
         if (sender is Button btn && btn.CommandParameter is Guid id)
         {
             await _vm.SetAsComparisonAsync(id);
-            await DisplayAlert("Compare", "Paycheck set as comparison scenario. Go to the Compare tab to see it.", "OK");
+            await DisplayAlert("Compare", "Paycheck set as comparison scenario. Go to the Compare page to see it.", "OK");
         }
     }
 

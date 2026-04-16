@@ -27,7 +27,7 @@
             <Label Text="No Saved Paychecks"
                    TextColor="#78909C" FontSize="20" FontAttributes="Bold"
                    HorizontalTextAlignment="Center" />
-            <Label Text="Go to the Results tab and tap &quot;Save as New Paycheck&quot; to save your first paycheck calculation."
+            <Label Text="Go to the Results page and tap &quot;Save as New Paycheck&quot; to save your first paycheck calculation."
                    TextColor="#90A4AE" FontSize="14"
                    HorizontalTextAlignment="Center" />
         </VerticalStackLayout>
