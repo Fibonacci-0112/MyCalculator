@@ -3,14 +3,14 @@
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:views="clr-namespace:PaycheckCalc.App.Views"
        x:Class="PaycheckCalc.App.AppShell"
-       Shell.TabBarBackgroundColor="#1565C0"
+       Shell.TabBarBackgroundColor="#37474F"
        Shell.TabBarForegroundColor="White"
-       Shell.TabBarUnselectedColor="#90CAF9"
+       Shell.TabBarUnselectedColor="#B0BEC5"
        Shell.TabBarTitleColor="White"
        Shell.NavBarHasShadow="False"
-       Shell.BackgroundColor="#1565C0"
+       Shell.BackgroundColor="#37474F"
        Shell.TitleColor="White"
-       Shell.FlyoutBackgroundColor="#F0F4FF"
+       Shell.FlyoutBackgroundColor="#ECEFF1"
        FlyoutBehavior="Flyout">
 
     <FlyoutItem Title="Inputs" Route="Inputs">
