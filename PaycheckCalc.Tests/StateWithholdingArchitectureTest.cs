@@ -4,6 +4,7 @@ using PaycheckCalc.Core.Tax.Arkansas;
 using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Colorado;
 using PaycheckCalc.Core.Tax.Connecticut;
+using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.State;
@@ -700,6 +701,8 @@ public class FullRegistryIntegrationTest
         registry.Register(new OklahomaWithholdingCalculator(new OklahomaOw2PercentageCalculator(okJson)));
 
         registry.Register(new PennsylvaniaWithholdingCalculator());
+
+        registry.Register(new IllinoisWithholdingCalculator());
 
         var coDataPath = Path.Combine(AppContext.BaseDirectory, "co_dr0004_2026.json");
         var coJson = File.ReadAllText(coDataPath);

@@ -30,32 +30,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         Assert.Equal(125.00m, result.Withholding);
     }
 
-    [Fact]
-    public void Illinois_FlatRate_WithAllowances()
-    {
-        var calc = CreateCalculator(UsState.IL);
-
-        var context = new CommonWithholdingContext(
-            UsState.IL,
-            GrossWages: 4000m,
-            PayPeriod: PayFrequency.Biweekly,
-            Year: 2026);
-        var values = new StateInputValues
-        {
-            ["FilingStatus"] = "Single",
-            ["Allowances"] = 2,
-            ["AdditionalWithholding"] = 0m
-        };
-
-        var result = calc.Calculate(context, values);
-
-        // annual = 4000 * 26 = 104,000
-        // allowance deduction = 2 * 2775 = 5550
-        // taxable = 104000 - 5550 = 98,450
-        // tax = 98450 * 0.0495 = 4873.275
-        // per period = 4873.275 / 26 = 187.43365... rounds to 187.43
-        Assert.Equal(187.43m, result.Withholding);
-    }
+    // Illinois uses a dedicated calculator (IllinoisWithholdingCalculator)
 
     [Fact]
     public void NorthCarolina_FlatRate_WithStandardDeduction_Married()
@@ -375,7 +350,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         [
             UsState.AZ,
             UsState.DC, UsState.DE, UsState.GA, UsState.HI, UsState.IA,
-            UsState.ID, UsState.IL, UsState.IN, UsState.KS, UsState.KY,
+            UsState.ID, UsState.IN, UsState.KS, UsState.KY,
             UsState.LA, UsState.MA, UsState.MD, UsState.ME, UsState.MI,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
             UsState.ND, UsState.NE, UsState.NJ, UsState.NM, UsState.NY,

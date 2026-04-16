@@ -10,6 +10,7 @@ using PaycheckCalc.Core.Tax.Arkansas;
 using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Colorado;
 using PaycheckCalc.Core.Tax.Connecticut;
+using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.Federal;
@@ -102,6 +103,9 @@ public static class MauiProgram
             // Connecticut — TPG-211 table-driven withholding calculation rules
             var ctCalc = sp.GetRequiredService<ConnecticutWithholdingCalculator>();
             registry.Register(ctCalc);
+
+            // Illinois — flat 4.95% with IL-W-4 basic and additional allowances
+            registry.Register(new IllinoisWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
