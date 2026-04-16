@@ -68,7 +68,7 @@ public sealed class SelfEmploymentTaxCalculator
 
         // Step 2: Social Security — capped at the remaining wage base
         // after subtracting W-2 SS wages (Schedule SE lines 8a–11)
-        var remainingSsBase = Math.Max(0m, _socialSecurityWageBase - Math.Max(0m, w2SocialSecurityWages));
+        var remainingSsBase = Math.Max(0m, _socialSecurityWageBase - w2SocialSecurityWages);
         var ssTaxable = Math.Min(seTaxable, remainingSsBase);
         var ssTax = R(ssTaxable * CombinedSocialSecurityRate);
 
@@ -79,7 +79,7 @@ public sealed class SelfEmploymentTaxCalculator
         // threshold reduced by W-2 Medicare wages (Schedule SE lines 14–18).
         // The threshold for the employee-only 0.9% Additional Medicare Tax
         // is effectively: max(0, threshold − W-2 Medicare wages).
-        var reducedThreshold = Math.Max(0m, _additionalMedicareThreshold - Math.Max(0m, w2MedicareWages));
+        var reducedThreshold = Math.Max(0m, _additionalMedicareThreshold - w2MedicareWages);
         var additionalMedicare = R(Math.Max(0m, seTaxable - reducedThreshold) * AdditionalMedicareRate);
 
         // Step 5: Total SE tax
