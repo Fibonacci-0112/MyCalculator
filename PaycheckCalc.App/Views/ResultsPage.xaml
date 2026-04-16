@@ -204,6 +204,30 @@
                         Padding="16,12"
                         HorizontalOptions="FillAndExpand" />
 
+                <!-- Save Paycheck button (overwrite when loaded, prompt for name when new) -->
+                <Button x:Name="SavePaycheckBtn"
+                        Text="{Binding SaveButtonText}"
+                        Clicked="OnSavePaycheckClicked"
+                        IsVisible="{Binding CanExport}"
+                        BackgroundColor="#7B1FA2"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="12"
+                        Padding="16,12"
+                        HorizontalOptions="FillAndExpand" />
+
+                <!-- Loaded paycheck indicator -->
+                <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasLoadedPaycheck}" Padding="4,0">
+                    <Label Text="{Binding LoadedPaycheckName, StringFormat='Editing: {0}'}"
+                           TextColor="#7B1FA2" FontSize="12" FontAttributes="Italic"
+                           VerticalTextAlignment="Center" />
+                    <Button Grid.Column="1" Text="Save as New"
+                            Clicked="OnSaveAsNewClicked"
+                            BackgroundColor="#E1BEE7" TextColor="#7B1FA2"
+                            FontSize="11" FontAttributes="Bold"
+                            CornerRadius="8" Padding="10,4" HeightRequest="28" />
+                </Grid>
+
                 <!-- Export buttons -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="8"
                       IsVisible="{Binding CanExport}">

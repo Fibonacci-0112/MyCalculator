@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
+using PaycheckCalc.App.Storage;
 using PaycheckCalc.App.ViewModels;
 using PaycheckCalc.App.Views;
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Pay;
+using PaycheckCalc.Core.Storage;
 using PaycheckCalc.Core.Tax.Fica;
 using PaycheckCalc.Core.Tax.Alabama;
 using PaycheckCalc.Core.Tax.Arkansas;
@@ -137,7 +139,11 @@ public static class MauiProgram
                 sp.GetRequiredService<Irs15TPercentageCalculator>(),
                 sp.GetRequiredService<FicaCalculator>()));
 
+        builder.Services.AddSingleton<IPaycheckRepository>(
+            new JsonPaycheckRepository(FileSystem.AppDataDirectory));
+
         builder.Services.AddSingleton<CalculatorViewModel>();
+        builder.Services.AddSingleton<SavedPaychecksViewModel>();
         builder.Services.AddSingleton<InputsPage>();
         builder.Services.AddSingleton<PayHoursPage>();
         builder.Services.AddSingleton<FederalPage>();
@@ -145,6 +151,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<DeductionsPage>();
         builder.Services.AddSingleton<ResultsPage>();
         builder.Services.AddSingleton<ComparePage>();
+        builder.Services.AddSingleton<SavedPaychecksPage>();
         builder.Services.AddSingleton<AppShell>();
 
         return builder.Build();
