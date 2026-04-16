@@ -9,16 +9,20 @@
        Shell.TabBarTitleColor="White"
        Shell.NavBarHasShadow="False"
        Shell.BackgroundColor="#1565C0"
-       Shell.TitleColor="White">
-    <TabBar>
-        <Tab Title="Inputs">
-            <ShellContent ContentTemplate="{DataTemplate views:InputsPage}" />
-        </Tab>
-        <Tab Title="Results">
-            <ShellContent ContentTemplate="{DataTemplate views:ResultsPage}" />
-        </Tab>
-        <Tab Title="Compare">
-            <ShellContent ContentTemplate="{DataTemplate views:ComparePage}" />
-        </Tab>
-    </TabBar>
+       Shell.TitleColor="White"
+       Shell.FlyoutBackgroundColor="#F0F4FF"
+       FlyoutBehavior="Flyout">
+
+    <FlyoutItem Title="Inputs" Route="Inputs">
+        <ShellContent ContentTemplate="{DataTemplate views:InputsPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Results" Route="Results">
+        <ShellContent ContentTemplate="{DataTemplate views:ResultsPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Compare" Route="Compare">
+        <ShellContent ContentTemplate="{DataTemplate views:ComparePage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Saved Paychecks" Route="Saved">
+        <ShellContent ContentTemplate="{DataTemplate views:SavedPaychecksPage}" />
+    </FlyoutItem>
 </Shell>

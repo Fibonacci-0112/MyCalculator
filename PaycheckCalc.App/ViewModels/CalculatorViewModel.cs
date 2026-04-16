@@ -6,6 +6,7 @@ using PaycheckCalc.App.Models;
 using PaycheckCalc.Core.Export;
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Pay;
+using PaycheckCalc.Core.Storage;
 using PaycheckCalc.Core.Tax.Federal;
 using PaycheckCalc.Core.Tax.State;
 using System.Collections.ObjectModel;
@@ -22,13 +23,15 @@ public partial class CalculatorViewModel : ObservableObject
     private readonly PayCalculator _calc;
     private readonly AnnualProjectionCalculator _projectionCalc;
     private readonly StateCalculatorRegistry _stateRegistry;
+    private readonly IPaycheckRepository _repo;
     private UsState _previousState;
 
-    public CalculatorViewModel(PayCalculator calc, AnnualProjectionCalculator projectionCalc, StateCalculatorRegistry stateRegistry)
+    public CalculatorViewModel(PayCalculator calc, AnnualProjectionCalculator projectionCalc, StateCalculatorRegistry stateRegistry, IPaycheckRepository repo)
     {
         _calc = calc;
         _projectionCalc = projectionCalc;
         _stateRegistry = stateRegistry;
+        _repo = repo;
         Frequency = PayFrequency.Biweekly;
         SelectedFrequencyPickerItem = Frequencies.FirstOrDefault(f => f.Value == Frequency);
         OvertimeMultiplier = 1.5m;
@@ -196,6 +199,16 @@ public partial class CalculatorViewModel : ObservableObject
             };
         }
         _stateFieldCache[state] = cache;
+    }
+
+    /// <summary>
+    /// Pre-populates the state field cache for a given state from saved values.
+    /// Used by <see cref="Mappers.PaycheckInputRestorer"/> to restore state-specific
+    /// input values before triggering <see cref="RebuildStateFields"/>.
+    /// </summary>
+    public void SetStateFieldCache(UsState state, Dictionary<string, object?> values)
+    {
+        _stateFieldCache[state] = new Dictionary<string, object?>(values, StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -400,5 +413,97 @@ public partial class CalculatorViewModel : ObservableObject
             Title = "Export Paycheck PDF",
             File = new ShareFile(filePath)
         });
+    }
+
+    // ── Save / Load paycheck persistence ────────────────────
+
+    /// <summary>
+    /// The ID of the currently loaded saved paycheck, if any.
+    /// When set, "Save Paycheck" overwrites this entry instead of creating a new one.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasLoadedPaycheck))]
+    [NotifyPropertyChangedFor(nameof(SaveButtonText))]
+    public partial Guid? LoadedPaycheckId { get; set; }
+
+    /// <summary>
+    /// The display name of the currently loaded saved paycheck.
+    /// </summary>
+    [ObservableProperty] public partial string? LoadedPaycheckName { get; set; }
+
+    public bool HasLoadedPaycheck => LoadedPaycheckId is not null;
+
+    /// <summary>Button text changes based on whether we're overwriting or creating new.</summary>
+    public string SaveButtonText => HasLoadedPaycheck ? "Save Paycheck" : "Save as New Paycheck";
+
+    /// <summary>
+    /// Saves the current paycheck. If a paycheck is loaded (overwrite mode),
+    /// updates the existing entry. Otherwise the page prompts for a name first
+    /// and calls <see cref="SaveWithNameAsync"/>.
+    /// </summary>
+    public async Task SaveCurrentAsync()
+    {
+        if (_lastResult is null) return;
+
+        if (LoadedPaycheckId is { } existingId)
+        {
+            // Overwrite the existing saved paycheck
+            var existing = await _repo.GetByIdAsync(existingId);
+            if (existing is not null)
+            {
+                var stateValues = new StateInputValues();
+                foreach (var field in StateFields)
+                    stateValues[field.Key] = field.GetResolvedValue();
+
+                var input = PaycheckInputMapper.Map(this, stateValues);
+                var updated = new SavedPaycheck
+                {
+                    Id = existing.Id,
+                    Name = existing.Name,
+                    CreatedAt = existing.CreatedAt,
+                    UpdatedAt = DateTimeOffset.UtcNow,
+                    Input = input,
+                    Result = _lastResult
+                };
+                await _repo.SaveAsync(updated);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Saves the current paycheck with a new name, creating a new entry.
+    /// Called by the page after a DisplayPromptAsync dialog.
+    /// </summary>
+    public async Task SaveWithNameAsync(string name)
+    {
+        if (_lastResult is null) return;
+
+        var stateValues = new StateInputValues();
+        foreach (var field in StateFields)
+            stateValues[field.Key] = field.GetResolvedValue();
+
+        var input = PaycheckInputMapper.Map(this, stateValues);
+        var paycheck = new SavedPaycheck
+        {
+            Name = name,
+            Input = input,
+            Result = _lastResult
+        };
+
+        await _repo.SaveAsync(paycheck);
+
+        // Track the newly saved paycheck for future overwrites
+        LoadedPaycheckId = paycheck.Id;
+        LoadedPaycheckName = paycheck.Name;
+    }
+
+    /// <summary>
+    /// Clears the loaded paycheck tracking so the next save creates a new entry.
+    /// </summary>
+    [RelayCommand]
+    private void ClearLoadedPaycheck()
+    {
+        LoadedPaycheckId = null;
+        LoadedPaycheckName = null;
     }
 }
