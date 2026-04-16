@@ -48,6 +48,11 @@ public static class PdfSelfEmploymentExporter
 
                     // SE Tax
                     SectionHeader(col, "Self-Employment Tax (Schedule SE)");
+                    if (result.W2SocialSecurityWages > 0 || result.W2MedicareWages > 0)
+                    {
+                        ResultRow(col, "W-2 Social Security Wages (Box 3)", result.W2SocialSecurityWages);
+                        ResultRow(col, "W-2 Medicare Wages (Box 5)", result.W2MedicareWages);
+                    }
                     ResultRow(col, "SE Taxable Earnings (92.35%)", result.SeTaxableEarnings);
                     ResultRow(col, "Social Security Tax (12.4%)", result.SocialSecurityTax);
                     ResultRow(col, "Medicare Tax (2.9%)", result.MedicareTax);

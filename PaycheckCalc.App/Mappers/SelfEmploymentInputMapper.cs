@@ -19,6 +19,8 @@ public static class SelfEmploymentInputMapper
             CostOfGoodsSold = vm.CostOfGoodsSold,
             TotalBusinessExpenses = vm.TotalBusinessExpenses,
             OtherIncome = vm.OtherIncome,
+            W2SocialSecurityWages = vm.W2SocialSecurityWages,
+            W2MedicareWages = vm.W2MedicareWages,
             FilingStatus = vm.FederalFilingStatus,
             State = vm.SelectedState,
             StateInputValues = stateValues,

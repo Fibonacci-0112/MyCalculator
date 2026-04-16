@@ -27,6 +27,23 @@ public sealed class SelfEmploymentInput
     /// </summary>
     public decimal OtherIncome { get; init; }
 
+    // ── W-2 FICA coordination ───────────────────────────────
+    /// <summary>
+    /// W-2 Social Security wages (Box 3) already subject to employer
+    /// withholding. Used to coordinate the SS wage base cap so that SE
+    /// Social Security tax is only assessed on the remaining room under
+    /// the annual wage base ($184,500 for 2026).
+    /// </summary>
+    public decimal W2SocialSecurityWages { get; init; }
+
+    /// <summary>
+    /// W-2 Medicare wages (Box 5) already subject to employer withholding.
+    /// Used to coordinate the Additional Medicare Tax threshold ($200,000
+    /// for most filers) so that the 0.9% surtax applies only to combined
+    /// wages + SE earnings above that threshold.
+    /// </summary>
+    public decimal W2MedicareWages { get; init; }
+
     // ── Federal filing info ─────────────────────────────────
     public FederalFilingStatus FilingStatus { get; init; } = FederalFilingStatus.SingleOrMarriedSeparately;
 

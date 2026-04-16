@@ -18,6 +18,8 @@ public static class SelfEmploymentResultMapper
             CostOfGoodsSold = result.CostOfGoodsSold,
             TotalExpenses = result.TotalExpenses,
             NetProfit = result.NetProfit,
+            W2SocialSecurityWages = result.W2SocialSecurityWages,
+            W2MedicareWages = result.W2MedicareWages,
             SeTaxableEarnings = result.SeTaxableEarnings,
             SocialSecurityTax = result.SocialSecurityTax,
             MedicareTax = result.MedicareTax,

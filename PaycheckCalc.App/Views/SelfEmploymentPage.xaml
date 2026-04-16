@@ -84,6 +84,39 @@
                                 Margin="0,6,0,0" />
                     </Grid>
                 </Border>
+
+                <!-- W-2 FICA Coordination -->
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="W-2 FICA Coordination" FontSize="15" FontAttributes="Bold"
+                               TextColor="#1565C0" />
+                        <Label Text="If you also have W-2 wages, enter your W-2 Box 3 and Box 5 amounts to correctly coordinate the Social Security wage base and Additional Medicare Tax threshold."
+                               TextColor="#78909C" FontSize="12" />
+                        <BoxView HeightRequest="1" Color="#E0E0E0" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"
+                              ColumnSpacing="12" RowSpacing="14">
+                            <Label Text="W-2 SS Wages (Box 3)" Grid.Row="0" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding W2SocialSecurityWages}" Keyboard="Numeric"
+                                   Grid.Row="0" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E3F2FD">
+                                <Entry.Behaviors>
+                                    <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                </Entry.Behaviors>
+                            </Entry>
+                            <Label Text="W-2 Medicare Wages (Box 5)" Grid.Row="1" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding W2MedicareWages}" Keyboard="Numeric"
+                                   Grid.Row="1" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E3F2FD">
+                                <Entry.Behaviors>
+                                    <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                </Entry.Behaviors>
+                            </Entry>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
             </VerticalStackLayout>
         </ScrollView>
 
