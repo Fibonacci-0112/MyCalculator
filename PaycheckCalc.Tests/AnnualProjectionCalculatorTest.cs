@@ -328,6 +328,67 @@ public sealed class AnnualProjectionCalculatorTest
         Assert.True(projection.AnnualizedNetPay > 0m);
     }
 
+    // ── Annualized deductions ─────────────────────────────────
+
+    [Fact]
+    public void AnnualizedPreTaxDeductions_IsZero_WhenNoDeductions()
+    {
+        var (projection, _) = RunProjection(
+            frequency: PayFrequency.Biweekly,
+            hourlyRate: 50m,
+            regularHours: 40m);
+
+        Assert.Equal(0m, projection.AnnualizedPreTaxDeductions);
+        Assert.Equal(0m, projection.AnnualizedPostTaxDeductions);
+    }
+
+    [Fact]
+    public void AnnualizedPreTaxDeductions_Biweekly_Is26TimesPerPeriod()
+    {
+        // $200 pre-tax per period × 26 = $5,200 annualized
+        var (projection, result) = RunProjection(
+            frequency: PayFrequency.Biweekly,
+            hourlyRate: 50m,
+            regularHours: 40m,
+            preTaxDeduction: 200m);
+
+        Assert.Equal(200m, result.PreTaxDeductions);
+        Assert.Equal(5_200m, projection.AnnualizedPreTaxDeductions);
+    }
+
+    [Fact]
+    public void AnnualizedPostTaxDeductions_Biweekly_Is26TimesPerPeriod()
+    {
+        // $100 post-tax per period × 26 = $2,600 annualized
+        var (projection, result) = RunProjection(
+            frequency: PayFrequency.Biweekly,
+            hourlyRate: 50m,
+            regularHours: 40m,
+            postTaxDeduction: 100m);
+
+        Assert.Equal(100m, result.PostTaxDeductions);
+        Assert.Equal(2_600m, projection.AnnualizedPostTaxDeductions);
+    }
+
+    [Fact]
+    public void AnnualizedDeductions_BothPreAndPostTax_Monthly()
+    {
+        // Gross: 160 hrs × $30/hr = $4,800 per period
+        // $300 pre-tax per period × 12 = $3,600 annualized
+        // $150 post-tax per period × 12 = $1,800 annualized
+        var (projection, result) = RunProjection(
+            frequency: PayFrequency.Monthly,
+            hourlyRate: 30m,
+            regularHours: 160m,
+            preTaxDeduction: 300m,
+            postTaxDeduction: 150m);
+
+        Assert.Equal(300m, result.PreTaxDeductions);
+        Assert.Equal(150m, result.PostTaxDeductions);
+        Assert.Equal(3_600m, projection.AnnualizedPreTaxDeductions);
+        Assert.Equal(1_800m, projection.AnnualizedPostTaxDeductions);
+    }
+
     // ── Helpers ─────────────────────────────────────────────
 
     private static (AnnualProjection projection, PaycheckResult result) RunProjection(
@@ -335,7 +396,9 @@ public sealed class AnnualProjectionCalculatorTest
         decimal hourlyRate,
         decimal regularHours,
         int paycheckNumber = 1,
-        decimal step4cExtra = 0m)
+        decimal step4cExtra = 0m,
+        decimal preTaxDeduction = 0m,
+        decimal postTaxDeduction = 0m)
     {
         var registry = new StateCalculatorRegistry();
         registry.Register(new NoIncomeTaxWithholdingAdapter(UsState.TX));
@@ -345,6 +408,12 @@ public sealed class AnnualProjectionCalculatorTest
         var fed = new Irs15TPercentageCalculator(fedJson);
         var payCalc = new PayCalculator(registry, fica, fed);
         var projCalc = new AnnualProjectionCalculator(fed, fica);
+
+        var deductions = new List<Deduction>();
+        if (preTaxDeduction > 0m)
+            deductions.Add(new Deduction { Name = "401k", Type = DeductionType.PreTax, Amount = preTaxDeduction });
+        if (postTaxDeduction > 0m)
+            deductions.Add(new Deduction { Name = "Roth 401k", Type = DeductionType.PostTax, Amount = postTaxDeduction });
 
         var input = new PaycheckInput
         {
@@ -356,7 +425,8 @@ public sealed class AnnualProjectionCalculatorTest
             {
                 Step4cExtraWithholding = step4cExtra
             },
-            PaycheckNumber = paycheckNumber
+            PaycheckNumber = paycheckNumber,
+            Deductions = deductions
         };
 
         var result = payCalc.Calculate(input);

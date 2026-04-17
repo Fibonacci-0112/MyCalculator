@@ -297,7 +297,17 @@ public partial class CalculatorViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(NetPayDifference));
         OnPropertyChanged(nameof(CanExport));
+        OnPropertyChanged(nameof(ShowDeductions));
+        OnPropertyChanged(nameof(ShowBothDeductions));
     }
+
+    /// <summary>True when the result has any pre-tax or post-tax deductions to display.</summary>
+    public bool ShowDeductions =>
+        (ResultCard?.PreTaxDeductions ?? 0m) > 0m || (ResultCard?.PostTaxDeductions ?? 0m) > 0m;
+
+    /// <summary>True when the result has both pre-tax and post-tax deductions (for separator visibility).</summary>
+    public bool ShowBothDeductions =>
+        (ResultCard?.PreTaxDeductions ?? 0m) > 0m && (ResultCard?.PostTaxDeductions ?? 0m) > 0m;
 
     /// <summary>
     /// Saved scenario snapshot for side-by-side comparison.

@@ -14,6 +14,8 @@ public sealed class AnnualProjection
 
     // ── Annualized amounts (per-period × periods/year) ──────
     public decimal AnnualizedGrossPay { get; init; }
+    public decimal AnnualizedPreTaxDeductions { get; init; }
+    public decimal AnnualizedPostTaxDeductions { get; init; }
     public decimal AnnualizedFederalTaxableWages { get; init; }
     public decimal AnnualizedFicaTaxableWages { get; init; }
     public decimal AnnualizedStateTaxableWages { get; init; }

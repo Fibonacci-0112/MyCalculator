@@ -33,6 +33,8 @@ public sealed class AnnualProjectionCalculator
 
         // ── Annualized amounts (per-period × periods/year) ──────
         decimal annualGross = R(result.GrossPay * periods);
+        decimal annualPreTaxDeductions = R(result.PreTaxDeductions * periods);
+        decimal annualPostTaxDeductions = R(result.PostTaxDeductions * periods);
         decimal annualFedTaxable = R(result.FederalTaxableIncome * periods);
         decimal annualFicaTaxable = R((result.GrossPay - result.PreTaxDeductions) * periods);
         decimal annualStateTaxable = R(result.StateTaxableWages * periods);
@@ -82,6 +84,8 @@ public sealed class AnnualProjectionCalculator
             RemainingPaychecks = remaining,
 
             AnnualizedGrossPay = annualGross,
+            AnnualizedPreTaxDeductions = annualPreTaxDeductions,
+            AnnualizedPostTaxDeductions = annualPostTaxDeductions,
             AnnualizedFederalTaxableWages = annualFedTaxable,
             AnnualizedFicaTaxableWages = annualFicaTaxable,
             AnnualizedStateTaxableWages = annualStateTaxable,

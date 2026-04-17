@@ -18,6 +18,8 @@ public static class AnnualProjectionMapper
             RemainingPaychecks = projection.RemainingPaychecks,
 
             AnnualizedGrossPay = projection.AnnualizedGrossPay,
+            AnnualizedPreTaxDeductions = projection.AnnualizedPreTaxDeductions,
+            AnnualizedPostTaxDeductions = projection.AnnualizedPostTaxDeductions,
             AnnualizedFederalTaxableWages = projection.AnnualizedFederalTaxableWages,
             AnnualizedFicaTaxableWages = projection.AnnualizedFicaTaxableWages,
             AnnualizedStateTaxableWages = projection.AnnualizedStateTaxableWages,
