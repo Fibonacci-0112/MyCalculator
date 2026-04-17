@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="clr-namespace:PaycheckCalc.App.Behaviors"
+             xmlns:vm="clr-namespace:PaycheckCalc.App.ViewModels"
+             x:Class="PaycheckCalc.App.Views.AnnualTaxPage"
+             x:Name="PageRoot"
+             Title="Annual Tax"
+             BackgroundColor="#FAFAFA">
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Tab header row -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,*,*,*"
+              BackgroundColor="#455A64" Padding="0" ColumnSpacing="0">
+            <Button x:Name="TabBasics" Text="Basics"
+                    Clicked="OnTabClicked"
+                    BackgroundColor="#1565C0" TextColor="White"
+                    FontSize="13" FontAttributes="Bold"
+                    CornerRadius="0" BorderWidth="0"
+                    Padding="4,10" Grid.Column="0" />
+            <Button x:Name="TabW2" Text="W-2 Jobs"
+                    Clicked="OnTabClicked"
+                    BackgroundColor="#455A64" TextColor="#B0BEC5"
+                    FontSize="13"
+                    CornerRadius="0" BorderWidth="0"
+                    Padding="4,10" Grid.Column="1" />
+            <Button x:Name="TabSchedule1" Text="Income / Adj."
+                    Clicked="OnTabClicked"
+                    BackgroundColor="#455A64" TextColor="#B0BEC5"
+                    FontSize="13"
+                    CornerRadius="0" BorderWidth="0"
+                    Padding="4,10" Grid.Column="2" />
+            <Button x:Name="TabCreditsPayments" Text="Credits / Pay"
+                    Clicked="OnTabClicked"
+                    BackgroundColor="#455A64" TextColor="#B0BEC5"
+                    FontSize="13"
+                    CornerRadius="0" BorderWidth="0"
+                    Padding="4,10" Grid.Column="3" />
+        </Grid>
+
+        <!-- Basics tab -->
+        <ScrollView Grid.Row="1" x:Name="BasicsContent" IsVisible="True">
+            <VerticalStackLayout Padding="16" Spacing="10">
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="16">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Filing Information" FontSize="15" FontAttributes="Bold"
+                               TextColor="#1565C0" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                              ColumnSpacing="12" RowSpacing="14">
+                            <Label Text="Tax Year" Grid.Row="0" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding TaxYear}" Keyboard="Numeric"
+                                   Grid.Row="0" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E3F2FD" />
+
+                            <Label Text="Filing Status" Grid.Row="1" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Picker ItemsSource="{Binding FederalStatuses}"
+                                    SelectedItem="{Binding SelectedFederalPickerItem}"
+                                    Grid.Row="1" Grid.Column="1" TextColor="Black" />
+
+                            <Label Text="Residence State" Grid.Row="2" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Picker ItemsSource="{Binding StatePickerItems}"
+                                    SelectedItem="{Binding SelectedStatePickerItem}"
+                                    Grid.Row="2" Grid.Column="1" TextColor="Black" />
+
+                            <Label Text="Qualifying Children (CTC)" Grid.Row="3" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding QualifyingChildren}" Keyboard="Numeric"
+                                   Grid.Row="3" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E3F2FD" />
+
+                            <Label Text="Itemized Over Standard" Grid.Row="4" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding ItemizedDeductionsOverStandard}" Keyboard="Numeric"
+                                   Grid.Row="4" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E3F2FD">
+                                <Entry.Behaviors>
+                                    <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                </Entry.Behaviors>
+                            </Entry>
+                        </Grid>
+
+                        <Button Text="Calculate" Command="{Binding CalculateCommand}"
+                                BackgroundColor="#1565C0" TextColor="White"
+                                FontAttributes="Bold" CornerRadius="8"
+                                Margin="0,6,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- W-2 Jobs tab -->
+        <ScrollView Grid.Row="1" x:Name="W2Content" IsVisible="False">
+            <VerticalStackLayout Padding="16" Spacing="10">
+                <Label Text="Add one W-2 entry per employer. On a joint return, check &quot;Spouse&quot; for jobs held by the spouse so excess Social Security tax is computed per taxpayer."
+                       TextColor="#78909C" FontSize="12" />
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding W2Jobs}" Spacing="10">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:W2JobItemViewModel">
+                            <Border BackgroundColor="White" StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12" Padding="14">
+                                <VerticalStackLayout Spacing="10">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <Entry Text="{Binding Name}" Placeholder="Employer name"
+                                               Grid.Column="0"
+                                               TextColor="Black" BackgroundColor="#ECEFF1" />
+                                        <Button Text="✕" Grid.Column="1"
+                                                WidthRequest="44" HeightRequest="44"
+                                                BackgroundColor="#B71C1C" TextColor="White"
+                                                FontAttributes="Bold" CornerRadius="8"
+                                                Command="{Binding Source={x:Reference PageRoot}, Path=BindingContext.RemoveW2JobCommand}"
+                                                CommandParameter="{Binding .}" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                        <Label Text="Spouse's W-2?" Grid.Column="0"
+                                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="13" />
+                                        <Switch IsToggled="{Binding IsSpouse}" Grid.Column="1"
+                                                OnColor="#1565C0" HorizontalOptions="Start" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                                          ColumnSpacing="10" RowSpacing="8">
+                                        <Label Text="Box 1 Wages" Grid.Row="0" Grid.Column="0"
+                                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="13" />
+                                        <Entry Text="{Binding WagesBox1}" Keyboard="Numeric"
+                                               Grid.Row="0" Grid.Column="1"
+                                               TextColor="Black" BackgroundColor="#E3F2FD">
+                                            <Entry.Behaviors>
+                                                <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                            </Entry.Behaviors>
+                                        </Entry>
+                                        <Label Text="Box 2 Fed WH" Grid.Row="1" Grid.Column="0"
+                                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="13" />
+                                        <Entry Text="{Binding FederalWithholdingBox2}" Keyboard="Numeric"
+                                               Grid.Row="1" Grid.Column="1"
+                                               TextColor="Black" BackgroundColor="#E3F2FD">
+                                            <Entry.Behaviors>
+                                                <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                            </Entry.Behaviors>
+                                        </Entry>
+                                        <Label Text="Box 3 SS Wages" Grid.Row="2" Grid.Column="0"
+                                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="13" />
+                                        <Entry Text="{Binding SocialSecurityWagesBox3}" Keyboard="Numeric"
+                                               Grid.Row="2" Grid.Column="1"
+                                               TextColor="Black" BackgroundColor="#E3F2FD">
+                                            <Entry.Behaviors>
+                                                <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                            </Entry.Behaviors>
+                                        </Entry>
+                                        <Label Text="Box 4 SS Tax" Grid.Row="3" Grid.Column="0"
+                                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="13" />
+                                        <Entry Text="{Binding SocialSecurityTaxBox4}" Keyboard="Numeric"
+                                               Grid.Row="3" Grid.Column="1"
+                                               TextColor="Black" BackgroundColor="#E3F2FD">
+                                            <Entry.Behaviors>
+                                                <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                            </Entry.Behaviors>
+                                        </Entry>
+                                        <Label Text="Box 5 Medicare Wages" Grid.Row="4" Grid.Column="0"
+                                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="13" />
+                                        <Entry Text="{Binding MedicareWagesBox5}" Keyboard="Numeric"
+                                               Grid.Row="4" Grid.Column="1"
+                                               TextColor="Black" BackgroundColor="#E3F2FD">
+                                            <Entry.Behaviors>
+                                                <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                            </Entry.Behaviors>
+                                        </Entry>
+                                        <Label Text="Box 6 Medicare Tax" Grid.Row="5" Grid.Column="0"
+                                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="13" />
+                                        <Entry Text="{Binding MedicareTaxBox6}" Keyboard="Numeric"
+                                               Grid.Row="5" Grid.Column="1"
+                                               TextColor="Black" BackgroundColor="#E3F2FD">
+                                            <Entry.Behaviors>
+                                                <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                            </Entry.Behaviors>
+                                        </Entry>
+                                        <Label Text="Box 16 State Wages" Grid.Row="6" Grid.Column="0"
+                                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="13" />
+                                        <Entry Text="{Binding StateWagesBox16}" Keyboard="Numeric"
+                                               Grid.Row="6" Grid.Column="1"
+                                               TextColor="Black" BackgroundColor="#FFF8E1">
+                                            <Entry.Behaviors>
+                                                <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                            </Entry.Behaviors>
+                                        </Entry>
+                                        <Label Text="Box 17 State WH" Grid.Row="7" Grid.Column="0"
+                                               VerticalTextAlignment="Center" TextColor="#37474F" FontSize="13" />
+                                        <Entry Text="{Binding StateWithholdingBox17}" Keyboard="Numeric"
+                                               Grid.Row="7" Grid.Column="1"
+                                               TextColor="Black" BackgroundColor="#FFF8E1">
+                                            <Entry.Behaviors>
+                                                <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                            </Entry.Behaviors>
+                                        </Entry>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <Button Text="+ Add W-2" Command="{Binding AddW2JobCommand}"
+                        BackgroundColor="#00897B" TextColor="White"
+                        FontAttributes="Bold" CornerRadius="8"
+                        Margin="0,6,0,0" />
+                <Button Text="Calculate" Command="{Binding CalculateCommand}"
+                        BackgroundColor="#1565C0" TextColor="White"
+                        FontAttributes="Bold" CornerRadius="8" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Income / Adjustments tab -->
+        <ScrollView Grid.Row="1" x:Name="Schedule1Content" IsVisible="False">
+            <VerticalStackLayout Padding="16" Spacing="10">
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="16">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Additional Income (Schedule 1 Part I)"
+                               FontSize="15" FontAttributes="Bold" TextColor="#1565C0" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                              ColumnSpacing="12" RowSpacing="10">
+                            <Label Text="Taxable Interest" Grid.Row="0" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding TaxableInterest}" Keyboard="Numeric"
+                                   Grid.Row="0" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E8F5E9">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Ordinary Dividends" Grid.Row="1" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding OrdinaryDividends}" Keyboard="Numeric"
+                                   Grid.Row="1" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E8F5E9">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Qualified Dividends" Grid.Row="2" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding QualifiedDividends}" Keyboard="Numeric"
+                                   Grid.Row="2" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E8F5E9">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Net Capital Gain/Loss" Grid.Row="3" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding CapitalGainOrLoss}" Keyboard="Numeric"
+                                   Grid.Row="3" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E8F5E9">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Unemployment Comp." Grid.Row="4" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding UnemploymentCompensation}" Keyboard="Numeric"
+                                   Grid.Row="4" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E8F5E9">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Taxable Soc. Security" Grid.Row="5" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding TaxableSocialSecurity}" Keyboard="Numeric"
+                                   Grid.Row="5" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E8F5E9">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Other Additional Income" Grid.Row="6" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding OtherAdditionalIncome}" Keyboard="Numeric"
+                                   Grid.Row="6" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E8F5E9">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="16">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Adjustments (Schedule 1 Part II)"
+                               FontSize="15" FontAttributes="Bold" TextColor="#1565C0" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                              ColumnSpacing="12" RowSpacing="10">
+                            <Label Text="Student Loan Interest" Grid.Row="0" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding StudentLoanInterest}" Keyboard="Numeric"
+                                   Grid.Row="0" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#EDE7F6">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="HSA Deduction" Grid.Row="1" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding HsaDeduction}" Keyboard="Numeric"
+                                   Grid.Row="1" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#EDE7F6">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Traditional IRA Ded." Grid.Row="2" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding TraditionalIraDeduction}" Keyboard="Numeric"
+                                   Grid.Row="2" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#EDE7F6">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Educator Expenses" Grid.Row="3" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding EducatorExpenses}" Keyboard="Numeric"
+                                   Grid.Row="3" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#EDE7F6">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Other Adjustments" Grid.Row="4" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding OtherAdjustments}" Keyboard="Numeric"
+                                   Grid.Row="4" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#EDE7F6">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                        </Grid>
+
+                        <Button Text="Calculate" Command="{Binding CalculateCommand}"
+                                BackgroundColor="#1565C0" TextColor="White"
+                                FontAttributes="Bold" CornerRadius="8"
+                                Margin="0,6,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Credits / Payments tab -->
+        <ScrollView Grid.Row="1" x:Name="CreditsPaymentsContent" IsVisible="False">
+            <VerticalStackLayout Padding="16" Spacing="10">
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="16">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Credits" FontSize="15" FontAttributes="Bold" TextColor="#1565C0" />
+                        <Label Text="Enter pre-computed amounts for any credits you have already calculated. Structured Form 8812/8863/8880 inputs are not yet exposed in the UI."
+                               TextColor="#78909C" FontSize="12" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto"
+                              ColumnSpacing="12" RowSpacing="10">
+                            <Label Text="Child Tax Credit" Grid.Row="0" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding PrecomputedChildTaxCredit}" Keyboard="Numeric"
+                                   Grid.Row="0" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#FFF3E0">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Other Nonrefundable" Grid.Row="1" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding NonrefundableCredits}" Keyboard="Numeric"
+                                   Grid.Row="1" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#FFF3E0">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Refundable Credits (EITC, etc.)" Grid.Row="2" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding RefundableCredits}" Keyboard="Numeric"
+                                   Grid.Row="2" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#FFF3E0">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="16">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Other Taxes (Schedule 2)" FontSize="15" FontAttributes="Bold" TextColor="#1565C0" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"
+                              ColumnSpacing="12" RowSpacing="10">
+                            <Label Text="NIIT (Net Investment)" Grid.Row="0" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding NetInvestmentIncomeTax}" Keyboard="Numeric"
+                                   Grid.Row="0" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#FCE4EC">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                            <Label Text="Other Schedule 2 Taxes" Grid.Row="1" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding OtherSchedule2Taxes}" Keyboard="Numeric"
+                                   Grid.Row="1" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#FCE4EC">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="16">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Payments" FontSize="15" FontAttributes="Bold" TextColor="#1565C0" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto"
+                              ColumnSpacing="12" RowSpacing="10">
+                            <Label Text="1040-ES Estimated Payments" Grid.Row="0" Grid.Column="0"
+                                   VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
+                            <Entry Text="{Binding EstimatedTaxPayments}" Keyboard="Numeric"
+                                   Grid.Row="0" Grid.Column="1"
+                                   TextColor="Black" BackgroundColor="#E1F5FE">
+                                <Entry.Behaviors><behaviors:DecimalFormatBehavior IsCurrency="True" /></Entry.Behaviors>
+                            </Entry>
+                        </Grid>
+                        <Button Text="Calculate" Command="{Binding CalculateCommand}"
+                                BackgroundColor="#1565C0" TextColor="White"
+                                FontAttributes="Bold" CornerRadius="8"
+                                Margin="0,6,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

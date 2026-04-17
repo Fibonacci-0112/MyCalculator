@@ -17,7 +17,9 @@ using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.Federal;
+using PaycheckCalc.Core.Tax.Federal.Annual;
 using PaycheckCalc.Core.Tax.State;
+using PaycheckCalc.Core.Tax.State.Annual;
 using PaycheckCalc.Core.Tax.SelfEmployment;
 
 namespace PaycheckCalc.App;
@@ -158,9 +160,30 @@ public static class MauiProgram
                 sp.GetRequiredService<Irs15TPercentageCalculator>(),
                 sp.GetRequiredService<StateCalculatorRegistry>()));
 
+        // ── Annual Form 1040 engine ─────────────────────────
+        builder.Services.AddSingleton<Federal1040TaxCalculator>(sp =>
+        {
+            using var stream = FileSystem.OpenAppPackageFileAsync("federal_1040_brackets_2026.json").Result;
+            using var reader = new StreamReader(stream);
+            var json = reader.ReadToEnd();
+            return new Federal1040TaxCalculator(json);
+        });
+        builder.Services.AddSingleton<Schedule1Calculator>();
+        builder.Services.AddSingleton<AnnualStateTaxCalculator>(sp =>
+            new AnnualStateTaxCalculator(sp.GetRequiredService<StateCalculatorRegistry>()));
+        builder.Services.AddSingleton<Form1040Calculator>(sp =>
+            new Form1040Calculator(
+                sp.GetRequiredService<Federal1040TaxCalculator>(),
+                sp.GetRequiredService<Schedule1Calculator>(),
+                sp.GetRequiredService<SelfEmploymentTaxCalculator>(),
+                sp.GetRequiredService<QbiDeductionCalculator>(),
+                sp.GetRequiredService<FicaCalculator>(),
+                stateTax: sp.GetRequiredService<AnnualStateTaxCalculator>()));
+
         builder.Services.AddSingleton<CalculatorViewModel>();
         builder.Services.AddSingleton<SavedPaychecksViewModel>();
         builder.Services.AddSingleton<SelfEmploymentViewModel>();
+        builder.Services.AddSingleton<AnnualTaxViewModel>();
         builder.Services.AddSingleton<InputsPage>();
         builder.Services.AddSingleton<PayHoursPage>();
         builder.Services.AddSingleton<FederalPage>();
@@ -171,6 +194,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<SavedPaychecksPage>();
         builder.Services.AddSingleton<SelfEmploymentPage>();
         builder.Services.AddSingleton<SelfEmploymentResultsPage>();
+        builder.Services.AddSingleton<AnnualTaxPage>();
+        builder.Services.AddSingleton<AnnualTaxResultsPage>();
         builder.Services.AddSingleton<AppShell>();
 
         return builder.Build();

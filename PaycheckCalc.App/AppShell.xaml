@@ -31,4 +31,10 @@
     <FlyoutItem Title="SE Results" Route="SEResults">
         <ShellContent ContentTemplate="{DataTemplate views:SelfEmploymentResultsPage}" />
     </FlyoutItem>
+    <FlyoutItem Title="Annual Tax" Route="AnnualTax">
+        <ShellContent ContentTemplate="{DataTemplate views:AnnualTaxPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Annual Results" Route="AnnualResults">
+        <ShellContent ContentTemplate="{DataTemplate views:AnnualTaxResultsPage}" />
+    </FlyoutItem>
 </Shell>
