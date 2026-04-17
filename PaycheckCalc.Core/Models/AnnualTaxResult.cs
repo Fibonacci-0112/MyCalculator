@@ -134,4 +134,13 @@ public sealed class AnnualTaxResult
     /// the orchestrator is run without a state calculator (back-compat).
     /// </summary>
     public AnnualStateTaxResult? StateTax { get; init; }
+
+    // ── Form 1040-ES quarterly estimates ────────────────────
+    /// <summary>
+    /// Quarterly estimated-tax worksheet output (Form 1040-ES). Always
+    /// populated by <c>Form1040Calculator</c>; when expected withholding
+    /// already covers the safe harbor, <see cref="QuarterlyEstimatesResult.EstimatesRequired"/>
+    /// is false and each installment amount is $0.
+    /// </summary>
+    public QuarterlyEstimatesResult? QuarterlyEstimates { get; init; }
 }

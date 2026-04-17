@@ -88,6 +88,16 @@ public class Form1040CalculatorTest
 
         Assert.Equal(230.00m, result.RefundOrOwe);
         Assert.Equal(0.22m, result.MarginalTaxRate);
+
+        // Form 1040-ES: no prior-year info supplied → 90% CY safe harbor.
+        // 90% × $8,770 = $7,893 required; $9,000 withholding already covers
+        // it, so no quarterly estimates are required.
+        Assert.NotNull(result.QuarterlyEstimates);
+        Assert.Equal(SafeHarborBasis.NinetyPercentOfCurrentYear,
+            result.QuarterlyEstimates!.SafeHarborBasis);
+        Assert.Equal(7_893.00m, result.QuarterlyEstimates.RequiredAnnualPayment);
+        Assert.Equal(0m, result.QuarterlyEstimates.TotalEstimatedPayments);
+        Assert.False(result.QuarterlyEstimates.EstimatesRequired);
     }
 
     // ── Scenario 2: MFJ with both spouses working ─────────────────

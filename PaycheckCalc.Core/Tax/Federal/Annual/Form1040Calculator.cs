@@ -33,6 +33,7 @@ public sealed class Form1040Calculator
     private readonly Form8863EducationCreditsCalculator _education;
     private readonly Form8880SaversCreditCalculator _savers;
     private readonly Form8960NiitCalculator _niit;
+    private readonly Form1040ESCalculator _es;
     private readonly AnnualStateTaxCalculator? _stateTax;
 
     public Form1040Calculator(
@@ -45,7 +46,8 @@ public sealed class Form1040Calculator
         Form8863EducationCreditsCalculator? education = null,
         Form8880SaversCreditCalculator? savers = null,
         Form8960NiitCalculator? niit = null,
-        AnnualStateTaxCalculator? stateTax = null)
+        AnnualStateTaxCalculator? stateTax = null,
+        Form1040ESCalculator? quarterlyEstimates = null)
     {
         _tax = tax;
         _sched1 = sched1;
@@ -56,6 +58,7 @@ public sealed class Form1040Calculator
         _education = education ?? new Form8863EducationCreditsCalculator();
         _savers = savers ?? new Form8880SaversCreditCalculator();
         _niit = niit ?? new Form8960NiitCalculator();
+        _es = quarterlyEstimates ?? new Form1040ESCalculator();
         _stateTax = stateTax;
     }
 
@@ -224,6 +227,18 @@ public sealed class Form1040Calculator
         // injected the result's StateTax property is null (back-compat).
         AnnualStateTaxResult? stateTaxResult = _stateTax?.Calculate(profile, incomeTaxAfterCredits);
 
+        // ── Step 15: Form 1040-ES quarterly estimates ───────
+        // Derive the four 1040-ES installments from the current-year total
+        // tax and expected withholding. Prior-year info, when supplied on
+        // the profile, enables the 100% / 110% prior-year safe harbor.
+        var expectedWithholding = R(w2FedWH + Math.Max(0m, profile.AdditionalExpectedWithholding));
+        var quarterly = _es.Calculate(
+            taxYear: profile.TaxYear,
+            filingStatus: profile.FilingStatus,
+            currentYearProjectedTax: totalTax,
+            expectedWithholding: expectedWithholding,
+            priorYear: profile.PriorYearSafeHarbor);
+
         return new AnnualTaxResult
         {
             TaxYear = profile.TaxYear,
@@ -265,7 +280,9 @@ public sealed class Form1040Calculator
             EffectiveTaxRate = effectiveRate,
             MarginalTaxRate = marginalRate,
 
-            StateTax = stateTaxResult
+            StateTax = stateTaxResult,
+
+            QuarterlyEstimates = quarterly
         };
     }
 
