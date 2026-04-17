@@ -186,14 +186,16 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     }
 
     // ── Allowance credit tests ───────────────────────────────────────
+    // Delaware now uses a dedicated calculator (DelawareWithholdingCalculator).
+    // See DelawareWithholdingCalculatorTest for allowance credit coverage.
 
     [Fact]
-    public void Delaware_AllowanceCredit_ReducesTax()
+    public void Nebraska_AllowanceCredit_ReducesTax()
     {
-        var calc = CreateCalculator(UsState.DE);
+        var calc = CreateCalculator(UsState.NE);
 
         var context = new CommonWithholdingContext(
-            UsState.DE,
+            UsState.NE,
             GrossWages: 4000m,
             PayPeriod: PayFrequency.Monthly,
             Year: 2026);
@@ -206,21 +208,19 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         var result = calc.Calculate(context, values);
 
+        // Nebraska: AllowanceCreditAmount = $171, std ded single = $8,600
         // annual = 4000 * 12 = 48,000
-        // std ded single = 3,250
-        // taxable = 48000 - 3250 = 44,750
-        // Brackets:
-        // 0-2000 @ 0% = 0
-        // 2000-5000 @ 2.2% = 66.00
-        // 5000-10000 @ 3.9% = 195.00
-        // 10000-20000 @ 4.8% = 480.00
-        // 20000-25000 @ 5.2% = 260.00
-        // 25000-44750 @ 5.55% = 1096.125
-        // total = 0 + 66 + 195 + 480 + 260 + 1096.125 = 2097.125
-        // credit = 2 * 110 = 220
-        // net tax = 2097.125 - 220 = 1877.125
-        // per period = 1877.125 / 12 = 156.427083... rounds to 156.43
-        Assert.Equal(156.43m, result.Withholding);
+        // taxable = 48,000 - 8,600 = 39,400
+        // NE brackets (single):
+        //   0-4,030 @ 2.46% = 99.138
+        //   4,030-24,120 @ 3.51% = 705.159
+        //   24,120-38,870 @ 5.01% = 738.975
+        //   38,870-39,400 @ 5.20% = 27.56
+        //   total = 1570.832
+        // credit = 2 * 171 = 342
+        // net tax = 1570.832 - 342 = 1228.832
+        // per period = 1228.832 / 12 = 102.4026..., rounds to 102.40
+        Assert.Equal(102.40m, result.Withholding);
     }
 
     // ── Additional withholding test ──────────────────────────────────
@@ -349,7 +349,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         UsState[] expectedStates =
         [
             UsState.AZ,
-            UsState.DC, UsState.DE, UsState.GA, UsState.HI, UsState.IA,
+            UsState.DC, UsState.GA, UsState.HI, UsState.IA,
             UsState.ID, UsState.IN, UsState.KS, UsState.KY,
             UsState.LA, UsState.MA, UsState.MD, UsState.ME, UsState.MI,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
