@@ -4,7 +4,7 @@
              xmlns:helpers="clr-namespace:PaycheckCalc.App.Helpers"
              x:Class="PaycheckCalc.App.Views.SavedPaychecksPage"
              Title="Saved Paychecks"
-             BackgroundColor="#FAFAFA">
+             BackgroundColor="#F0F4FF">
 
     <ContentPage.Resources>
         <helpers:InvertBoolConverter x:Key="InvertBoolConverter" />
@@ -13,7 +13,7 @@
     <Grid RowDefinitions="Auto,*">
 
         <!-- Page Header -->
-        <Grid Grid.Row="0" BackgroundColor="#00695C" Padding="16,20,16,20">
+        <Grid Grid.Row="0" BackgroundColor="#1565C0" Padding="16,20,16,20">
             <Label Text="Saved Paychecks"
                    TextColor="White"
                    FontSize="22"
@@ -82,7 +82,7 @@
                             <HorizontalStackLayout Grid.Row="2" Grid.ColumnSpan="2" Spacing="8" Margin="0,4,0,0">
                                 <Button Text="Load"
                                         Clicked="OnLoadClicked" CommandParameter="{Binding Id}"
-                                        BackgroundColor="#00695C" TextColor="White"
+                                        BackgroundColor="#1565C0" TextColor="White"
                                         FontSize="12" FontAttributes="Bold"
                                         CornerRadius="8" Padding="12,6" HeightRequest="32" />
                                 <Button Text="Compare"

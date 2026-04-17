@@ -4,7 +4,7 @@
              xmlns:behaviors="clr-namespace:PaycheckCalc.App.Behaviors"
              x:Class="PaycheckCalc.App.Views.PayHoursPage"
              Title="Pay &amp; Hours"
-             BackgroundColor="#FAFAFA">
+             BackgroundColor="#F0F4FF">
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="10">
             <Border BackgroundColor="White" StrokeThickness="0"
@@ -18,7 +18,7 @@
                     <Label Text="Hourly Rate" Grid.Row="1" Grid.Column="0"
                            VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                     <Entry Text="{Binding HourlyRate}" Keyboard="Numeric" Grid.Row="1" Grid.Column="1"
-                           TextColor="Black" BackgroundColor="#E0F2F1">
+                           TextColor="Black" BackgroundColor="#EEF2FF">
                         <Entry.Behaviors>
                             <behaviors:DecimalFormatBehavior IsCurrency="True" />
                         </Entry.Behaviors>
@@ -26,7 +26,7 @@
                     <Label Text="Regular Hours" Grid.Row="2" Grid.Column="0"
                            VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                     <Entry Text="{Binding RegularHours}" Keyboard="Numeric" Grid.Row="2" Grid.Column="1"
-                           TextColor="Black" BackgroundColor="#E0F2F1">
+                           TextColor="Black" BackgroundColor="#EEF2FF">
                         <Entry.Behaviors>
                             <behaviors:DecimalFormatBehavior />
                         </Entry.Behaviors>
@@ -34,7 +34,7 @@
                     <Label Text="Overtime Hours" Grid.Row="3" Grid.Column="0"
                            VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                     <Entry Text="{Binding OvertimeHours}" Keyboard="Numeric" Grid.Row="3" Grid.Column="1"
-                           TextColor="Black" BackgroundColor="#E0F2F1">
+                           TextColor="Black" BackgroundColor="#EEF2FF">
                         <Entry.Behaviors>
                             <behaviors:DecimalFormatBehavior />
                         </Entry.Behaviors>
@@ -42,7 +42,7 @@
                     <Label Text="OT Multiplier" Grid.Row="4" Grid.Column="0"
                            VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                     <Entry Text="{Binding OvertimeMultiplier}" Keyboard="Numeric" Grid.Row="4" Grid.Column="1"
-                           TextColor="Black" BackgroundColor="#E0F2F1">
+                           TextColor="Black" BackgroundColor="#EEF2FF">
                         <Entry.Behaviors>
                             <behaviors:DecimalFormatBehavior />
                         </Entry.Behaviors>
@@ -50,10 +50,10 @@
                     <Label Text="Paycheck # (this year)" Grid.Row="5" Grid.Column="0"
                            VerticalTextAlignment="Center" TextColor="#37474F" FontSize="14" />
                     <Entry Text="{Binding PaycheckNumber}" Keyboard="Numeric" Grid.Row="5" Grid.Column="1"
-                           TextColor="Black" BackgroundColor="#E0F2F1" />
+                           TextColor="Black" BackgroundColor="#EEF2FF" />
                     <Button Text="Calculate" Command="{Binding CalculateCommand}"
                             Grid.Row="6" Grid.ColumnSpan="2"
-                            BackgroundColor="#00897B" TextColor="White"
+                            BackgroundColor="#1565C0" TextColor="White"
                             FontAttributes="Bold" CornerRadius="8"
                             Margin="0,6,0,0" />
                 </Grid>
