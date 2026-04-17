@@ -55,7 +55,7 @@ public sealed class Form1040ESCalculator
         decimal expectedWithholding,
         PriorYearSafeHarborInput? priorYear = null)
     {
-        // Normalise negatives: a "negative" projected tax means a refund
+        // Normalize negatives: a "negative" projected tax means a refund
         // without any liability, which cannot drive an estimate.
         var cyTax = Math.Max(0m, currentYearProjectedTax);
         var withholding = Math.Max(0m, expectedWithholding);
