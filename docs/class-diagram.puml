@@ -2,7 +2,27 @@
 
 ' ──────────────────────────────────────────────
 ' PlantUML class diagram for the PaycheckCalc solution.
-' Covers PaycheckCalc.Core and PaycheckCalc.App.
+' Covers PaycheckCalc.Core (UI-agnostic payroll / tax engine) and
+' PaycheckCalc.App (MAUI MVVM front end).
+'
+' Layout is grouped by package to mirror the folder structure:
+'   PaycheckCalc.Core
+'     ├─ Models            – domain inputs, results, profiles
+'     ├─ Pay               – per-paycheck orchestration
+'     ├─ Tax/Fica          – FICA (SS + Medicare)
+'     ├─ Tax/Federal       – IRS Pub 15-T per-paycheck withholding
+'     ├─ Tax/Federal/Annual – Form 1040 engine (annual)
+'     ├─ Tax/SelfEmployment – Schedule C / SE tax / QBI
+'     ├─ Tax/State         – state-tax plugin model + registry
+'     ├─ Tax/<StateName>   – per-state calculators
+'     ├─ Storage           – persistence abstraction
+'     └─ Export            – CSV / PDF exporters
+'   PaycheckCalc.App
+'     ├─ ViewModels        – MVVM view models (CommunityToolkit.Mvvm)
+'     ├─ Views             – XAML pages
+'     ├─ Models            – UI/presentation DTOs
+'     ├─ Mappers           – domain ⇄ UI translation
+'     └─ Storage           – JSON paycheck repository
 ' ──────────────────────────────────────────────
 
 skinparam classAttributeIconSize 0
@@ -10,868 +30,759 @@ skinparam linetype ortho
 hide empty members
 
 ' ═══════════════════════════════════════════════
-' Core Models – Enums
+' PaycheckCalc.Core – Enums
 ' ═══════════════════════════════════════════════
 
-enum PayFrequency {
-    Weekly
-    Biweekly
-    Semimonthly
-    Monthly
-    Quarterly
-    Semiannual
-    Annual
-    Daily
+package "Core.Models" as CoreModels {
+
+    enum PayFrequency {
+        Weekly
+        Biweekly
+        Semimonthly
+        Monthly
+        Quarterly
+        Semiannual
+        Annual
+        Daily
+    }
+
+    enum FilingStatus {
+        Single
+        Married
+    }
+
+    enum DeductionType {
+        PreTax
+        PostTax
+    }
+
+    enum DeductionAmountType {
+        Dollar
+        Percentage
+    }
+
+    enum UsState {
+        AL
+        AK
+        AR
+        ' … all 50 states + DC …
+        WV
+        WY
+    }
+
+    enum W2JobHolder {
+        Taxpayer
+        Spouse
+    }
+
+    ' ═══════════════════════════════════════════
+    ' Domain Inputs
+    ' ═══════════════════════════════════════════
+
+    class PaycheckInput <<sealed>> {
+        +Frequency : PayFrequency
+        +HourlyRate : decimal
+        +RegularHours : decimal
+        +OvertimeHours : decimal
+        +OvertimeMultiplier : decimal
+        +State : UsState
+        +StateInputValues : StateInputValues?
+        +FederalW4 : FederalW4Input
+        +Deductions : IReadOnlyList<Deduction>
+        +YtdSocialSecurityWages : decimal
+        +YtdMedicareWages : decimal
+        +PaycheckNumber : int
+    }
+
+    class Deduction <<sealed>> {
+        +Name : string
+        +Type : DeductionType
+        +Amount : decimal
+        +AmountType : DeductionAmountType
+        +ReducesStateTaxableWages : bool
+        +EffectiveAmount(grossPay) : decimal
+    }
+
+    class W2JobInput <<sealed>> {
+        +Name : string
+        +Holder : W2JobHolder
+        +WagesBox1 : decimal
+        +FederalWithholdingBox2 : decimal
+        +SocialSecurityWagesBox3 : decimal
+        +SocialSecurityTaxBox4 : decimal
+        +MedicareWagesBox5 : decimal
+        +MedicareTaxBox6 : decimal
+        +StateWagesBox16 : decimal
+        +StateWithholdingBox17 : decimal
+        +SourceState : UsState?
+    }
+
+    class SelfEmploymentInput <<sealed>> {
+        +GrossRevenue : decimal
+        +CostOfGoodsSold : decimal
+        +TotalBusinessExpenses : decimal
+        +OtherIncome : decimal
+        +W2SocialSecurityWages : decimal
+        +W2MedicareWages : decimal
+        +FilingStatus : FederalFilingStatus
+        +State : UsState
+        +StateInputValues : StateInputValues?
+        +ItemizedDeductionsOverStandard : decimal
+        +IsSpecifiedServiceBusiness : bool
+        +QualifiedBusinessW2Wages : decimal
+        +QualifiedPropertyUbia : decimal
+        +EstimatedTaxPayments : decimal
+    }
+
+    class OtherIncomeInput <<sealed>>
+    class AdjustmentsInput <<sealed>>
+    class ChildTaxCreditInput <<sealed>>
+    class EducationCreditsInput <<sealed>>
+    class EducationStudentInput <<sealed>>
+    class SaversCreditInput <<sealed>>
+    class NetInvestmentIncomeInput <<sealed>>
+    class CreditsInput <<sealed>>
+    class OtherTaxesInput <<sealed>>
+
+    class TaxYearProfile <<sealed>> {
+        +TaxYear : int
+        +FilingStatus : FederalFilingStatus
+        +QualifyingChildren : int
+        +ResidenceState : UsState
+        +W2Jobs : IReadOnlyList<W2JobInput>
+        +SelfEmployment : SelfEmploymentInput?
+        +OtherIncome : OtherIncomeInput
+        +Adjustments : AdjustmentsInput
+        +ItemizedDeductionsOverStandard : decimal
+        +Credits : CreditsInput
+        +OtherTaxes : OtherTaxesInput
+        +EstimatedTaxPayments : decimal
+        +StateInputValues : StateInputValues?
+    }
+
+    ' ═══════════════════════════════════════════
+    ' Domain Results
+    ' ═══════════════════════════════════════════
+
+    class PaycheckResult <<sealed>> {
+        +GrossPay : decimal
+        +PreTaxDeductions : decimal
+        +PostTaxDeductions : decimal
+        +State : UsState
+        +StateTaxableWages : decimal
+        +StateWithholding : decimal
+        +StateDisabilityInsurance : decimal
+        +StateDisabilityInsuranceLabel : string
+        +SocialSecurityWithholding : decimal
+        +MedicareWithholding : decimal
+        +AdditionalMedicareWithholding : decimal
+        +FederalTaxableIncome : decimal
+        +FederalWithholding : decimal
+        +TotalTaxes : decimal
+        +NetPay : decimal
+    }
+
+    class SelfEmploymentResult <<sealed>>
+    class AnnualProjection <<sealed>>
+    class AnnualTaxResult <<sealed>>
+    class AnnualStateTaxResult <<sealed>>
+
+    class CalculationScenario <<sealed>> {
+        +Input : PaycheckInput
+        +Result : PaycheckResult
+    }
+
+    class SavedPaycheck <<sealed>> {
+        +Id : Guid
+        +Name : string
+        +CreatedAt : DateTimeOffset
+        +UpdatedAt : DateTimeOffset
+        +Input : PaycheckInput
+        +Result : PaycheckResult
+    }
 }
 
-enum FilingStatus {
-    Single
-    Married
-}
-
-enum DeductionType {
-    PreTax
-    PostTax
-}
-
-enum DeductionAmountType {
-    Dollar
-    Percentage
-}
-
-enum UsState {
-    AK
-    AL
-    AR
-    ...
-    WV
-    WY
-}
-
-enum FederalFilingStatus {
-    SingleOrMarriedSeparately
-    MarriedFilingJointly
-    HeadOfHousehold
-}
-
-enum CaliforniaFilingStatus {
-    Single
-    Married
-    HeadOfHousehold
-}
-
-enum AlabamaFilingStatus {
-    Zero
-    Single
-    MarriedFilingJointly
-    MarriedFilingSeparately
-    HeadOfFamily
-}
-
-' ═══════════════════════════════════════════════
-' Core Models – Data Classes
-' ═══════════════════════════════════════════════
-
-class PaycheckInput <<sealed>> {
-    +Frequency : PayFrequency
-    +HourlyRate : decimal
-    +RegularHours : decimal
-    +OvertimeHours : decimal
-    +OvertimeMultiplier : decimal
-    +State : UsState
-    +StateInputValues : StateInputValues?
-    +FederalW4 : FederalW4Input
-    +Deductions : IReadOnlyList<Deduction>
-    +YtdSocialSecurityWages : decimal
-    +YtdMedicareWages : decimal
-    +PaycheckNumber : int
-}
-
-class PaycheckResult <<sealed>> {
-    +GrossPay : decimal
-    +PreTaxDeductions : decimal
-    +PostTaxDeductions : decimal
-    +State : UsState
-    +StateTaxableWages : decimal
-    +StateWithholding : decimal
-    +StateDisabilityInsurance : decimal
-    +StateDisabilityInsuranceLabel : string
-    +SocialSecurityWithholding : decimal
-    +MedicareWithholding : decimal
-    +AdditionalMedicareWithholding : decimal
-    +FederalTaxableIncome : decimal
-    +FederalWithholding : decimal
-    +NetPay : decimal
-    +TotalTaxes : decimal
-}
-
-class Deduction <<sealed>> {
-    +Name : string
-    +Type : DeductionType
-    +AmountType : DeductionAmountType
-    +Amount : decimal
-    +ReducesStateTaxableWages : bool
-    +EffectiveAmount(grossPay : decimal) : decimal
-}
-
-class FederalW4Input <<sealed>> {
-    +FilingStatus : FederalFilingStatus
-    +Step2Checked : bool
-    +Step3TaxCredits : decimal
-    +Step4aOtherIncome : decimal
-    +Step4bDeductions : decimal
-    +Step4cExtraWithholding : decimal
-}
-
-class CalculationScenario <<sealed>> {
-    +Input : PaycheckInput
-    +Result : PaycheckResult
-}
-
-class AnnualProjection <<sealed>> {
-    +PayPeriodsPerYear : int
-    +CurrentPaycheckNumber : int
-    +RemainingPaychecks : int
-    +AnnualizedGrossPay : decimal
-    +AnnualizedFederalWithholding : decimal
-    +AnnualizedStateWithholding : decimal
-    +AnnualizedFica : decimal
-    +AnnualizedNetPay : decimal
-    +ProjectedYtdGrossPay : decimal
-    +ProjectedYtdNetPay : decimal
-    +EstimatedAnnualFederalLiability : decimal
-    +EstimatedAnnualFicaLiability : decimal
-    +AnnualizedTotalWithholding : decimal
-    +EstimatedTotalLiability : decimal
-    +OverUnderWithholding : decimal
-}
-
-PaycheckInput *-- FederalW4Input
-PaycheckInput *-- "0..*" Deduction
-PaycheckInput *-- StateInputValues
-Deduction --> DeductionType
-Deduction --> DeductionAmountType
+' Composition / usage relationships in Core.Models
+PaycheckInput "1" *-- "many" Deduction
 PaycheckInput --> PayFrequency
 PaycheckInput --> UsState
+PaycheckInput --> "FederalW4" FederalW4Input
+PaycheckInput --> StateInputValues
+Deduction --> DeductionType
+Deduction --> DeductionAmountType
+
+TaxYearProfile "1" *-- "many" W2JobInput
+TaxYearProfile --> SelfEmploymentInput
+TaxYearProfile --> OtherIncomeInput
+TaxYearProfile --> AdjustmentsInput
+TaxYearProfile --> CreditsInput
+TaxYearProfile --> OtherTaxesInput
+TaxYearProfile --> UsState
+TaxYearProfile --> FederalFilingStatus
+TaxYearProfile --> StateInputValues
+
+W2JobInput --> W2JobHolder
+W2JobInput --> UsState
+
+CreditsInput --> ChildTaxCreditInput
+CreditsInput --> EducationCreditsInput
+CreditsInput --> SaversCreditInput
+EducationCreditsInput "1" *-- "many" EducationStudentInput
+OtherTaxesInput --> NetInvestmentIncomeInput
+
+SelfEmploymentInput --> FederalFilingStatus
+SelfEmploymentInput --> UsState
+SelfEmploymentInput --> StateInputValues
+
 PaycheckResult --> UsState
+CalculationScenario --> PaycheckInput
+CalculationScenario --> PaycheckResult
+SavedPaycheck --> PaycheckInput
+SavedPaycheck --> PaycheckResult
+
+AnnualTaxResult --> FederalFilingStatus
+AnnualTaxResult --> AnnualStateTaxResult
+
+' ═══════════════════════════════════════════════
+' PaycheckCalc.Core – Per-paycheck orchestration
+' ═══════════════════════════════════════════════
+
+package "Core.Pay" as CorePay {
+
+    class PayCalculator <<sealed>> {
+        -_stateRegistry : StateCalculatorRegistry
+        -_fica : FicaCalculator
+        -_fed : Irs15TPercentageCalculator
+        +Calculate(input : PaycheckInput) : PaycheckResult
+    }
+
+    class AnnualProjectionCalculator <<sealed>> {
+        +Project(input : PaycheckInput, result : PaycheckResult) : AnnualProjection
+    }
+}
+
+PayCalculator ..> PaycheckInput : reads
+PayCalculator ..> PaycheckResult : produces
+PayCalculator --> StateCalculatorRegistry
+PayCalculator --> FicaCalculator
+PayCalculator --> Irs15TPercentageCalculator
+
+AnnualProjectionCalculator --> Irs15TPercentageCalculator
+AnnualProjectionCalculator --> FicaCalculator
+AnnualProjectionCalculator ..> AnnualProjection : produces
+
+' ═══════════════════════════════════════════════
+' PaycheckCalc.Core – FICA
+' ═══════════════════════════════════════════════
+
+package "Core.Tax.Fica" as CoreFica {
+
+    class FicaCalculator <<sealed>> {
+        +{static} SocialSecurityRate : decimal = 0.062
+        +{static} MedicareRate : decimal = 0.0145
+        +{static} AdditionalMedicareRate : decimal = 0.009
+        +SocialSecurityWageBase : decimal
+        +AdditionalMedicareEmployerThreshold : decimal
+        +Calculate(medicareWagesThisPeriod, ytdSs, ytdMed) : (ss, medicare, addl)
+    }
+}
+
+' ═══════════════════════════════════════════════
+' PaycheckCalc.Core – Federal (per-paycheck)
+' ═══════════════════════════════════════════════
+
+package "Core.Tax.Federal" as CoreFederal {
+
+    enum FederalFilingStatus {
+        SingleOrMarriedSeparately
+        MarriedFilingJointly
+        HeadOfHousehold
+    }
+
+    class FederalW4Input <<sealed>> {
+        +FilingStatus : FederalFilingStatus
+        +Step2Checked : bool
+        +Step3TaxCredits : decimal
+        +Step4aOtherIncome : decimal
+        +Step4bDeductions : decimal
+        +Step4cExtraWithholding : decimal
+    }
+
+    class Irs15TPercentageCalculator <<sealed>> {
+        -_data : Irs15TRoot
+        +Irs15TPercentageCalculator(json : string)
+        +CalculateWithholding(wages, frequency, w4) : decimal
+    }
+
+    class Irs15TRoot
+}
+
 FederalW4Input --> FederalFilingStatus
-CalculationScenario *-- PaycheckInput
-CalculationScenario *-- PaycheckResult
+Irs15TPercentageCalculator --> Irs15TRoot
+Irs15TPercentageCalculator ..> FederalW4Input
 
 ' ═══════════════════════════════════════════════
-' State Tax – Interface & Core Types
+' PaycheckCalc.Core – Federal Annual (Form 1040)
 ' ═══════════════════════════════════════════════
 
-interface IStateWithholdingCalculator {
-    +State : UsState
-    +GetInputSchema() : IReadOnlyList<StateFieldDefinition>
-    +Validate(values : StateInputValues) : IReadOnlyList<string>
-    +Calculate(context : CommonWithholdingContext, values : StateInputValues) : StateWithholdingResult
+package "Core.Tax.Federal.Annual" as CoreFedAnnual {
+
+    class Form1040Calculator <<sealed>> {
+        -_tax : Federal1040TaxCalculator
+        -_sched1 : Schedule1Calculator
+        -_seTax : SelfEmploymentTaxCalculator
+        -_qbi : QbiDeductionCalculator
+        -_fica : FicaCalculator
+        -_ctc : ChildTaxCreditCalculator
+        -_education : Form8863EducationCreditsCalculator
+        -_savers : Form8880SaversCreditCalculator
+        -_niit : Form8960NiitCalculator
+        -_stateTax : AnnualStateTaxCalculator?
+        +Calculate(profile : TaxYearProfile) : AnnualTaxResult
+    }
+
+    class Federal1040TaxCalculator <<sealed>> {
+        +Federal1040TaxCalculator(bracketsJson : string)
+        +ComputeTax(taxableIncome, status) : decimal
+    }
+
+    class Schedule1Calculator <<sealed>>
+    class Schedule1Result <<sealed>>
+
+    class ChildTaxCreditCalculator <<sealed>>
+    class ChildTaxCreditResult <<sealed>>
+
+    class Form8863EducationCreditsCalculator <<sealed>>
+    class EducationCreditsResult <<sealed>>
+
+    class Form8880SaversCreditCalculator <<sealed>>
+    class SaversCreditResult <<sealed>>
+
+    class Form8960NiitCalculator <<sealed>>
 }
 
-class CommonWithholdingContext <<sealed record>> {
-    +State : UsState
-    +GrossWages : decimal
-    +PayPeriod : PayFrequency
-    +Year : int
-    +PreTaxDeductionsReducingStateWages : decimal
-    +FederalWithholdingPerPeriod : decimal
+Form1040Calculator --> Federal1040TaxCalculator
+Form1040Calculator --> Schedule1Calculator
+Form1040Calculator --> SelfEmploymentTaxCalculator
+Form1040Calculator --> QbiDeductionCalculator
+Form1040Calculator --> FicaCalculator
+Form1040Calculator --> ChildTaxCreditCalculator
+Form1040Calculator --> Form8863EducationCreditsCalculator
+Form1040Calculator --> Form8880SaversCreditCalculator
+Form1040Calculator --> Form8960NiitCalculator
+Form1040Calculator --> AnnualStateTaxCalculator
+Form1040Calculator ..> TaxYearProfile : reads
+Form1040Calculator ..> AnnualTaxResult : produces
+
+Schedule1Calculator ..> Schedule1Result
+ChildTaxCreditCalculator ..> ChildTaxCreditResult
+Form8863EducationCreditsCalculator ..> EducationCreditsResult
+Form8880SaversCreditCalculator ..> SaversCreditResult
+
+' ═══════════════════════════════════════════════
+' PaycheckCalc.Core – Self-Employment
+' ═══════════════════════════════════════════════
+
+package "Core.Tax.SelfEmployment" as CoreSE {
+
+    class SelfEmploymentCalculator <<sealed>> {
+        -_seTax : SelfEmploymentTaxCalculator
+        -_qbi : QbiDeductionCalculator
+        -_fed : Irs15TPercentageCalculator
+        -_stateRegistry : StateCalculatorRegistry
+        +Calculate(input : SelfEmploymentInput) : SelfEmploymentResult
+    }
+
+    class SelfEmploymentTaxCalculator <<sealed>> {
+        +{static} SelfEmploymentTaxableRate : decimal = 0.9235
+        +{static} CombinedSocialSecurityRate : decimal
+        +{static} CombinedMedicareRate : decimal
+        +Calculate(netSeEarnings, w2SsWages, w2MedicareWages) : (seTax, deductibleHalf)
+    }
+
+    class QbiDeductionCalculator <<sealed>>
 }
 
-class StateInputValues <<sealed>> {
-    +StateInputValues()
-    +StateInputValues(source : IDictionary)
-    +GetValueOrDefault<T>(key : string, fallback : T) : T
+SelfEmploymentCalculator --> SelfEmploymentTaxCalculator
+SelfEmploymentCalculator --> QbiDeductionCalculator
+SelfEmploymentCalculator --> Irs15TPercentageCalculator
+SelfEmploymentCalculator --> StateCalculatorRegistry
+SelfEmploymentCalculator ..> SelfEmploymentInput : reads
+SelfEmploymentCalculator ..> SelfEmploymentResult : produces
+SelfEmploymentTaxCalculator --> FicaCalculator
+
+' ═══════════════════════════════════════════════
+' PaycheckCalc.Core – State plugin model
+' ═══════════════════════════════════════════════
+
+package "Core.Tax.State" as CoreState {
+
+    enum StateFieldType {
+        Text
+        Integer
+        Decimal
+        Toggle
+        Picker
+    }
+
+    class StateFieldDefinition <<sealed>> {
+        +Key : string
+        +Label : string
+        +FieldType : StateFieldType
+        +IsRequired : bool
+        +DefaultValue : object?
+        +Options : IReadOnlyList<string>?
+    }
+
+    class StateInputValues <<sealed>>
+    note right of StateInputValues
+        Extends Dictionary<string, object?>;
+        bag of per-state values keyed by
+        StateFieldDefinition.Key.
+    end note
+
+    class "CommonWithholdingContext\n<<record>>" as CommonWithholdingContext {
+        +State : UsState
+        +GrossWages : decimal
+        +PayPeriod : PayFrequency
+        +Year : int
+        +PreTaxDeductionsReducingStateWages : decimal
+        +FederalWithholdingPerPeriod : decimal
+    }
+
+    class StateWithholdingResult <<sealed>> {
+        +TaxableWages : decimal
+        +Withholding : decimal
+        +DisabilityInsurance : decimal
+        +DisabilityInsuranceLabel : string
+        +Description : string?
+    }
+
+    interface IStateWithholdingCalculator {
+        +State : UsState
+        +GetInputSchema() : IReadOnlyList<StateFieldDefinition>
+        +Validate(values) : IReadOnlyList<string>
+        +Calculate(context, values) : StateWithholdingResult
+    }
+
+    class StateCalculatorRegistry <<sealed>> {
+        +Register(calc : IStateWithholdingCalculator)
+        +IsSupported(state : UsState) : bool
+        +GetCalculator(state : UsState) : IStateWithholdingCalculator
+        +SupportedStates : IReadOnlyList<UsState>
+    }
+
+    class NoIncomeTaxWithholdingAdapter <<sealed>>
+    class PercentageMethodWithholdingAdapter <<sealed>>
+
+    class TaxBracket <<sealed>> {
+        +Floor : decimal
+        +Ceiling : decimal?
+        +Rate : decimal
+    }
+
+    class PercentageMethodConfig <<sealed>> {
+        +StandardDeductionSingle : decimal
+        +StandardDeductionMarried : decimal
+        +AllowanceAmount : decimal
+        +AllowanceCreditAmount : decimal
+        +BracketsSingle : TaxBracket[]
+        +BracketsMarried : TaxBracket[]
+    }
+
+    class PercentageMethodStateTaxCalculator <<sealed>> {
+        +CalculateWithholding(input : StateTaxInput) : StateTaxResult
+    }
+
+    class StateTaxInput <<sealed>>
+    class StateTaxResult <<sealed>>
+
+    class StateTaxConfigs2026 <<static>> {
+        +{static} Configs : IReadOnlyDictionary<UsState, PercentageMethodConfig>
+    }
 }
 
-enum StateFieldType {
-    Text
-    Integer
-    Decimal
-    Toggle
-    Picker
-}
-
-class StateFieldDefinition <<sealed>> {
-    +Key : string
-    +Label : string
-    +FieldType : StateFieldType
-    +IsRequired : bool
-    +DefaultValue : object?
-    +Options : IReadOnlyList<string>?
-}
-
-class StateWithholdingResult <<sealed>> {
-    +TaxableWages : decimal
-    +Withholding : decimal
-    +DisabilityInsurance : decimal
-    +DisabilityInsuranceLabel : string
-    +Description : string?
-}
-
-class StateTaxInput <<sealed>> {
-    +GrossWages : decimal
-    +Frequency : PayFrequency
-    +FilingStatus : FilingStatus
-    +Allowances : int
-    +AdditionalWithholding : decimal
-    +PreTaxDeductionsReducingStateWages : decimal
-}
-
-class StateTaxResult <<sealed>> {
-    +TaxableWages : decimal
-    +Withholding : decimal
-}
-
-IStateWithholdingCalculator --> CommonWithholdingContext
-IStateWithholdingCalculator --> StateInputValues
-IStateWithholdingCalculator --> StateWithholdingResult
-IStateWithholdingCalculator --> StateFieldDefinition
 StateFieldDefinition --> StateFieldType
+CommonWithholdingContext --> UsState
 CommonWithholdingContext --> PayFrequency
 
-' ═══════════════════════════════════════════════
-' State Tax – Registry & Generic Adapters
-' ═══════════════════════════════════════════════
+IStateWithholdingCalculator --> UsState
+IStateWithholdingCalculator ..> StateFieldDefinition
+IStateWithholdingCalculator ..> StateInputValues
+IStateWithholdingCalculator ..> CommonWithholdingContext
+IStateWithholdingCalculator ..> StateWithholdingResult
 
-class StateCalculatorRegistry <<sealed>> {
-    -_calculators : Dictionary<UsState, IStateWithholdingCalculator>
-    +SupportedStates : IReadOnlyList<UsState>
-    +Register(calculator : IStateWithholdingCalculator) : void
-    +IsSupported(state : UsState) : bool
-    +GetCalculator(state : UsState) : IStateWithholdingCalculator
-}
-
-class NoIncomeTaxWithholdingAdapter <<sealed>> {
-    +State : UsState
-    +NoIncomeTaxWithholdingAdapter(state : UsState)
-    +GetInputSchema() : IReadOnlyList<StateFieldDefinition>
-    +Validate(values : StateInputValues) : IReadOnlyList<string>
-    +Calculate(ctx : CommonWithholdingContext, vals : StateInputValues) : StateWithholdingResult
-}
-
-class PercentageMethodWithholdingAdapter <<sealed>> {
-    -_inner : PercentageMethodStateTaxCalculator
-    +State : UsState
-    +GetInputSchema() : IReadOnlyList<StateFieldDefinition>
-    +Validate(values : StateInputValues) : IReadOnlyList<string>
-    +Calculate(ctx : CommonWithholdingContext, vals : StateInputValues) : StateWithholdingResult
-}
-
-class PercentageMethodStateTaxCalculator <<sealed>> {
-    -_config : PercentageMethodConfig
-    +State : UsState
-    +CalculateWithholding(input : StateTaxInput) : StateTaxResult
-}
-
-class PercentageMethodConfig <<sealed>> {
-    +StandardDeductionSingle : decimal
-    +StandardDeductionMarried : decimal
-    +AllowanceAmount : decimal
-    +AllowanceCreditAmount : decimal
-    +BracketsSingle : TaxBracket[]
-    +BracketsMarried : TaxBracket[]
-}
-
-class TaxBracket <<sealed>> {
-    +Floor : decimal
-    +Ceiling : decimal?
-    +Rate : decimal
-}
-
-class StateTaxConfigs2026 <<static>> {
-    +{static} Configs : IReadOnlyDictionary<UsState, PercentageMethodConfig>
-}
+StateCalculatorRegistry "1" o-- "many" IStateWithholdingCalculator
 
 NoIncomeTaxWithholdingAdapter ..|> IStateWithholdingCalculator
 PercentageMethodWithholdingAdapter ..|> IStateWithholdingCalculator
-PercentageMethodWithholdingAdapter *-- PercentageMethodStateTaxCalculator
-PercentageMethodStateTaxCalculator *-- PercentageMethodConfig
-PercentageMethodStateTaxCalculator --> StateTaxInput
-PercentageMethodStateTaxCalculator --> StateTaxResult
-PercentageMethodConfig *-- "0..*" TaxBracket
-StateCalculatorRegistry o-- "0..*" IStateWithholdingCalculator
-StateTaxConfigs2026 ..> PercentageMethodConfig : provides
+PercentageMethodWithholdingAdapter --> PercentageMethodStateTaxCalculator
+
+PercentageMethodConfig "1" *-- "many" TaxBracket
+PercentageMethodStateTaxCalculator --> PercentageMethodConfig
+PercentageMethodStateTaxCalculator ..> StateTaxInput
+PercentageMethodStateTaxCalculator ..> StateTaxResult
+StateTaxConfigs2026 ..> PercentageMethodConfig
 
 ' ═══════════════════════════════════════════════
-' State Tax – Alabama
+' PaycheckCalc.Core – State Annual
 ' ═══════════════════════════════════════════════
 
-class AlabamaWithholdingCalculator <<sealed>> {
-    +State : UsState
-    +GetInputSchema() : IReadOnlyList<StateFieldDefinition>
-    +Validate(values : StateInputValues) : IReadOnlyList<string>
-    +Calculate(ctx : CommonWithholdingContext, vals : StateInputValues) : StateWithholdingResult
+package "Core.Tax.State.Annual" as CoreStateAnnual {
+    class AnnualStateTaxCalculator <<sealed>> {
+        +Calculate(profile, fedAgi) : AnnualStateTaxResult
+    }
 }
 
-class AlabamaFormulaCalculator {
-    +{static} CalculateWithholding(grossWages : decimal, payPeriods : int, federalWithholding : decimal, status : AlabamaFilingStatus, dependents : int) : decimal
+AnnualStateTaxCalculator --> StateCalculatorRegistry
+AnnualStateTaxCalculator ..> TaxYearProfile
+AnnualStateTaxCalculator ..> AnnualStateTaxResult
+
+' ═══════════════════════════════════════════════
+' PaycheckCalc.Core – Per-state calculators
+' ═══════════════════════════════════════════════
+
+package "Core.Tax.<States>" as CoreStates {
+
+    class AlabamaWithholdingCalculator <<sealed>>
+    class AlabamaFormulaCalculator <<sealed>>
+
+    class ArkansasWithholdingCalculator <<sealed>>
+    class ArkansasFormulaCalculator <<sealed>>
+
+    class CaliforniaWithholdingCalculator <<sealed>>
+    class CaliforniaPercentageCalculator <<sealed>>
+    enum CaliforniaFilingStatus {
+        Single
+        Married
+        HeadOfHousehold
+    }
+
+    class ColoradoWithholdingCalculator <<sealed>>
+    class ConnecticutWithholdingCalculator <<sealed>>
+    class DelawareWithholdingCalculator <<sealed>>
+    class IllinoisWithholdingCalculator <<sealed>>
+    class PennsylvaniaWithholdingCalculator <<sealed>>
+
+    class OklahomaWithholdingCalculator <<sealed>>
+    class OklahomaOw2PercentageCalculator <<sealed>>
 }
 
 AlabamaWithholdingCalculator ..|> IStateWithholdingCalculator
-AlabamaWithholdingCalculator ..> AlabamaFormulaCalculator
-AlabamaFormulaCalculator --> AlabamaFilingStatus
-
-' ═══════════════════════════════════════════════
-' State Tax – Arkansas
-' ═══════════════════════════════════════════════
-
-class ArkansasWithholdingCalculator <<sealed>> {
-    -_inner : ArkansasFormulaCalculator
-    +State : UsState
-    +ArkansasWithholdingCalculator(inner : ArkansasFormulaCalculator)
-    +GetInputSchema() : IReadOnlyList<StateFieldDefinition>
-    +Validate(values : StateInputValues) : IReadOnlyList<string>
-    +Calculate(ctx : CommonWithholdingContext, vals : StateInputValues) : StateWithholdingResult
-}
-
-class ArkansasFormulaCalculator <<sealed>> {
-    +ArkansasFormulaCalculator(json : string)
-    +CalculateWithholding(grossWages : decimal, payPeriods : int, exemptions : int) : decimal
-    +{static} RoundToNearest50(amount : decimal) : decimal
-}
+AlabamaWithholdingCalculator --> AlabamaFormulaCalculator
 
 ArkansasWithholdingCalculator ..|> IStateWithholdingCalculator
-ArkansasWithholdingCalculator *-- ArkansasFormulaCalculator
-
-' ═══════════════════════════════════════════════
-' State Tax – California
-' ═══════════════════════════════════════════════
-
-class CaliforniaWithholdingCalculator <<sealed>> {
-    -_inner : CaliforniaPercentageCalculator
-    -{static} SdiRate : decimal
-    +State : UsState
-    +CaliforniaWithholdingCalculator(inner : CaliforniaPercentageCalculator)
-    +GetInputSchema() : IReadOnlyList<StateFieldDefinition>
-    +Validate(values : StateInputValues) : IReadOnlyList<string>
-    +Calculate(ctx : CommonWithholdingContext, vals : StateInputValues) : StateWithholdingResult
-}
-
-class CaliforniaPercentageCalculator <<sealed>> {
-    +CaliforniaPercentageCalculator(json : string)
-    +CalculateWithholding(grossPay : decimal, freq : PayFrequency, status : CaliforniaFilingStatus, regularAllowances : int, estimatedDeductionAllowances : int) : decimal
-}
+ArkansasWithholdingCalculator --> ArkansasFormulaCalculator
 
 CaliforniaWithholdingCalculator ..|> IStateWithholdingCalculator
-CaliforniaWithholdingCalculator *-- CaliforniaPercentageCalculator
+CaliforniaWithholdingCalculator --> CaliforniaPercentageCalculator
 CaliforniaPercentageCalculator --> CaliforniaFilingStatus
 
-' ═══════════════════════════════════════════════
-' State Tax – Colorado
-' ═══════════════════════════════════════════════
-
-class ColoradoWithholdingCalculator <<sealed>> {
-    -{static} FlatRate : decimal
-    -{static} FmliRate : decimal
-    +State : UsState
-    +ColoradoWithholdingCalculator(json : string)
-    +GetInputSchema() : IReadOnlyList<StateFieldDefinition>
-    +Validate(values : StateInputValues) : IReadOnlyList<string>
-    +Calculate(ctx : CommonWithholdingContext, vals : StateInputValues) : StateWithholdingResult
-}
-
 ColoradoWithholdingCalculator ..|> IStateWithholdingCalculator
-
-' ═══════════════════════════════════════════════
-' State Tax – Connecticut
-' ═══════════════════════════════════════════════
-
-class ConnecticutWithholdingCalculator <<sealed>> {
-    -{static} NoFormFlatRate : decimal
-    -{static} PfmliRate : decimal
-    +State : UsState
-    +ConnecticutWithholdingCalculator(json : string)
-    +GetInputSchema() : IReadOnlyList<StateFieldDefinition>
-    +Validate(values : StateInputValues) : IReadOnlyList<string>
-    +Calculate(ctx : CommonWithholdingContext, vals : StateInputValues) : StateWithholdingResult
-}
-
 ConnecticutWithholdingCalculator ..|> IStateWithholdingCalculator
-
-' ═══════════════════════════════════════════════
-' State Tax – Oklahoma
-' ═══════════════════════════════════════════════
-
-class OklahomaWithholdingCalculator <<sealed>> {
-    -_inner : OklahomaOw2PercentageCalculator
-    +State : UsState
-    +OklahomaWithholdingCalculator(inner : OklahomaOw2PercentageCalculator)
-    +GetInputSchema() : IReadOnlyList<StateFieldDefinition>
-    +Validate(values : StateInputValues) : IReadOnlyList<string>
-    +Calculate(ctx : CommonWithholdingContext, vals : StateInputValues) : StateWithholdingResult
-}
-
-class OklahomaOw2PercentageCalculator <<sealed>> {
-    -_data : Ow2Root
-    +OklahomaOw2PercentageCalculator(json : string)
-    +GetAllowanceAmount(frequency : PayFrequency) : decimal
-    +CalculateWithholding(wages : decimal, freq : PayFrequency, status : FilingStatus) : decimal
-}
-
-class Ow2Root <<sealed>> {
-    +AllowanceAmounts : Dictionary<string, decimal>
-    +Tables : List<Ow2Table>
-}
-
-class Ow2Table <<sealed>> {
-    +Frequency : string
-    +Single : List<Ow2Bracket>
-    +Married : List<Ow2Bracket>
-}
-
-class Ow2Bracket <<sealed>> {
-    +Over : decimal
-    +Under : decimal?
-    +Base : decimal
-    +Rate : decimal
-    +ExcessOver : decimal
-}
-
-OklahomaWithholdingCalculator ..|> IStateWithholdingCalculator
-OklahomaWithholdingCalculator *-- OklahomaOw2PercentageCalculator
-OklahomaOw2PercentageCalculator *-- Ow2Root
-Ow2Root *-- "0..*" Ow2Table
-Ow2Table *-- "0..*" Ow2Bracket
-
-' ═══════════════════════════════════════════════
-' State Tax – Pennsylvania
-' ═══════════════════════════════════════════════
-
-class PennsylvaniaWithholdingCalculator <<sealed>> {
-    -{static} FlatRate : decimal
-    +State : UsState
-    +GetInputSchema() : IReadOnlyList<StateFieldDefinition>
-    +Validate(values : StateInputValues) : IReadOnlyList<string>
-    +Calculate(ctx : CommonWithholdingContext, vals : StateInputValues) : StateWithholdingResult
-}
-
+DelawareWithholdingCalculator ..|> IStateWithholdingCalculator
+IllinoisWithholdingCalculator ..|> IStateWithholdingCalculator
 PennsylvaniaWithholdingCalculator ..|> IStateWithholdingCalculator
 
-' ═══════════════════════════════════════════════
-' Federal Tax
-' ═══════════════════════════════════════════════
-
-class Irs15TPercentageCalculator <<sealed>> {
-    -_data : Irs15TRoot
-    +Irs15TPercentageCalculator(json : string)
-    +CalculateWithholding(taxableWages : decimal, freq : PayFrequency, w4 : FederalW4Input) : decimal
-}
-
-class Irs15TRoot <<sealed>> {
-    +Year : int
-    +AnnualTables : AnnualTables
-    +WorksheetConstants : WorksheetConstants
-}
-
-class AnnualTables <<sealed>> {
-    +Standard : AnnualSchedule
-    +Step2Checked : AnnualSchedule
-}
-
-class AnnualSchedule <<sealed>> {
-    +MarriedFilingJointly : List<AnnualBracket>
-    +SingleOrMfs : List<AnnualBracket>
-    +HeadOfHousehold : List<AnnualBracket>
-}
-
-class AnnualBracket <<sealed>> {
-    +Over : decimal
-    +Under : decimal?
-    +Base : decimal
-    +Rate : decimal
-    +ExcessOver : decimal
-}
-
-class WorksheetConstants <<sealed>> {
-    +Line1G : Line1GConstants
-}
-
-class Line1GConstants <<sealed>> {
-    +Mfj : decimal
-    +Other : decimal
-}
-
-Irs15TPercentageCalculator *-- Irs15TRoot
-Irs15TRoot *-- AnnualTables
-Irs15TRoot *-- WorksheetConstants
-AnnualTables *-- AnnualSchedule : Standard
-AnnualTables *-- AnnualSchedule : Step2Checked
-AnnualSchedule *-- "0..*" AnnualBracket
-WorksheetConstants *-- Line1GConstants
+OklahomaWithholdingCalculator ..|> IStateWithholdingCalculator
+OklahomaWithholdingCalculator --> OklahomaOw2PercentageCalculator
 
 ' ═══════════════════════════════════════════════
-' FICA Tax
+' PaycheckCalc.Core – Storage & Export
 ' ═══════════════════════════════════════════════
 
-class FicaCalculator <<sealed>> {
-    +{static} SocialSecurityRate : decimal
-    +{static} MedicareRate : decimal
-    +{static} AdditionalMedicareRate : decimal
-    +SocialSecurityWageBase : decimal
-    +AdditionalMedicareEmployerThreshold : decimal
-    +Calculate(wagesThisPeriod : decimal, ytdSsWages : decimal, ytdMedicareWages : decimal) : (decimal, decimal, decimal)
+package "Core.Storage" as CoreStorage {
+    interface IPaycheckRepository {
+        +GetAllAsync() : Task<IReadOnlyList<SavedPaycheck>>
+        +GetByIdAsync(id) : Task<SavedPaycheck?>
+        +SaveAsync(paycheck : SavedPaycheck) : Task
+        +DeleteAsync(id : Guid) : Task
+    }
+}
+
+IPaycheckRepository ..> SavedPaycheck
+
+package "Core.Export" as CoreExport {
+    class CsvPaycheckExporter <<static>>
+    class PdfPaycheckExporter <<static>>
+    class CsvSelfEmploymentExporter <<static>>
+    class PdfSelfEmploymentExporter <<static>>
+}
+
+CsvPaycheckExporter ..> PaycheckResult
+PdfPaycheckExporter ..> PaycheckResult
+CsvSelfEmploymentExporter ..> SelfEmploymentResult
+PdfSelfEmploymentExporter ..> SelfEmploymentResult
+
+' ═══════════════════════════════════════════════
+' PaycheckCalc.App – Presentation Models
+' ═══════════════════════════════════════════════
+
+package "App.Models" as AppModels {
+    class ResultCardModel <<sealed>>
+    class AnnualProjectionModel <<sealed>>
+    class AnnualTaxResultModel <<sealed>>
+    class SelfEmploymentResultModel <<sealed>>
+    class ScenarioSnapshot <<sealed>>
 }
 
 ' ═══════════════════════════════════════════════
-' Pay Orchestrator & Annual Projection
+' PaycheckCalc.App – Mappers (domain ⇄ UI)
 ' ═══════════════════════════════════════════════
 
-class PayCalculator <<sealed>> {
-    -_stateRegistry : StateCalculatorRegistry
-    -_fica : FicaCalculator
-    -_fed : Irs15TPercentageCalculator
-    +PayCalculator(stateRegistry : StateCalculatorRegistry, fica : FicaCalculator, fed : Irs15TPercentageCalculator)
-    +Calculate(input : PaycheckInput) : PaycheckResult
+package "App.Mappers" as AppMappers {
+    class PaycheckInputMapper <<static>>
+    class PaycheckInputRestorer <<static>>
+    class ResultCardMapper <<static>>
+    class ScenarioMapper <<static>>
+    class SavedPaycheckMapper <<static>>
+    class AnnualProjectionMapper <<static>>
+    class AnnualTaxInputMapper <<static>>
+    class AnnualTaxResultMapper <<static>>
+    class SelfEmploymentInputMapper <<static>>
+    class SelfEmploymentResultMapper <<static>>
 }
 
-class AnnualProjectionCalculator <<sealed>> {
-    -_fed : Irs15TPercentageCalculator
-    -_fica : FicaCalculator
-    +AnnualProjectionCalculator(fed : Irs15TPercentageCalculator, fica : FicaCalculator)
-    +Calculate(input : PaycheckInput, result : PaycheckResult) : AnnualProjection
-}
-
-PayCalculator *-- StateCalculatorRegistry
-PayCalculator *-- FicaCalculator
-PayCalculator *-- Irs15TPercentageCalculator
-PayCalculator ..> PaycheckInput : uses
-PayCalculator ..> PaycheckResult : creates
-
-AnnualProjectionCalculator *-- Irs15TPercentageCalculator
-AnnualProjectionCalculator *-- FicaCalculator
-AnnualProjectionCalculator ..> PaycheckInput : uses
-AnnualProjectionCalculator ..> PaycheckResult : uses
-AnnualProjectionCalculator ..> AnnualProjection : creates
+PaycheckInputMapper ..> PaycheckInput
+PaycheckInputRestorer ..> PaycheckInput
+ResultCardMapper ..> PaycheckResult
+ResultCardMapper ..> ResultCardModel
+ScenarioMapper ..> CalculationScenario
+ScenarioMapper ..> ScenarioSnapshot
+SavedPaycheckMapper ..> SavedPaycheck
+AnnualProjectionMapper ..> AnnualProjection
+AnnualProjectionMapper ..> AnnualProjectionModel
+AnnualTaxInputMapper ..> TaxYearProfile
+AnnualTaxResultMapper ..> AnnualTaxResult
+AnnualTaxResultMapper ..> AnnualTaxResultModel
+SelfEmploymentInputMapper ..> SelfEmploymentInput
+SelfEmploymentResultMapper ..> SelfEmploymentResult
+SelfEmploymentResultMapper ..> SelfEmploymentResultModel
 
 ' ═══════════════════════════════════════════════
-' Export
+' PaycheckCalc.App – View Models (CommunityToolkit.Mvvm)
 ' ═══════════════════════════════════════════════
 
-class CsvPaycheckExporter <<static>> {
-    +{static} Generate(result : PaycheckResult) : string
+package "App.ViewModels" as AppViewModels {
+    class CalculatorViewModel <<partial>> {
+        -_calc : PayCalculator
+        -_projectionCalc : AnnualProjectionCalculator
+        -_stateRegistry : StateCalculatorRegistry
+        -_repo : IPaycheckRepository
+        +Deductions : ObservableCollection<DeductionItemViewModel>
+        +StateFields : ObservableCollection<StateFieldViewModel>
+        +LoadedPaycheckId : Guid?
+        +CalculateCommand
+        +SaveCommand
+        +ExportCommand
+    }
+
+    class SavedPaychecksViewModel <<partial>>
+    class SavedPaycheckViewModel <<sealed>>
+    class SelfEmploymentViewModel <<partial>>
+    class AnnualTaxViewModel <<partial>>
+    class W2JobItemViewModel <<partial>>
+    class DeductionItemViewModel <<partial>>
+    class StateFieldViewModel <<partial>>
+
+    class "PickerItem<T>\n<<record>>" as PickerItem
 }
 
-class PdfPaycheckExporter <<static>> {
-    +{static} Generate(result : PaycheckResult) : byte[]
-}
+CalculatorViewModel --> PayCalculator
+CalculatorViewModel --> AnnualProjectionCalculator
+CalculatorViewModel --> StateCalculatorRegistry
+CalculatorViewModel --> IPaycheckRepository
+CalculatorViewModel "1" *-- "many" DeductionItemViewModel
+CalculatorViewModel "1" *-- "many" StateFieldViewModel
 
-CsvPaycheckExporter ..> PaycheckResult : reads
-PdfPaycheckExporter ..> PaycheckResult : reads
+SavedPaychecksViewModel --> IPaycheckRepository
+SavedPaychecksViewModel "1" *-- "many" SavedPaycheckViewModel
+SavedPaycheckViewModel ..> SavedPaycheck
+
+SelfEmploymentViewModel --> SelfEmploymentCalculator
+SelfEmploymentViewModel --> StateCalculatorRegistry
+
+AnnualTaxViewModel --> Form1040Calculator
+AnnualTaxViewModel "1" *-- "many" W2JobItemViewModel
+
+StateFieldViewModel ..> StateFieldDefinition
 
 ' ═══════════════════════════════════════════════
-' App – ViewModels
+' PaycheckCalc.App – Views (MAUI pages)
 ' ═══════════════════════════════════════════════
 
-abstract class ObservableObject
-
-class "PickerItem<T>" as PickerItemT <<record>> {
-    +Value : T
-    +Text : string
-    +ToString() : string
+package "App.Views" as AppViews {
+    class AppShell
+    class InputsPage
+    class PayHoursPage
+    class FederalPage
+    class StatePage
+    class DeductionsPage
+    class ResultsPage
+    class ComparePage
+    class SavedPaychecksPage
+    class SelfEmploymentPage
+    class SelfEmploymentResultsPage
+    class AnnualTaxPage
+    class AnnualTaxResultsPage
 }
 
-class CalculatorViewModel <<partial>> {
-    -_calc : PayCalculator
-    -_projectionCalc : AnnualProjectionCalculator
-    -_stateRegistry : StateCalculatorRegistry
-    +SelectedInputTab : int
-    +SelectedResultTab : int
-    +SelectedFederalPickerItem : PickerItem<FederalFilingStatus>
-    +SelectedFrequencyPickerItem : PickerItem<PayFrequency>
-    +SelectedStatePickerItem : PickerItem<UsState>
-    +Frequency : PayFrequency
-    +HourlyRate : decimal
-    +RegularHours : decimal
-    +OvertimeHours : decimal
-    +OvertimeMultiplier : decimal
-    +PaycheckNumber : int
-    +SelectedState : UsState
-    +FederalFilingStatus : FederalFilingStatus
-    +FederalStep2Checked : bool
-    +FederalStep3Credits : decimal
-    +FederalStep4aOtherIncome : decimal
-    +FederalStep4bDeductions : decimal
-    +FederalStep4cExtraWithholding : decimal
-    +StateFields : ObservableCollection<StateFieldViewModel>
-    +Deductions : ObservableCollection<DeductionItemViewModel>
-    +StateValidationErrors : ObservableCollection<string>
-    +ResultCard : ResultCardModel
-    +Projection : AnnualProjectionModel
-    +SavedScenario : ScenarioSnapshot
-    +CanExport : bool
-    +HasSavedComparison : bool
-    +NetPayDifference : decimal
-    +Frequencies : IReadOnlyList<PickerItem>
-    +StatePickerItems : IReadOnlyList<PickerItem>
-    +SelectTabCommand() : void
-    +SelectResultTabCommand() : void
-    +CalculateCommand() : void
-    +SaveForCompareCommand() : void
-    +AddDeductionCommand() : void
-    +RemoveDeductionCommand() : void
-    +ExportCsvCommand() : Task
-    +ExportPdfCommand() : Task
-}
-
-class StateFieldViewModel <<partial>> {
-    +Definition : StateFieldDefinition
-    +Key : string
-    +Label : string
-    +Options : IReadOnlyList<string>
-    +IsPicker : bool
-    +IsText : bool
-    +IsNumeric : bool
-    +IsToggle : bool
-    +IsCurrency : bool
-    +SelectedOption : string
-    +StringValue : string
-    +BoolValue : bool
-    +ErrorMessage : string
-    +HasError : bool
-    +Validate() : void
-    +GetResolvedValue() : object
-}
-
-class DeductionItemViewModel <<partial>> {
-    +Name : string
-    +Amount : decimal
-    +AmountType : DeductionAmountType
-    +ReducesStateTaxableWages : bool
-    +IsPercentageAmount : bool
-    +IsDollarAmount : bool
-    +Type : DeductionType
-    +SelectedDeductionTypePickerItem : PickerItem<DeductionType>
-    +DeductionTypeItems : IReadOnlyList<PickerItem>
-    +AmountTypes : IReadOnlyList<DeductionAmountType>
-    +ToDeduction() : Deduction
-}
-
-CalculatorViewModel --|> ObservableObject
-StateFieldViewModel --|> ObservableObject
-DeductionItemViewModel --|> ObservableObject
-
-CalculatorViewModel *-- PayCalculator
-CalculatorViewModel *-- AnnualProjectionCalculator
-CalculatorViewModel *-- StateCalculatorRegistry
-CalculatorViewModel *-- "0..*" StateFieldViewModel
-CalculatorViewModel *-- "0..*" DeductionItemViewModel
-CalculatorViewModel --> ResultCardModel
-CalculatorViewModel --> AnnualProjectionModel
-CalculatorViewModel --> ScenarioSnapshot
-
-StateFieldViewModel --> StateFieldDefinition
-DeductionItemViewModel --> DeductionType
-DeductionItemViewModel --> DeductionAmountType
-DeductionItemViewModel ..> Deduction : creates
+InputsPage --> CalculatorViewModel
+PayHoursPage --> CalculatorViewModel
+FederalPage --> CalculatorViewModel
+StatePage --> CalculatorViewModel
+DeductionsPage --> CalculatorViewModel
+ResultsPage --> CalculatorViewModel
+ComparePage --> CalculatorViewModel
+SavedPaychecksPage --> SavedPaychecksViewModel
+SelfEmploymentPage --> SelfEmploymentViewModel
+SelfEmploymentResultsPage --> SelfEmploymentViewModel
+AnnualTaxPage --> AnnualTaxViewModel
+AnnualTaxResultsPage --> AnnualTaxViewModel
 
 ' ═══════════════════════════════════════════════
-' App – Presentation Models
+' PaycheckCalc.App – Storage implementation
 ' ═══════════════════════════════════════════════
 
-class ResultCardModel <<sealed>> {
-    +GrossPay : decimal
-    +FederalTaxableIncome : decimal
-    +StateTaxableWages : decimal
-    +FederalWithholding : decimal
-    +SocialSecurityWithholding : decimal
-    +MedicareWithholding : decimal
-    +AdditionalMedicareWithholding : decimal
-    +StateWithholding : decimal
-    +StateDisabilityInsurance : decimal
-    +StateDisabilityInsuranceLabel : string
-    +StateName : string
-    +PreTaxDeductions : decimal
-    +PostTaxDeductions : decimal
-    +TotalTaxes : decimal
-    +NetPay : decimal
-    +ShowStateDisabilityInsurance : bool
+package "App.Storage" as AppStorage {
+    class JsonPaycheckRepository <<sealed>> {
+        +JsonPaycheckRepository(appDataDirectory : string)
+    }
 }
 
-class AnnualProjectionModel <<sealed>> {
-    +PayPeriodsPerYear : int
-    +CurrentPaycheckNumber : int
-    +RemainingPaychecks : int
-    +AnnualizedGrossPay : decimal
-    +AnnualizedFederalWithholding : decimal
-    +AnnualizedStateWithholding : decimal
-    +AnnualizedFica : decimal
-    +AnnualizedNetPay : decimal
-    +ProjectedYtdGrossPay : decimal
-    +ProjectedYtdNetPay : decimal
-    +EstimatedAnnualFederalLiability : decimal
-    +EstimatedAnnualFicaLiability : decimal
-    +AnnualizedTotalWithholding : decimal
-    +EstimatedTotalLiability : decimal
-    +OverUnderWithholding : decimal
-    +IsOverWithholding : bool
-    +IsUnderWithholding : bool
-    +OverUnderAmount : decimal
-    +OverUnderLabel : string
-}
-
-class ScenarioSnapshot <<sealed>> {
-    +Frequency : PayFrequency
-    +HourlyRate : decimal
-    +RegularHours : decimal
-    +OvertimeHours : decimal
-    +OvertimeMultiplier : decimal
-    +State : UsState
-    +PretaxDeductions : decimal
-    +PosttaxDeductions : decimal
-    +ResultCard : ResultCardModel
-}
-
-ScenarioSnapshot --> ResultCardModel
+JsonPaycheckRepository ..|> IPaycheckRepository
 
 ' ═══════════════════════════════════════════════
-' App – Mappers
+' PaycheckCalc.App – Composition root
 ' ═══════════════════════════════════════════════
-
-class PaycheckInputMapper <<static>> {
-    +{static} Map(vm : CalculatorViewModel, stateValues : StateInputValues) : PaycheckInput
-}
-
-class ResultCardMapper <<static>> {
-    +{static} Map(result : PaycheckResult) : ResultCardModel
-}
-
-class AnnualProjectionMapper <<static>> {
-    +{static} Map(projection : AnnualProjection) : AnnualProjectionModel
-}
-
-class ScenarioMapper <<static>> {
-    +{static} Capture(vm : CalculatorViewModel) : ScenarioSnapshot
-}
-
-PaycheckInputMapper ..> CalculatorViewModel : reads
-PaycheckInputMapper ..> PaycheckInput : creates
-ResultCardMapper ..> PaycheckResult : reads
-ResultCardMapper ..> ResultCardModel : creates
-AnnualProjectionMapper ..> AnnualProjection : reads
-AnnualProjectionMapper ..> AnnualProjectionModel : creates
-ScenarioMapper ..> CalculatorViewModel : reads
-ScenarioMapper ..> ScenarioSnapshot : creates
-
-' ═══════════════════════════════════════════════
-' App – Views
-' ═══════════════════════════════════════════════
-
-abstract class ContentPage
-
-class InputsPage {
-    +InputsPage(vm : CalculatorViewModel)
-}
-
-class ResultsPage {
-    -_vm : CalculatorViewModel
-    -_chartDrawable : DoughnutChartDrawable
-    +ResultsPage(vm : CalculatorViewModel)
-    #OnAppearing() : void
-    #OnDisappearing() : void
-}
-
-class ComparePage {
-    +ComparePage(vm : CalculatorViewModel)
-}
-
-InputsPage --|> ContentPage
-ResultsPage --|> ContentPage
-ComparePage --|> ContentPage
-
-InputsPage ..> CalculatorViewModel : binds to
-ResultsPage *-- DoughnutChartDrawable
-ResultsPage ..> CalculatorViewModel : binds to
-ComparePage ..> CalculatorViewModel : binds to
-
-' ═══════════════════════════════════════════════
-' App – Controls & Behaviors
-' ═══════════════════════════════════════════════
-
-interface IDrawable {
-    +Draw(canvas : ICanvas, dirtyRect : RectF) : void
-}
-
-class DoughnutChartDrawable <<sealed>> {
-    -{static} SliceColors : Color[]
-    +Result : ResultCardModel
-    +Draw(canvas : ICanvas, dirtyRect : RectF) : void
-}
-
-DoughnutChartDrawable ..|> IDrawable
-DoughnutChartDrawable --> ResultCardModel
-
-abstract class "Behavior<Entry>" as BehaviorEntry
-
-class DecimalFormatBehavior {
-    +IsCurrency : bool
-    +IsPercentage : bool
-    #OnAttachedTo(entry : Entry) : void
-    #OnDetachingFrom(entry : Entry) : void
-}
-
-DecimalFormatBehavior --|> BehaviorEntry
-
-' ═══════════════════════════════════════════════
-' App – Helpers & Shell
-' ═══════════════════════════════════════════════
-
-class EnumDisplay <<static>> {
-    +{static} DeductionType(name : string) : string
-    +{static} PayFrequency(name : string) : string
-    +{static} FederalFilingStatus(name : string) : string
-    +{static} UsStateName(abbreviation : string) : string
-}
-
-interface IValueConverter
-
-class GreaterThanZeroConverter <<sealed>> {
-    +Convert(value : object, targetType : Type, parameter : object, culture : CultureInfo) : object
-    +ConvertBack(value : object, targetType : Type, parameter : object, culture : CultureInfo) : object
-}
-
-GreaterThanZeroConverter ..|> IValueConverter
-
-abstract class Shell
-
-class AppShell {
-    +AppShell()
-}
-
-AppShell --|> Shell
-
-abstract class Application
 
 class App {
-    -_shell : AppShell
-    +App(shell : AppShell)
-    #CreateWindow(activationState : IActivationState) : Window
+    #CreateWindow(activationState) : Window
 }
-
-App --|> Application
-App *-- AppShell
-
-' ═══════════════════════════════════════════════
-' App – DI Composition Root
-' ═══════════════════════════════════════════════
 
 class MauiProgram <<static>> {
     +{static} CreateMauiApp() : MauiApp
 }
 
+App *-- AppShell
+
 MauiProgram ..> PayCalculator : registers
 MauiProgram ..> AnnualProjectionCalculator : registers
-MauiProgram ..> CalculatorViewModel : registers
-MauiProgram ..> StateCalculatorRegistry : registers
 MauiProgram ..> FicaCalculator : registers
 MauiProgram ..> Irs15TPercentageCalculator : registers
-MauiProgram ..> ArkansasFormulaCalculator : registers
-MauiProgram ..> CaliforniaPercentageCalculator : registers
-MauiProgram ..> ColoradoWithholdingCalculator : registers
-MauiProgram ..> ConnecticutWithholdingCalculator : registers
-MauiProgram ..> OklahomaOw2PercentageCalculator : registers
-MauiProgram ..> InputsPage : registers
-MauiProgram ..> ResultsPage : registers
-MauiProgram ..> ComparePage : registers
+MauiProgram ..> StateCalculatorRegistry : registers
+MauiProgram ..> SelfEmploymentCalculator : registers
+MauiProgram ..> SelfEmploymentTaxCalculator : registers
+MauiProgram ..> QbiDeductionCalculator : registers
+MauiProgram ..> Form1040Calculator : registers
+MauiProgram ..> Federal1040TaxCalculator : registers
+MauiProgram ..> Schedule1Calculator : registers
+MauiProgram ..> AnnualStateTaxCalculator : registers
+MauiProgram ..> IPaycheckRepository : registers
+MauiProgram ..> CalculatorViewModel : registers
+MauiProgram ..> SavedPaychecksViewModel : registers
+MauiProgram ..> SelfEmploymentViewModel : registers
+MauiProgram ..> AnnualTaxViewModel : registers
+MauiProgram ..> AppShell : registers
 
 @enduml
