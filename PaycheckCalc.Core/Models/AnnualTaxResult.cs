@@ -53,6 +53,18 @@ public sealed class AnnualTaxResult
     /// <summary>Child Tax Credit applied (included within nonrefundable credits total).</summary>
     public decimal ChildTaxCredit { get; init; }
 
+    /// <summary>
+    /// Nonrefundable education credits applied from Form 8863
+    /// (AOTC 60% + LLC). Included within <see cref="NonrefundableCredits"/>.
+    /// </summary>
+    public decimal EducationCreditsNonrefundable { get; init; }
+
+    /// <summary>
+    /// Saver's Credit (Form 8880) applied. Included within
+    /// <see cref="NonrefundableCredits"/>.
+    /// </summary>
+    public decimal SaversCredit { get; init; }
+
     /// <summary>Form 1040 line 22 — income tax after nonrefundable credits.</summary>
     public decimal IncomeTaxAfterCredits { get; init; }
 
@@ -85,6 +97,18 @@ public sealed class AnnualTaxResult
 
     /// <summary>Refundable credits from <see cref="CreditsInput"/> (AOTC 40%, EITC, etc.).</summary>
     public decimal RefundableCredits { get; init; }
+
+    /// <summary>
+    /// Refundable portion of the American Opportunity Tax Credit (40% of AOTC
+    /// before cap). Included within <see cref="RefundableCredits"/>.
+    /// </summary>
+    public decimal RefundableEducationCredit { get; init; }
+
+    /// <summary>
+    /// Refundable Additional Child Tax Credit (ACTC) per OBBBA $1,700 cap.
+    /// Included within <see cref="RefundableCredits"/>.
+    /// </summary>
+    public decimal RefundableAdditionalChildTaxCredit { get; init; }
 
     /// <summary>Form 1040 line 33 — total payments.</summary>
     public decimal TotalPayments { get; init; }

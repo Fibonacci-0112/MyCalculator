@@ -534,4 +534,424 @@ public class Form1040CalculatorTest
         Assert.Equal(0m, result.FederalWithholdingFromW2s);
         Assert.True(result.RefundOrOwe < 0m);
     }
+
+    // ── Phase 4: per-spouse excess Social Security credit ──────────
+    //
+    // On a joint return the excess-SS test is applied per taxpayer. One spouse
+    // with two jobs over the SS wage base should generate a credit even when
+    // the other spouse has only one W-2 with moderate SS withholding.
+
+    [Fact]
+    public void Mfj_OneSpouseTwoJobsOverBase_OtherSpouseSingleJob_CreditsOnlyFirstSpouse()
+    {
+        // Spouse A: two employers, $120k SS wages each → $7,440 × 2 = $14,880 SS tax withheld.
+        //   Max per-taxpayer = $184,500 × 6.2% = $11,439. Excess = $3,441.
+        // Spouse B: one employer, $90k SS wages → $5,580 SS tax withheld. No credit.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.MarriedFilingJointly,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    Name = "Spouse A Employer 1",
+                    Holder = W2JobHolder.Taxpayer,
+                    WagesBox1 = 120_000m,
+                    FederalWithholdingBox2 = 18_000m,
+                    SocialSecurityWagesBox3 = 120_000m,
+                    SocialSecurityTaxBox4 = 7_440m,
+                    MedicareWagesBox5 = 120_000m,
+                },
+                new W2JobInput
+                {
+                    Name = "Spouse A Employer 2",
+                    Holder = W2JobHolder.Taxpayer,
+                    WagesBox1 = 120_000m,
+                    FederalWithholdingBox2 = 18_000m,
+                    SocialSecurityWagesBox3 = 120_000m,
+                    SocialSecurityTaxBox4 = 7_440m,
+                    MedicareWagesBox5 = 120_000m,
+                },
+                new W2JobInput
+                {
+                    Name = "Spouse B Only Employer",
+                    Holder = W2JobHolder.Spouse,
+                    WagesBox1 = 90_000m,
+                    FederalWithholdingBox2 = 12_000m,
+                    SocialSecurityWagesBox3 = 90_000m,
+                    SocialSecurityTaxBox4 = 5_580m,
+                    MedicareWagesBox5 = 90_000m,
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        // Only Spouse A's excess ($3,441) counts.
+        Assert.Equal(3_441m, result.ExcessSocialSecurityCredit);
+    }
+
+    [Fact]
+    public void Mfj_EachSpouseTwoJobsOverBase_CreditsBothSpouses()
+    {
+        // Each spouse has two jobs of $120k each SS wages.
+        //   Per-spouse excess = $14,880 − $11,439 = $3,441.
+        //   Total credit = $6,882.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.MarriedFilingJointly,
+            W2Jobs = new[]
+            {
+                new W2JobInput { Holder = W2JobHolder.Taxpayer, WagesBox1 = 120_000m, SocialSecurityWagesBox3 = 120_000m, SocialSecurityTaxBox4 = 7_440m, MedicareWagesBox5 = 120_000m },
+                new W2JobInput { Holder = W2JobHolder.Taxpayer, WagesBox1 = 120_000m, SocialSecurityWagesBox3 = 120_000m, SocialSecurityTaxBox4 = 7_440m, MedicareWagesBox5 = 120_000m },
+                new W2JobInput { Holder = W2JobHolder.Spouse,   WagesBox1 = 120_000m, SocialSecurityWagesBox3 = 120_000m, SocialSecurityTaxBox4 = 7_440m, MedicareWagesBox5 = 120_000m },
+                new W2JobInput { Holder = W2JobHolder.Spouse,   WagesBox1 = 120_000m, SocialSecurityWagesBox3 = 120_000m, SocialSecurityTaxBox4 = 7_440m, MedicareWagesBox5 = 120_000m },
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(6_882m, result.ExcessSocialSecurityCredit);
+    }
+
+    [Fact]
+    public void Mfj_CombinedHouseholdOverBase_ButEachSpouseUnder_NoCredit()
+    {
+        // Both spouses each have one job at $120k → combined $240k SS wages,
+        // but neither spouse individually has two employers. No credit.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.MarriedFilingJointly,
+            W2Jobs = new[]
+            {
+                new W2JobInput { Holder = W2JobHolder.Taxpayer, WagesBox1 = 120_000m, SocialSecurityWagesBox3 = 120_000m, SocialSecurityTaxBox4 = 7_440m, MedicareWagesBox5 = 120_000m },
+                new W2JobInput { Holder = W2JobHolder.Spouse,   WagesBox1 = 120_000m, SocialSecurityWagesBox3 = 120_000m, SocialSecurityTaxBox4 = 7_440m, MedicareWagesBox5 = 120_000m },
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(0m, result.ExcessSocialSecurityCredit);
+    }
+
+    // ── Phase 3: end-to-end credit computations wired through the orchestrator ──
+
+    [Fact]
+    public void ChildTaxCreditInput_FlowsThroughToReportedCtc()
+    {
+        // Single, $80k wages → tax before credits = $8,770 (from Scenario 1).
+        // 2 qualifying children × $2,200 = $4,400 nonrefundable CTC.
+        // After credits: $8,770 − $4,400 = $4,370.
+        // Payments = $9,000 → refund = $4,630.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 80_000m,
+                    FederalWithholdingBox2 = 9_000m,
+                    SocialSecurityWagesBox3 = 80_000m,
+                    MedicareWagesBox5 = 80_000m,
+                }
+            },
+            Credits = new CreditsInput
+            {
+                ChildTaxCreditInput = new ChildTaxCreditInput
+                {
+                    QualifyingChildren = 2,
+                    EarnedIncome = 80_000m
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(8_770m, result.IncomeTaxBeforeCredits);
+        Assert.Equal(4_400m, result.ChildTaxCredit);
+        Assert.Equal(4_400m, result.NonrefundableCredits);
+        Assert.Equal(4_370m, result.IncomeTaxAfterCredits);
+        Assert.Equal(4_630m, result.RefundOrOwe);
+        // No refundable ACTC because tax fully absorbed nonrefundable CTC.
+        Assert.Equal(0m, result.RefundableAdditionalChildTaxCredit);
+    }
+
+    [Fact]
+    public void LowIncomeFamily_Actc_AppearsAsRefundablePayment()
+    {
+        // $20,000 wages → tax before std ded = ($20k − $16,100) × 10% = $390.
+        // 2 QC → $4,400 nonrefundable CTC (capped at $390 → applied = $390).
+        // Unused CTC = $4,400 − $390 = $4,010.
+        // ACTC = min(15% × ($20k − $2,500), 2 × $1,700, $4,010)
+        //      = min($2,625, $3,400, $4,010) = $2,625.
+        // Payments = $0 WH + $2,625 ACTC = $2,625. Tax after credits = $0.
+        // Refund = $2,625.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 20_000m,
+                    FederalWithholdingBox2 = 0m,
+                    SocialSecurityWagesBox3 = 20_000m,
+                    MedicareWagesBox5 = 20_000m,
+                }
+            },
+            Credits = new CreditsInput
+            {
+                ChildTaxCreditInput = new ChildTaxCreditInput
+                {
+                    QualifyingChildren = 2,
+                    EarnedIncome = 20_000m
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(390m, result.IncomeTaxBeforeCredits);
+        Assert.Equal(390m, result.NonrefundableCredits);
+        Assert.Equal(0m, result.IncomeTaxAfterCredits);
+        Assert.Equal(2_625m, result.RefundableAdditionalChildTaxCredit);
+        Assert.Equal(2_625m, result.RefundableCredits);
+        Assert.Equal(2_625m, result.TotalPayments);
+        Assert.Equal(2_625m, result.RefundOrOwe);
+    }
+
+    [Fact]
+    public void EducationCredits_FlowThroughToNonrefundableAndRefundable()
+    {
+        // Single, $80k wages → tax $8,770.
+        // One AOTC student with $5,000 expenses → $2,500 credit = $1,500 NR + $1,000 R.
+        // Nonrefundable applied = $1,500; tax after = $7,270. Total tax = $7,270.
+        // Payments = $9,000 WH + $1,000 refundable AOTC = $10,000.
+        // Refund = $10,000 − $7,270 = $2,730.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 80_000m,
+                    FederalWithholdingBox2 = 9_000m,
+                    SocialSecurityWagesBox3 = 80_000m,
+                    MedicareWagesBox5 = 80_000m,
+                }
+            },
+            Credits = new CreditsInput
+            {
+                EducationCredits = new EducationCreditsInput
+                {
+                    Students = new[]
+                    {
+                        new EducationStudentInput
+                        {
+                            QualifiedExpenses = 5_000m,
+                            ClaimAmericanOpportunityCredit = true
+                        }
+                    }
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(1_500m, result.EducationCreditsNonrefundable);
+        Assert.Equal(1_000m, result.RefundableEducationCredit);
+        Assert.Equal(1_500m, result.NonrefundableCredits);
+        Assert.Equal(7_270m, result.IncomeTaxAfterCredits);
+        Assert.Equal(7_270m, result.TotalTax);
+        Assert.Equal(10_000m, result.TotalPayments);
+        Assert.Equal(2_730m, result.RefundOrOwe);
+    }
+
+    [Fact]
+    public void SaversCredit_FlowsThroughAsNonrefundable()
+    {
+        // MFJ $45k wages → taxable = $45k − $32,200 = $12,800. Tax = $12,800 × 10% = $1,280.
+        // SaversCredit: $2,000 taxpayer + $2,000 spouse = $4,000 eligible, AGI $45k → 50% band.
+        // Credit = 50% × $4,000 = $2,000 (exceeds tax, capped at $1,280).
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.MarriedFilingJointly,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 45_000m,
+                    FederalWithholdingBox2 = 500m,
+                    SocialSecurityWagesBox3 = 45_000m,
+                    MedicareWagesBox5 = 45_000m,
+                }
+            },
+            Credits = new CreditsInput
+            {
+                SaversCredit = new SaversCreditInput
+                {
+                    TaxpayerContributions = 2_000m,
+                    SpouseContributions = 2_000m
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(12_800m, result.TaxableIncome);
+        Assert.Equal(1_280m, result.IncomeTaxBeforeCredits);
+        Assert.Equal(2_000m, result.SaversCredit); // raw calculator output
+        Assert.Equal(1_280m, result.NonrefundableCredits); // capped at tax
+        Assert.Equal(0m, result.IncomeTaxAfterCredits);
+    }
+
+    [Fact]
+    public void Niit_StructuredInputAddsToTotalTax()
+    {
+        // Single, $250k wages + $20k dividends → AGI $270k.
+        // Taxable = $270k − $16,100 std ded = $253,900.
+        // Bracket for $253,900 single: $201,775–$256,225 at 32%
+        //   = $41,024 + ($253,900 − $201,775) × 32%
+        //   = $41,024 + $16,680 = $57,704.
+        // NIIT: excess MAGI over $200k threshold = $70k; min(NII $20k, $70k) = $20k.
+        //   NIIT = 3.8% × $20,000 = $760.
+        // Total tax = $57,704 + $760 = $58,464.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 250_000m,
+                    FederalWithholdingBox2 = 50_000m,
+                    SocialSecurityWagesBox3 = 184_500m,
+                    MedicareWagesBox5 = 250_000m,
+                }
+            },
+            OtherIncome = new OtherIncomeInput
+            {
+                OrdinaryDividends = 20_000m
+            },
+            OtherTaxes = new OtherTaxesInput
+            {
+                NetInvestmentIncome = new NetInvestmentIncomeInput
+                {
+                    NetInvestmentIncome = 20_000m
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(270_000m, result.AdjustedGrossIncome);
+        Assert.Equal(57_704m, result.IncomeTaxBeforeCredits);
+        Assert.Equal(760m, result.NetInvestmentIncomeTax);
+        Assert.Equal(58_464m, result.TotalTax);
+    }
+
+    [Fact]
+    public void Niit_StructuredAndLegacyInputs_AreAdditive()
+    {
+        // Legacy pre-computed NIIT $500 + structured $380 = $880 total NIIT.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 210_000m,
+                    FederalWithholdingBox2 = 20_000m,
+                    SocialSecurityWagesBox3 = 184_500m,
+                    MedicareWagesBox5 = 210_000m,
+                }
+            },
+            OtherTaxes = new OtherTaxesInput
+            {
+                NetInvestmentIncomeTax = 500m, // legacy pre-computed
+                NetInvestmentIncome = new NetInvestmentIncomeInput
+                {
+                    NetInvestmentIncome = 10_000m // AGI $210k → excess $10k → min($10k, $10k) = $10k → $380 NIIT
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(880m, result.NetInvestmentIncomeTax);
+    }
+
+    [Fact]
+    public void LegacyChildTaxCredit_StillSupported()
+    {
+        // Back-compat: callers setting Credits.ChildTaxCredit directly continue to work.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 80_000m,
+                    FederalWithholdingBox2 = 9_000m,
+                    SocialSecurityWagesBox3 = 80_000m,
+                    MedicareWagesBox5 = 80_000m,
+                }
+            },
+            Credits = new CreditsInput
+            {
+                ChildTaxCredit = 2_000m // legacy lump-sum path
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(2_000m, result.ChildTaxCredit);
+        Assert.Equal(2_000m, result.NonrefundableCredits);
+        Assert.Equal(6_770m, result.IncomeTaxAfterCredits);
+    }
+
+    [Fact]
+    public void AllCreditsCombined_Stack_CappedAtIncomeTax()
+    {
+        // Stress test: all four structured credits + legacy nonrefundable all
+        // supplied together. Total requested > tax → cap at tax.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.MarriedFilingJointly,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 45_000m,
+                    FederalWithholdingBox2 = 500m,
+                    SocialSecurityWagesBox3 = 45_000m,
+                    MedicareWagesBox5 = 45_000m,
+                }
+            },
+            Credits = new CreditsInput
+            {
+                NonrefundableCredits = 5_000m, // legacy
+                ChildTaxCreditInput = new ChildTaxCreditInput { QualifyingChildren = 2, EarnedIncome = 45_000m },
+                EducationCredits = new EducationCreditsInput
+                {
+                    Students = new[]
+                    {
+                        new EducationStudentInput { QualifiedExpenses = 5_000m, ClaimAmericanOpportunityCredit = true }
+                    }
+                },
+                SaversCredit = new SaversCreditInput { TaxpayerContributions = 2_000m }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        // Taxable = $45k − $32,200 = $12,800. Tax = $1,280.
+        Assert.Equal(1_280m, result.IncomeTaxBeforeCredits);
+        Assert.Equal(1_280m, result.NonrefundableCredits); // capped
+        Assert.Equal(0m, result.IncomeTaxAfterCredits);
+    }
 }

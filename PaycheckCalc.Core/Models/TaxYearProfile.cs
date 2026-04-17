@@ -3,50 +3,90 @@ using PaycheckCalc.Core.Tax.Federal;
 namespace PaycheckCalc.Core.Models;
 
 /// <summary>
-/// Placeholder inputs for future Form 8863 / 8880 / dependent care / CTC work
-/// (Phase 3 of the plan). Present now so <see cref="TaxYearProfile"/> is stable
-/// and <c>Form1040Calculator</c> can accept a credits bundle without churn when
-/// the individual form calculators are wired in.
-///
-/// Until the dedicated credit calculators land, only pre-computed amounts on
-/// this object are applied as lump-sum credits.
+/// Container for Schedule 3 credits. Callers may supply either structured
+/// inputs (<see cref="ChildTaxCredit"/> / <see cref="EducationCredits"/> /
+/// <see cref="SaversCredit"/>) that are computed by the dedicated
+/// calculators, or the legacy pre-computed lump sums
+/// (<see cref="NonrefundableCredits"/>, <see cref="RefundableCredits"/>,
+/// <see cref="PrecomputedChildTaxCredit"/>) for back-compat, or both —
+/// the engine adds them together.
 /// </summary>
 public sealed class CreditsInput
 {
     /// <summary>
-    /// Pre-computed nonrefundable credits (e.g. from Form 8880 Saver's Credit
-    /// once implemented). Applied against tax before refundable credits.
+    /// Pre-computed nonrefundable credits (e.g. from external tools). Added
+    /// to the engine's dedicated-calculator results before capping at the
+    /// income tax.
     /// </summary>
     public decimal NonrefundableCredits { get; init; }
 
     /// <summary>
-    /// Pre-computed refundable credits (e.g. 40% refundable AOTC, EITC).
-    /// Added to total payments on the Form 1040.
+    /// Pre-computed refundable credits (e.g. EITC). Added to the engine's
+    /// dedicated-calculator refundable totals.
     /// </summary>
     public decimal RefundableCredits { get; init; }
 
     /// <summary>
-    /// Child Tax Credit — simplified entry as a single dollar amount.
-    /// The full CTC/ACTC split will move into a dedicated calculator.
+    /// Pre-computed Child Tax Credit (legacy lump-sum entry). When a
+    /// <see cref="ChildTaxCredit"/> input is also supplied the two amounts
+    /// are combined — prefer the structured input for new code.
     /// </summary>
-    public decimal ChildTaxCredit { get; init; }
+    public decimal PrecomputedChildTaxCredit { get; init; }
+
+    /// <summary>
+    /// Back-compat alias for <see cref="PrecomputedChildTaxCredit"/>. Existing
+    /// callers that set <c>Credits.ChildTaxCredit = …</c> continue to work.
+    /// </summary>
+    public decimal ChildTaxCredit
+    {
+        get => PrecomputedChildTaxCredit;
+        init => PrecomputedChildTaxCredit = value;
+    }
+
+    /// <summary>
+    /// Structured Child Tax Credit / ODC input. When non-null the engine
+    /// runs <c>ChildTaxCreditCalculator</c> against it.
+    /// </summary>
+    public ChildTaxCreditInput? ChildTaxCreditInput { get; init; }
+
+    /// <summary>
+    /// Structured education credits input (Form 8863). When non-null the
+    /// engine runs <c>Form8863EducationCreditsCalculator</c>.
+    /// </summary>
+    public EducationCreditsInput? EducationCredits { get; init; }
+
+    /// <summary>
+    /// Structured Saver's Credit input (Form 8880). When non-null the
+    /// engine runs <c>Form8880SaversCreditCalculator</c>.
+    /// </summary>
+    public SaversCreditInput? SaversCredit { get; init; }
 }
 
 /// <summary>
-/// Placeholder inputs for future Schedule 2 "other taxes" beyond what can be
-/// derived from Schedule SE and FICA coordination. Present so the orchestrator
-/// API is stable.
+/// Schedule 2 "other taxes" beyond what Schedule SE and FICA coordination
+/// cover. Callers may supply either a structured
+/// <see cref="NetInvestmentIncomeInput"/> (which drives
+/// <c>Form8960NiitCalculator</c>) or the legacy pre-computed
+/// <see cref="NetInvestmentIncomeTax"/> lump sum — the engine adds them
+/// together.
 /// </summary>
 public sealed class OtherTaxesInput
 {
     /// <summary>
-    /// Net Investment Income Tax (Form 8960) — entered as a pre-computed amount.
-    /// Dedicated calculator will replace this in a future phase.
+    /// Legacy pre-computed NIIT amount. When a
+    /// <see cref="NetInvestmentIncome"/> input is also supplied the two
+    /// amounts are combined.
     /// </summary>
     public decimal NetInvestmentIncomeTax { get; init; }
 
     /// <summary>Any other Schedule 2 Part II taxes entered directly.</summary>
     public decimal OtherSchedule2Taxes { get; init; }
+
+    /// <summary>
+    /// Structured Net Investment Income Tax input (Form 8960). When non-null
+    /// the engine runs <c>Form8960NiitCalculator</c>.
+    /// </summary>
+    public NetInvestmentIncomeInput? NetInvestmentIncome { get; init; }
 }
 
 /// <summary>
