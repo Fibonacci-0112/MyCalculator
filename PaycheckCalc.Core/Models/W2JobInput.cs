@@ -52,6 +52,13 @@ public sealed class W2JobInput
     /// <summary>W-2 Box 6: Medicare tax withheld (including any employer-withheld Additional Medicare).</summary>
     public decimal MedicareTaxBox6 { get; init; }
 
+    /// <summary>
+    /// W-2 Box 16: state taxable wages for the year. When zero, the annual
+    /// state-tax engine falls back to <see cref="WagesBox1"/> (federal wages)
+    /// as a reasonable approximation for most states.
+    /// </summary>
+    public decimal StateWagesBox16 { get; init; }
+
     /// <summary>W-2 Box 17: state income tax withheld for the year.</summary>
     public decimal StateWithholdingBox17 { get; init; }
 

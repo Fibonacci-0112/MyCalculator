@@ -1,6 +1,7 @@
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Tax.Fica;
 using PaycheckCalc.Core.Tax.SelfEmployment;
+using PaycheckCalc.Core.Tax.State.Annual;
 
 namespace PaycheckCalc.Core.Tax.Federal.Annual;
 
@@ -32,6 +33,7 @@ public sealed class Form1040Calculator
     private readonly Form8863EducationCreditsCalculator _education;
     private readonly Form8880SaversCreditCalculator _savers;
     private readonly Form8960NiitCalculator _niit;
+    private readonly AnnualStateTaxCalculator? _stateTax;
 
     public Form1040Calculator(
         Federal1040TaxCalculator tax,
@@ -42,7 +44,8 @@ public sealed class Form1040Calculator
         ChildTaxCreditCalculator? ctc = null,
         Form8863EducationCreditsCalculator? education = null,
         Form8880SaversCreditCalculator? savers = null,
-        Form8960NiitCalculator? niit = null)
+        Form8960NiitCalculator? niit = null,
+        AnnualStateTaxCalculator? stateTax = null)
     {
         _tax = tax;
         _sched1 = sched1;
@@ -53,6 +56,7 @@ public sealed class Form1040Calculator
         _education = education ?? new Form8863EducationCreditsCalculator();
         _savers = savers ?? new Form8880SaversCreditCalculator();
         _niit = niit ?? new Form8960NiitCalculator();
+        _stateTax = stateTax;
     }
 
     public AnnualTaxResult Calculate(TaxYearProfile profile)
@@ -213,6 +217,13 @@ public sealed class Form1040Calculator
             ? R(totalTax / totalIncome * 100m)
             : 0m;
 
+        // ── Step 14: Optional annual state-tax projection ───
+        // Runs the registered state calculator once at Annual frequency so
+        // the engine returns a year-end state refund/owe alongside federal.
+        // Stays additive and optional: if no AnnualStateTaxCalculator was
+        // injected the result's StateTax property is null (back-compat).
+        AnnualStateTaxResult? stateTaxResult = _stateTax?.Calculate(profile, incomeTaxAfterCredits);
+
         return new AnnualTaxResult
         {
             TaxYear = profile.TaxYear,
@@ -252,7 +263,9 @@ public sealed class Form1040Calculator
 
             RefundOrOwe = refundOrOwe,
             EffectiveTaxRate = effectiveRate,
-            MarginalTaxRate = marginalRate
+            MarginalTaxRate = marginalRate,
+
+            StateTax = stateTaxResult
         };
     }
 
