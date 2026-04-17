@@ -158,9 +158,11 @@ public sealed class PaEitCalculator : ILocalWithholdingCalculator
         var withholding = Math.Round(taxableWages * effectiveRate, 2, MidpointRounding.AwayFromZero)
                         + additional;
 
-        var description = residentRate >= nonResidentRate
+        var description = residentRate > nonResidentRate
             ? $"Applied resident rate {residentRate:P3} (PSD {homePsd})."
-            : $"Applied work-location non-resident rate {nonResidentRate:P3} (PSD {workPsd}).";
+            : residentRate < nonResidentRate
+                ? $"Applied work-location non-resident rate {nonResidentRate:P3} (PSD {workPsd})."
+                : $"Resident and work non-resident rates equal at {residentRate:P3}.";
 
         return new LocalWithholdingResult
         {

@@ -99,7 +99,10 @@ public abstract class OhioMunicipalCalculator : ILocalWithholdingCalculator
         string description;
         string localityName;
 
-        if (work != null && (resident == null || string.Equals(residentCode, workCode, StringComparison.OrdinalIgnoreCase)))
+        var sameMuni = resident != null && work != null
+            && string.Equals(residentCode, workCode, StringComparison.OrdinalIgnoreCase);
+
+        if (work != null && (resident == null || sameMuni))
         {
             // Pure work-muni withholding. Either the employee is not a resident of any
             // member muni, or they work where they live — no credit math either way.
