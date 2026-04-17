@@ -45,5 +45,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Link>connecticut_withholding_2026.json</Link>
     </None>
+    <None Include="..\PaycheckCalc.Core\Data\Federal2026\federal_1040_brackets_2026.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>federal_1040_brackets_2026.json</Link>
+    </None>
   </ItemGroup>
 </Project>
