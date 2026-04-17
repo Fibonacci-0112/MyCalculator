@@ -40,11 +40,9 @@ public sealed class Form8863EducationCreditsCalculator
     {
         if (input.Students.Count == 0) return EducationCreditsResult.Zero;
 
-        // MFS filers cannot claim either credit.
-        if (status == FederalFilingStatus.MarriedFilingJointly)
-        {
-            // MFJ is fine — handled with its own phase-out.
-        }
+        // Note: MFS is statutorily ineligible for both credits per §25A(g)(6),
+        // but the current FederalFilingStatus enum folds Single and MFS into
+        // one bucket; MFS precision is deferred until the enum is split.
 
         // ── Step 1: raw AOTC and LLC before phase-out ────────
         decimal aotcRaw = 0m;

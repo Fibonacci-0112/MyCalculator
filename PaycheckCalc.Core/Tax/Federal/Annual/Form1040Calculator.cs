@@ -148,14 +148,14 @@ public sealed class Form1040Calculator
             ? _savers.Calculate(credits.SaversCredit, profile.FilingStatus, agi)
             : SaversCreditResult.Zero;
 
-        var legacyCtc = Math.Max(0m, credits.PrecomputedChildTaxCredit);
+        var precomputedCtc = Math.Max(0m, credits.PrecomputedChildTaxCredit);
         var legacyOtherNonrefundable = Math.Max(0m, credits.NonrefundableCredits);
 
         var totalNonrefundableRequested = R(
               ctcResult.NonrefundableApplied
             + educationResult.TotalNonrefundable
             + saversResult.Credit
-            + legacyCtc
+            + precomputedCtc
             + legacyOtherNonrefundable);
 
         var nonrefundableApplied = Math.Min(incomeTaxBefore, totalNonrefundableRequested);
@@ -164,10 +164,10 @@ public sealed class Form1040Calculator
         // Reported CTC amount: the structured calculator's nonrefundable applied
         // plus whatever slice of the legacy pre-computed CTC can still fit under
         // the remaining tax room. Kept additive for back-compat.
-        var taxRoomForLegacyCtc = Math.Max(0m,
+        var taxRoomForPrecomputedCtc = Math.Max(0m,
             incomeTaxBefore - ctcResult.NonrefundableApplied - educationResult.TotalNonrefundable
               - saversResult.Credit - legacyOtherNonrefundable);
-        var reportedCtc = R(ctcResult.NonrefundableApplied + Math.Min(legacyCtc, taxRoomForLegacyCtc));
+        var reportedCtc = R(ctcResult.NonrefundableApplied + Math.Min(precomputedCtc, taxRoomForPrecomputedCtc));
 
         // ── Step 11: Schedule 2 other taxes ──────────────────
         var niit = Math.Max(0m, profile.OtherTaxes.NetInvestmentIncomeTax);
