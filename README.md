@@ -135,4 +135,5 @@ The app uses flyout navigation with four main sections:
 
 ## Documentation
 
+- [Wiki](docs/wiki/Home.md) — Full project wiki covering architecture, tax engine, state coverage, self-employment module, UI guide, and contributing guidelines.
 - [UML Class Diagram](docs/class-diagram.md) — Mermaid-based class diagram of the full architecture.
