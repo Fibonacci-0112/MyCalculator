@@ -1,4 +1,6 @@
+using PaycheckCalc.Core.Geocoding;
 using PaycheckCalc.Core.Tax.Federal;
+using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.State;
 
 namespace PaycheckCalc.Core.Models;
@@ -19,6 +21,33 @@ public sealed class PaycheckInput
     /// calculator's <see cref="IStateWithholdingCalculator.GetInputSchema"/>.
     /// </summary>
     public StateInputValues? StateInputValues { get; init; }
+
+    /// <summary>
+    /// Optional locality code identifying where the employee lives
+    /// (e.g. <c>"PA-EIT"</c>, <c>"NY-NYC"</c>). Used to look up an
+    /// <see cref="ILocalWithholdingCalculator"/> from the
+    /// <see cref="LocalCalculatorRegistry"/>. Null when no locality applies.
+    /// </summary>
+    public string? HomeLocalityCode { get; init; }
+
+    /// <summary>
+    /// Optional locality code identifying where the work is performed.
+    /// May equal <see cref="HomeLocalityCode"/>. Consulted by calculators
+    /// implementing reciprocity rules (PA Act 32, OH RITA/CCA).
+    /// </summary>
+    public string? WorkLocalityCode { get; init; }
+
+    /// <summary>
+    /// Dynamic locality-specific input values populated by the UI from the
+    /// calculator's <see cref="ILocalWithholdingCalculator.GetInputSchema"/>.
+    /// </summary>
+    public LocalInputValues? LocalInputValues { get; init; }
+
+    /// <summary>Raw home-address input used only by the resolver chain, not by tax calculators.</summary>
+    public AddressInput? HomeAddress { get; init; }
+
+    /// <summary>Raw work-address input used only by the resolver chain, not by tax calculators.</summary>
+    public AddressInput? WorkAddress { get; init; }
 
     public FederalW4Input FederalW4 { get; init; } = new();
 
