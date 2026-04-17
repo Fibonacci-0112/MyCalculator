@@ -148,36 +148,7 @@ public static class StateTaxConfigs2026
                 ]
             },
 
-            [UsState.DE] = new()
-            {
-                StandardDeductionSingle = 3_250m,
-                StandardDeductionMarried = 6_500m,
-                AllowanceCreditAmount = 110m,
-                BracketsSingle =
-                [
-                    B(0, 2_000m, 0m),
-                    B(2_000m, 5_000m, 0.022m),
-                    B(5_000m, 10_000m, 0.039m),
-                    B(10_000m, 20_000m, 0.048m),
-                    B(20_000m, 25_000m, 0.052m),
-                    B(25_000m, 60_000m, 0.0555m),
-                    B(60_000m, 125_000m, 0.0605m),
-                    B(125_000m, 250_000m, 0.0675m),
-                    B(250_000m, null, 0.0695m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 2_000m, 0m),
-                    B(2_000m, 5_000m, 0.022m),
-                    B(5_000m, 10_000m, 0.039m),
-                    B(10_000m, 20_000m, 0.048m),
-                    B(20_000m, 25_000m, 0.052m),
-                    B(25_000m, 60_000m, 0.0555m),
-                    B(60_000m, 125_000m, 0.0605m),
-                    B(125_000m, 250_000m, 0.0675m),
-                    B(250_000m, null, 0.0695m)
-                ]
-            },
+            // Delaware uses a dedicated calculator (DelawareWithholdingCalculator)
 
             [UsState.HI] = new()
             {

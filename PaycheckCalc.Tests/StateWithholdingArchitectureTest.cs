@@ -4,6 +4,7 @@ using PaycheckCalc.Core.Tax.Arkansas;
 using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Colorado;
 using PaycheckCalc.Core.Tax.Connecticut;
+using PaycheckCalc.Core.Tax.Delaware;
 using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
@@ -711,6 +712,8 @@ public class FullRegistryIntegrationTest
         var ctDataPath = Path.Combine(AppContext.BaseDirectory, "connecticut_withholding_2026.json");
         var ctJson = File.ReadAllText(ctDataPath);
         registry.Register(new ConnecticutWithholdingCalculator(ctJson));
+
+        registry.Register(new DelawareWithholdingCalculator());
 
         UsState[] noTaxStates = [UsState.AK, UsState.FL, UsState.NV, UsState.NH, UsState.SD, UsState.TN, UsState.TX, UsState.WA, UsState.WY];
         foreach (var state in noTaxStates)
