@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
+using PaycheckCalc.App.Services;
 using PaycheckCalc.App.Storage;
 using PaycheckCalc.App.ViewModels;
 using PaycheckCalc.App.Views;
+using PaycheckCalc.Core.Geocoding;
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Pay;
 using PaycheckCalc.Core.Storage;
@@ -14,6 +16,11 @@ using PaycheckCalc.Core.Tax.Colorado;
 using PaycheckCalc.Core.Tax.Connecticut;
 using PaycheckCalc.Core.Tax.Delaware;
 using PaycheckCalc.Core.Tax.Illinois;
+using PaycheckCalc.Core.Tax.Local;
+using PaycheckCalc.Core.Tax.Local.Maryland;
+using PaycheckCalc.Core.Tax.Local.NewYork;
+using PaycheckCalc.Core.Tax.Local.Ohio;
+using PaycheckCalc.Core.Tax.Local.Pennsylvania;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.Federal;
@@ -139,7 +146,61 @@ public static class MauiProgram
             new PayCalculator(
                 sp.GetRequiredService<StateCalculatorRegistry>(),
                 sp.GetRequiredService<FicaCalculator>(),
-                sp.GetRequiredService<Irs15TPercentageCalculator>()));
+                sp.GetRequiredService<Irs15TPercentageCalculator>(),
+                sp.GetRequiredService<LocalCalculatorRegistry>()));
+
+        // ── Local (sub-state) tax calculators ──────────────────
+        builder.Services.AddSingleton<LocalCalculatorRegistry>(sp =>
+        {
+            var registry = new LocalCalculatorRegistry();
+
+            // Pennsylvania Act 32 EIT + LST
+            using (var stream = FileSystem.OpenAppPackageFileAsync("pa_eit_2026.json").Result)
+            using (var reader = new StreamReader(stream))
+            {
+                registry.Register(new PaEitCalculator(new PaEitRateTable(reader.ReadToEnd())));
+            }
+            registry.Register(new PaLstCalculator());
+
+            // New York City
+            using (var stream = FileSystem.OpenAppPackageFileAsync("nyc_withholding_2026.json").Result)
+            using (var reader = new StreamReader(stream))
+            {
+                registry.Register(new NycWithholdingCalculator(reader.ReadToEnd()));
+            }
+
+            // Ohio RITA + CCA
+            using (var stream = FileSystem.OpenAppPackageFileAsync("oh_rita_2026.json").Result)
+            using (var reader = new StreamReader(stream))
+            {
+                registry.Register(new OhRitaCalculator(reader.ReadToEnd()));
+            }
+            using (var stream = FileSystem.OpenAppPackageFileAsync("oh_cca_2026.json").Result)
+            using (var reader = new StreamReader(stream))
+            {
+                registry.Register(new OhCcaCalculator(reader.ReadToEnd()));
+            }
+
+            // Maryland county surtax
+            using (var stream = FileSystem.OpenAppPackageFileAsync("md_county_surtax_2026.json").Result)
+            using (var reader = new StreamReader(stream))
+            {
+                registry.Register(new MdCountyCalculator(reader.ReadToEnd()));
+            }
+
+            return registry;
+        });
+
+        // ── Address / geocoding / jurisdiction services ────────
+        builder.Services.AddSingleton<IAddressService, AddressService>();
+        builder.Services.AddSingleton<IGeocodingCache, InMemoryGeocodingCache>();
+        builder.Services.AddSingleton<IGoogleMapsApiKeyProvider, SecureStorageGoogleMapsApiKeyProvider>();
+        builder.Services.AddSingleton<HttpClient>(_ => new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(15)
+        });
+        builder.Services.AddSingleton<IGeocodingService, GoogleMapsGeocodingService>();
+        builder.Services.AddSingleton<IJurisdictionService, JurisdictionResolver>();
 
         builder.Services.AddSingleton<AnnualProjectionCalculator>(sp =>
             new AnnualProjectionCalculator(
