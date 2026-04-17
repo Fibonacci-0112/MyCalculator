@@ -28,19 +28,31 @@ public sealed class Form1040Calculator
     private readonly SelfEmploymentTaxCalculator _seTax;
     private readonly QbiDeductionCalculator _qbi;
     private readonly FicaCalculator _fica;
+    private readonly ChildTaxCreditCalculator _ctc;
+    private readonly Form8863EducationCreditsCalculator _education;
+    private readonly Form8880SaversCreditCalculator _savers;
+    private readonly Form8960NiitCalculator _niit;
 
     public Form1040Calculator(
         Federal1040TaxCalculator tax,
         Schedule1Calculator sched1,
         SelfEmploymentTaxCalculator seTax,
         QbiDeductionCalculator qbi,
-        FicaCalculator fica)
+        FicaCalculator fica,
+        ChildTaxCreditCalculator? ctc = null,
+        Form8863EducationCreditsCalculator? education = null,
+        Form8880SaversCreditCalculator? savers = null,
+        Form8960NiitCalculator? niit = null)
     {
         _tax = tax;
         _sched1 = sched1;
         _seTax = seTax;
         _qbi = qbi;
         _fica = fica;
+        _ctc = ctc ?? new ChildTaxCreditCalculator();
+        _education = education ?? new Form8863EducationCreditsCalculator();
+        _savers = savers ?? new Form8880SaversCreditCalculator();
+        _niit = niit ?? new Form8960NiitCalculator();
     }
 
     public AnnualTaxResult Calculate(TaxYearProfile profile)
@@ -114,34 +126,82 @@ public sealed class Form1040Calculator
         var marginalRate = _tax.GetMarginalRate(taxableIncome, profile.FilingStatus);
 
         // ── Step 10: Nonrefundable credits (Schedule 3 + CTC) ──
-        // Simplified — CTC is capped at its nonrefundable ceiling of
-        // $2,200/child per OBBBA for 2026, but the engine currently accepts
-        // a pre-computed amount. A dedicated CTC calculator will land later.
-        var ctc = Math.Max(0m, profile.Credits.ChildTaxCredit);
-        var otherNonrefundable = Math.Max(0m, profile.Credits.NonrefundableCredits);
-        var totalNonrefundable = R(ctc + otherNonrefundable);
-        var nonrefundableApplied = Math.Min(incomeTaxBefore, totalNonrefundable);
+        // Credits stack in the following order against income tax:
+        //   1. Structured CTC/ODC (Form 8812 / OBBBA rules)
+        //   2. Structured education credits (Form 8863 — AOTC 60% + LLC)
+        //   3. Structured Saver's Credit (Form 8880)
+        //   4. Legacy pre-computed nonrefundable lump sum + pre-computed CTC
+        // The combined nonrefundable total is capped at the income tax.
+        var credits = profile.Credits;
 
+        // CTC needs to be computed against tax; use the pre-credit income tax
+        // as the ceiling for the nonrefundable portion per Form 8812 mechanics.
+        var ctcResult = credits.ChildTaxCreditInput is not null
+            ? _ctc.Calculate(credits.ChildTaxCreditInput, profile.FilingStatus, agi, incomeTaxBefore)
+            : ChildTaxCreditResult.Zero;
+
+        var educationResult = credits.EducationCredits is not null
+            ? _education.Calculate(credits.EducationCredits, profile.FilingStatus, agi)
+            : EducationCreditsResult.Zero;
+
+        var saversResult = credits.SaversCredit is not null
+            ? _savers.Calculate(credits.SaversCredit, profile.FilingStatus, agi)
+            : SaversCreditResult.Zero;
+
+        var legacyCtc = Math.Max(0m, credits.PrecomputedChildTaxCredit);
+        var legacyOtherNonrefundable = Math.Max(0m, credits.NonrefundableCredits);
+
+        var totalNonrefundableRequested = R(
+              ctcResult.NonrefundableApplied
+            + educationResult.TotalNonrefundable
+            + saversResult.Credit
+            + legacyCtc
+            + legacyOtherNonrefundable);
+
+        var nonrefundableApplied = Math.Min(incomeTaxBefore, totalNonrefundableRequested);
         var incomeTaxAfterCredits = R(incomeTaxBefore - nonrefundableApplied);
+
+        // Reported CTC amount: the structured calculator's nonrefundable applied
+        // plus whatever slice of the legacy pre-computed CTC can still fit under
+        // the remaining tax room. Kept additive for back-compat.
+        var taxRoomForLegacyCtc = Math.Max(0m,
+            incomeTaxBefore - ctcResult.NonrefundableApplied - educationResult.TotalNonrefundable
+              - saversResult.Credit - legacyOtherNonrefundable);
+        var reportedCtc = R(ctcResult.NonrefundableApplied + Math.Min(legacyCtc, taxRoomForLegacyCtc));
 
         // ── Step 11: Schedule 2 other taxes ──────────────────
         var niit = Math.Max(0m, profile.OtherTaxes.NetInvestmentIncomeTax);
+        if (profile.OtherTaxes.NetInvestmentIncome is not null)
+        {
+            niit += _niit.Calculate(profile.OtherTaxes.NetInvestmentIncome, profile.FilingStatus, agi);
+        }
+        niit = R(niit);
         var otherSch2 = Math.Max(0m, profile.OtherTaxes.OtherSchedule2Taxes);
         var seTaxTotal = seResult.TotalSeTax;
 
         var totalTax = R(incomeTaxAfterCredits + seTaxTotal + niit + otherSch2);
 
         // ── Step 12: Payments ─────────────────────────────────
-        // Excess SS credit: Schedule 3 line 11. When an employee has multiple
-        // employers that together withheld SS tax on wages above the annual
-        // SS wage base, the excess becomes a credit. We compute this from
-        // reported W-2 Box 4 vs. the statutory max (wage base × 6.2%).
+        // Excess SS credit: Schedule 3 line 11. When a single taxpayer has
+        // wages from two or more employers that together withheld SS tax on
+        // wages above the annual SS wage base, the excess becomes a credit.
+        //
+        // IMPORTANT: the excess-SS test is applied per taxpayer, not per
+        // return. On a joint return each spouse gets their own test — one
+        // spouse working two jobs can generate a credit even if the other
+        // spouse's SS withholding is below the base. We therefore group by
+        // <see cref="W2JobInput.Holder"/> for MFJ, and treat all jobs as the
+        // single filer's for every other status.
         var maxSsTax = R(_fica.SocialSecurityWageBase * FicaCalculator.SocialSecurityRate);
-        var excessSs = profile.W2Jobs.Count >= 2 && w2SsTax > maxSsTax
-            ? R(w2SsTax - maxSsTax)
-            : 0m;
+        var excessSs = CalculateExcessSocialSecurityCredit(
+            profile.W2Jobs, profile.FilingStatus, maxSsTax);
 
-        var refundable = Math.Max(0m, profile.Credits.RefundableCredits);
+        // Refundable credits = legacy pre-computed + refundable slice of AOTC
+        // + refundable ACTC. EITC etc. still flow through the legacy field.
+        var refundable = R(
+              Math.Max(0m, credits.RefundableCredits)
+            + educationResult.TotalRefundable
+            + ctcResult.RefundableActc);
         var estimatedPayments = Math.Max(0m, profile.EstimatedTaxPayments);
 
         var totalPayments = R(w2FedWH + estimatedPayments + excessSs + refundable);
@@ -172,7 +232,9 @@ public sealed class Form1040Calculator
 
             IncomeTaxBeforeCredits = incomeTaxBefore,
             NonrefundableCredits = R(nonrefundableApplied),
-            ChildTaxCredit = R(Math.Min(ctc, Math.Max(0m, incomeTaxBefore - otherNonrefundable))),
+            ChildTaxCredit = reportedCtc,
+            EducationCreditsNonrefundable = R(educationResult.TotalNonrefundable),
+            SaversCredit = R(saversResult.Credit),
             IncomeTaxAfterCredits = incomeTaxAfterCredits,
 
             SelfEmploymentTax = R(seTaxTotal),
@@ -184,6 +246,8 @@ public sealed class Form1040Calculator
             EstimatedTaxPayments = R(estimatedPayments),
             ExcessSocialSecurityCredit = excessSs,
             RefundableCredits = R(refundable),
+            RefundableEducationCredit = R(educationResult.TotalRefundable),
+            RefundableAdditionalChildTaxCredit = R(ctcResult.RefundableActc),
             TotalPayments = totalPayments,
 
             RefundOrOwe = refundOrOwe,
@@ -193,4 +257,43 @@ public sealed class Form1040Calculator
     }
 
     private static decimal R(decimal v) => Math.Round(v, 2, MidpointRounding.AwayFromZero);
+
+    /// <summary>
+    /// Excess Social Security tax credit (Schedule 3 line 11). Applied per
+    /// taxpayer: each spouse on a joint return is tested independently so
+    /// that one spouse with two employers can generate a credit even if the
+    /// other spouse has only one job. For single/MFS/HoH returns all jobs
+    /// are assigned to a single taxpayer bucket.
+    /// </summary>
+    private static decimal CalculateExcessSocialSecurityCredit(
+        IReadOnlyList<W2JobInput> jobs,
+        FederalFilingStatus status,
+        decimal maxSsTaxPerTaxpayer)
+    {
+        if (jobs.Count == 0) return 0m;
+
+        decimal total = 0m;
+
+        if (status == FederalFilingStatus.MarriedFilingJointly)
+        {
+            // Per-spouse test on joint returns.
+            foreach (var holder in new[] { W2JobHolder.Taxpayer, W2JobHolder.Spouse })
+            {
+                var holderJobs = jobs.Where(j => j.Holder == holder).ToList();
+                if (holderJobs.Count < 2) continue; // one employer = no credit
+                var holderSsTax = holderJobs.Sum(j => j.SocialSecurityTaxBox4);
+                if (holderSsTax > maxSsTaxPerTaxpayer)
+                {
+                    total += R(holderSsTax - maxSsTaxPerTaxpayer);
+                }
+            }
+            return total;
+        }
+
+        // Non-joint: a single-filer Spouse flag is nonsensical, but we still
+        // treat every job as the one taxpayer's job to match IRS mechanics.
+        if (jobs.Count < 2) return 0m;
+        var ssTax = jobs.Sum(j => j.SocialSecurityTaxBox4);
+        return ssTax > maxSsTaxPerTaxpayer ? R(ssTax - maxSsTaxPerTaxpayer) : 0m;
+    }
 }
