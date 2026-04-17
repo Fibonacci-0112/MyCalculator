@@ -14,6 +14,8 @@ public sealed class AnnualProjectionModel
 
     // ── Annualized amounts ──────────────────────────────────
     public decimal AnnualizedGrossPay { get; init; }
+    public decimal AnnualizedPreTaxDeductions { get; init; }
+    public decimal AnnualizedPostTaxDeductions { get; init; }
     public decimal AnnualizedFederalTaxableWages { get; init; }
     public decimal AnnualizedFicaTaxableWages { get; init; }
     public decimal AnnualizedStateTaxableWages { get; init; }

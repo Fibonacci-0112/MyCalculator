@@ -181,6 +181,42 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- Deductions Section Header -->
+                <Label Text="DEDUCTIONS" TextColor="#78909C"
+                       FontSize="11" FontAttributes="Bold"
+                       Margin="4,4,0,0"
+                       IsVisible="{Binding ShowDeductions}" />
+
+                <!-- Deductions card: Pre-Tax, Post-Tax -->
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="16,8"
+                        IsVisible="{Binding ShowDeductions}">
+                    <VerticalStackLayout Spacing="0">
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10"
+                              IsVisible="{Binding ResultCard.PreTaxDeductions, Converter={StaticResource GreaterThanZeroConverter}}">
+                            <Label Text="Pre-Tax Deductions" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding ResultCard.PreTaxDeductions, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#5D4037" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+
+                        <BoxView HeightRequest="1" Color="#F0F0F0"
+                                 IsVisible="{Binding ShowBothDeductions}" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10"
+                              IsVisible="{Binding ResultCard.PostTaxDeductions, Converter={StaticResource GreaterThanZeroConverter}}">
+                            <Label Text="Post-Tax Deductions" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding ResultCard.PostTaxDeductions, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#5D4037" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </Border>
+
                 <!-- Net Pay card -->
                 <Border BackgroundColor="#2E7D32" StrokeThickness="0"
                         StrokeShape="RoundRectangle 16" Padding="20,18">
@@ -321,6 +357,28 @@
                                    FontSize="15" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView HeightRequest="1" Color="#F0F0F0" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10"
+                              IsVisible="{Binding Projection.AnnualizedPreTaxDeductions, Converter={StaticResource GreaterThanZeroConverter}}">
+                            <Label Text="Pre-Tax Deductions" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Projection.AnnualizedPreTaxDeductions, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#5D4037" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="#F0F0F0"
+                                 IsVisible="{Binding Projection.AnnualizedPreTaxDeductions, Converter={StaticResource GreaterThanZeroConverter}}" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10"
+                              IsVisible="{Binding Projection.AnnualizedPostTaxDeductions, Converter={StaticResource GreaterThanZeroConverter}}">
+                            <Label Text="Post-Tax Deductions" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding Projection.AnnualizedPostTaxDeductions, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#5D4037" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="#F0F0F0"
+                                 IsVisible="{Binding Projection.AnnualizedPostTaxDeductions, Converter={StaticResource GreaterThanZeroConverter}}" />
 
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
                             <Label Text="Federal Taxable Wages" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
