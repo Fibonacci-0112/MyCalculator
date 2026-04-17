@@ -152,6 +152,20 @@ public sealed class TaxYearProfile
     public decimal EstimatedTaxPayments { get; init; }
 
     /// <summary>
+    /// Optional prior-year figures enabling the 100% / 110% prior-year safe
+    /// harbor on the 1040-ES worksheet. When null, the annual engine falls
+    /// back to the 90%-of-current-year safe harbor for quarterly estimates.
+    /// </summary>
+    public PriorYearSafeHarborInput? PriorYearSafeHarbor { get; init; }
+
+    /// <summary>
+    /// Expected additional federal withholding beyond W-2 Box 2 (e.g. 1099-R
+    /// voluntary withholding). Combined with W-2 withholding when computing
+    /// whether estimates are required. Defaults to 0.
+    /// </summary>
+    public decimal AdditionalExpectedWithholding { get; init; }
+
+    /// <summary>
     /// Optional state-specific input values (e.g., Alabama dependents, IL-W-4
     /// allowances) consumed by the registered <see cref="IStateWithholdingCalculator"/>
     /// for <see cref="ResidenceState"/> when the annual state-tax projection
