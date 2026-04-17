@@ -126,4 +126,12 @@ public sealed class AnnualTaxResult
 
     /// <summary>Marginal federal bracket rate for taxable income (0–1 decimal, e.g. 0.22m).</summary>
     public decimal MarginalTaxRate { get; init; }
+
+    // ── Annual state tax projection ─────────────────────────
+    /// <summary>
+    /// Annual state/local income tax projection for the residence state,
+    /// produced by <c>AnnualStateTaxCalculator</c> when wired in. Null when
+    /// the orchestrator is run without a state calculator (back-compat).
+    /// </summary>
+    public AnnualStateTaxResult? StateTax { get; init; }
 }

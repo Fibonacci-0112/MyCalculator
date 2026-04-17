@@ -1,4 +1,5 @@
 using PaycheckCalc.Core.Tax.Federal;
+using PaycheckCalc.Core.Tax.State;
 
 namespace PaycheckCalc.Core.Models;
 
@@ -149,4 +150,13 @@ public sealed class TaxYearProfile
     /// Added to total payments alongside W-2 federal withholding.
     /// </summary>
     public decimal EstimatedTaxPayments { get; init; }
+
+    /// <summary>
+    /// Optional state-specific input values (e.g., Alabama dependents, IL-W-4
+    /// allowances) consumed by the registered <see cref="IStateWithholdingCalculator"/>
+    /// for <see cref="ResidenceState"/> when the annual state-tax projection
+    /// runs. Null / empty is accepted — calculators fall back to their own
+    /// defaults.
+    /// </summary>
+    public StateInputValues? StateInputValues { get; init; }
 }
