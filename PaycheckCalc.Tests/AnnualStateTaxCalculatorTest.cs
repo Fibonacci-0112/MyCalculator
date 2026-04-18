@@ -2,6 +2,7 @@ using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Tax.Federal;
 using PaycheckCalc.Core.Tax.Federal.Annual;
 using PaycheckCalc.Core.Tax.Fica;
+using PaycheckCalc.Core.Tax.Georgia;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.SelfEmployment;
 using PaycheckCalc.Core.Tax.State;
@@ -33,13 +34,17 @@ public class AnnualStateTaxCalculatorTest
         registry.Register(new PennsylvaniaWithholdingCalculator());
 
         // Percentage-method configs (annualized). Utah (flat 4.65%, no std
-        // deduction/allowances) and Georgia (flat 5.29%, $7,100 / $24,000
-        // std deduction) give clean hand-computable scenarios.
+        // deduction/allowances) gives a clean hand-computable scenario.
         foreach (var (state, config) in StateTaxConfigs2026.Configs)
         {
-            if (state == UsState.UT || state == UsState.GA)
+            if (state == UsState.UT)
                 registry.Register(new PercentageMethodWithholdingAdapter(state, config));
         }
+
+        // Georgia — dedicated calculator (flat 5.19%, $12,000 / $24,000 std
+        // deductions, $4,000 dependent allowance) per the 2026 Employer's
+        // Tax Guide.
+        registry.Register(new GeorgiaWithholdingCalculator());
 
         return registry;
     }
@@ -127,11 +132,11 @@ public class AnnualStateTaxCalculatorTest
         Assert.Equal(-4_650.00m, result.StateRefundOrOwe);
     }
 
-    // ── Georgia flat 5.29% with $7,100 single std deduction ─
-    // Wages $70,000, Box 17 $3,700.
-    // Annual taxable = 70,000 − 7,100 = $62,900.
-    // Liability = 62,900 × 5.29% = $3,327.41.
-    // Refund = 3,700 − 3,327.41 = $372.59.
+    // ── Georgia flat 5.19% with $12,000 single std deduction ─
+    // Wages $70,000, Box 17 $3,700. G-4 defaults to status A (Single).
+    // Annual taxable = 70,000 − 12,000 = $58,000.
+    // Liability = 58,000 × 5.19% = $3,010.20.
+    // Refund = 3,700 − 3,010.20 = $689.80.
     [Fact]
     public void Georgia_AppliesSingleStandardDeduction()
     {
@@ -153,9 +158,9 @@ public class AnnualStateTaxCalculatorTest
 
         var result = calc.Calculate(profile, federalTaxAnnual: 6_000m);
 
-        Assert.Equal(3_327.41m, result.StateIncomeTax);
+        Assert.Equal(3_010.20m, result.StateIncomeTax);
         Assert.Equal(3_700m, result.StateTaxWithheld);
-        Assert.Equal(372.59m, result.StateRefundOrOwe);
+        Assert.Equal(689.80m, result.StateRefundOrOwe);
     }
 
     // ── Fallback from Box 1 when Box 16 is missing ─────────

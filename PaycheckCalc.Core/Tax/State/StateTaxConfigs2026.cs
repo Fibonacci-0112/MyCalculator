@@ -27,13 +27,10 @@ public static class StateTaxConfigs2026
 
             // Colorado uses a dedicated calculator (ColoradoWithholdingCalculator)
 
-            [UsState.GA] = new()
-            {
-                StandardDeductionSingle = 7_100m,
-                StandardDeductionMarried = 24_000m,
-                BracketsSingle = [B(0, null, 0.0529m)],
-                BracketsMarried = [B(0, null, 0.0529m)]
-            },
+            // Georgia uses a dedicated calculator (GeorgiaWithholdingCalculator)
+            // — flat 5.19% with G-4 filing statuses A/B/C/D, $12,000/$24,000
+            // standard deductions, $4,000 dependent allowance, and $3,000
+            // additional allowance per HB 111 and the 2026 Employer's Tax Guide.
 
             [UsState.ID] = new()
             {

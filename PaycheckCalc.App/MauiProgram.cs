@@ -15,6 +15,7 @@ using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Colorado;
 using PaycheckCalc.Core.Tax.Connecticut;
 using PaycheckCalc.Core.Tax.Delaware;
+using PaycheckCalc.Core.Tax.Georgia;
 using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
@@ -119,6 +120,11 @@ public static class MauiProgram
 
             // Delaware — DE W-4, percentage method with personal credits
             registry.Register(new DelawareWithholdingCalculator());
+
+            // Georgia — flat 5.19% with G-4 filing statuses, dependents,
+            // standard deduction, and additional allowances (HB 111 / 2026
+            // Employer's Tax Guide)
+            registry.Register(new GeorgiaWithholdingCalculator());
 
             // Illinois — flat 4.95% with IL-W-4 basic and additional allowances
             registry.Register(new IllinoisWithholdingCalculator());
