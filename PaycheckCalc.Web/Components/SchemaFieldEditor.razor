@@ -1,0 +1,105 @@
+@*
+    Renders a state calculator's IStateWithholdingCalculator.GetInputSchema()
+    as a stack of dynamic form controls. Mirrors the schema-driven approach
+    used in the MAUI app's StatePage so per-state UI never gets hardcoded.
+*@
+
+@if (Schema is null || Schema.Count == 0)
+{
+    <p class="muted">No additional inputs required.</p>
+}
+else
+{
+    @foreach (var field in Schema)
+    {
+        <div class="field">
+            <label for="@FieldId(field.Key)">
+                @field.Label
+                @if (field.IsRequired)
+                {
+                    <span class="required">*</span>
+                }
+            </label>
+
+            @switch (field.FieldType)
+            {
+                case StateFieldType.Picker:
+                    <select id="@FieldId(field.Key)" class="input"
+                            value="@StringValue(field.Key)"
+                            @onchange="e => SetValue(field.Key, e.Value?.ToString())">
+                        @foreach (var option in field.Options ?? Array.Empty<string>())
+                        {
+                            <option value="@option">@option</option>
+                        }
+                    </select>
+                    break;
+
+                case StateFieldType.Toggle:
+                    <input id="@FieldId(field.Key)" type="checkbox"
+                           checked="@BoolValue(field.Key)"
+                           @onchange="e => SetValue(field.Key, (bool)(e.Value ?? false))" />
+                    break;
+
+                case StateFieldType.Integer:
+                    <input id="@FieldId(field.Key)" type="number" step="1" inputmode="numeric"
+                           class="input"
+                           value="@StringValue(field.Key)"
+                           @onchange="e => SetValue(field.Key, ParseInt(e.Value?.ToString()))" />
+                    break;
+
+                case StateFieldType.Decimal:
+                    <input id="@FieldId(field.Key)" type="number" step="0.01" inputmode="decimal"
+                           class="input"
+                           value="@StringValue(field.Key)"
+                           @onchange="e => SetValue(field.Key, ParseDecimal(e.Value?.ToString()))" />
+                    break;
+
+                default: // Text
+                    <input id="@FieldId(field.Key)" type="text"
+                           class="input"
+                           value="@StringValue(field.Key)"
+                           @onchange="e => SetValue(field.Key, e.Value?.ToString())" />
+                    break;
+            }
+        </div>
+    }
+}
+
+@code {
+    /// <summary>Field schema returned by the calculator.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<StateFieldDefinition>? Schema { get; set; }
+
+    /// <summary>Backing dictionary the UI mutates in place. Works with both <c>StateInputValues</c> and <c>LocalInputValues</c>.</summary>
+    [Parameter, EditorRequired] public IDictionary<string, object?> Values { get; set; } = new Dictionary<string, object?>();
+
+    /// <summary>Optional id prefix so multiple editors on one page don't collide.</summary>
+    [Parameter] public string IdPrefix { get; set; } = "field";
+
+    private string FieldId(string key) => $"{IdPrefix}-{key}";
+
+    private string StringValue(string key) =>
+        Values.TryGetValue(key, out var raw) ? raw?.ToString() ?? string.Empty : string.Empty;
+
+    private bool BoolValue(string key)
+    {
+        if (Values.TryGetValue(key, out var raw))
+        {
+            if (raw is bool b) return b;
+            if (raw is string s && bool.TryParse(s, out var parsed)) return parsed;
+        }
+        return false;
+    }
+
+    private void SetValue(string key, object? value)
+    {
+        Values[key] = value;
+    }
+
+    private static int ParseInt(string? raw) =>
+        int.TryParse(raw, System.Globalization.NumberStyles.Integer,
+                     System.Globalization.CultureInfo.InvariantCulture, out var n) ? n : 0;
+
+    private static decimal ParseDecimal(string? raw) =>
+        decimal.TryParse(raw, System.Globalization.NumberStyles.Number,
+                         System.Globalization.CultureInfo.InvariantCulture, out var d) ? d : 0m;
+}

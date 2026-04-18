@@ -4,6 +4,7 @@ using PaycheckCalc.App.Services;
 using PaycheckCalc.App.Storage;
 using PaycheckCalc.App.ViewModels;
 using PaycheckCalc.App.Views;
+using PaycheckCalc.Core.Data;
 using PaycheckCalc.Core.Geocoding;
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Pay;
@@ -42,51 +43,48 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
+        // Single asset loader shared by every JSON-backed calculator below.
+        builder.Services.AddSingleton<ITaxDataAssetLoader, MauiTaxDataAssetLoader>();
+
         builder.Services.AddSingleton<ArkansasFormulaCalculator>(sp =>
         {
-            using var stream = FileSystem.OpenAppPackageFileAsync("ar_withholding_2026.json").Result;
-            using var reader = new StreamReader(stream);
-            var json = reader.ReadToEnd();
+            var json = sp.GetRequiredService<ITaxDataAssetLoader>()
+                .ReadAllTextAsync("ar_withholding_2026.json").GetAwaiter().GetResult();
 
             return new ArkansasFormulaCalculator(json);
         });
         builder.Services.AddSingleton<OklahomaOw2PercentageCalculator>(sp =>
         {
-            using var stream = FileSystem.OpenAppPackageFileAsync("ok_ow2_2026_percentage.json").Result;
-            using var reader = new StreamReader(stream);
-            var json = reader.ReadToEnd();
+            var json = sp.GetRequiredService<ITaxDataAssetLoader>()
+                .ReadAllTextAsync("ok_ow2_2026_percentage.json").GetAwaiter().GetResult();
 
             return new OklahomaOw2PercentageCalculator(json);
         });
         builder.Services.AddSingleton<Irs15TPercentageCalculator>(sp =>
         {
-            using var stream = FileSystem.OpenAppPackageFileAsync("us_irs_15t_2026_percentage_automated.json").Result;
-            using var reader = new StreamReader(stream);
-            var json = reader.ReadToEnd();
+            var json = sp.GetRequiredService<ITaxDataAssetLoader>()
+                .ReadAllTextAsync("us_irs_15t_2026_percentage_automated.json").GetAwaiter().GetResult();
 
             return new Irs15TPercentageCalculator(json);
         });
         builder.Services.AddSingleton<CaliforniaPercentageCalculator>(sp =>
         {
-            using var stream = FileSystem.OpenAppPackageFileAsync("ca_method_b_2026.json").Result;
-            using var reader = new StreamReader(stream);
-            var json = reader.ReadToEnd();
+            var json = sp.GetRequiredService<ITaxDataAssetLoader>()
+                .ReadAllTextAsync("ca_method_b_2026.json").GetAwaiter().GetResult();
 
             return new CaliforniaPercentageCalculator(json);
         });
         builder.Services.AddSingleton<ColoradoWithholdingCalculator>(sp =>
         {
-            using var stream = FileSystem.OpenAppPackageFileAsync("co_dr0004_2026.json").Result;
-            using var reader = new StreamReader(stream);
-            var json = reader.ReadToEnd();
+            var json = sp.GetRequiredService<ITaxDataAssetLoader>()
+                .ReadAllTextAsync("co_dr0004_2026.json").GetAwaiter().GetResult();
 
             return new ColoradoWithholdingCalculator(json);
         });
         builder.Services.AddSingleton<ConnecticutWithholdingCalculator>(sp =>
         {
-            using var stream = FileSystem.OpenAppPackageFileAsync("connecticut_withholding_2026.json").Result;
-            using var reader = new StreamReader(stream);
-            var json = reader.ReadToEnd();
+            var json = sp.GetRequiredService<ITaxDataAssetLoader>()
+                .ReadAllTextAsync("connecticut_withholding_2026.json").GetAwaiter().GetResult();
 
             return new ConnecticutWithholdingCalculator(json);
         });
@@ -155,37 +153,37 @@ public static class MauiProgram
             var registry = new LocalCalculatorRegistry();
 
             // Pennsylvania Act 32 EIT + LST
-            using (var stream = FileSystem.OpenAppPackageFileAsync("pa_eit_2026.json").Result)
-            using (var reader = new StreamReader(stream))
             {
-                registry.Register(new PaEitCalculator(new PaEitRateTable(reader.ReadToEnd())));
+                var loader = sp.GetRequiredService<ITaxDataAssetLoader>();
+                var paJson = loader.ReadAllTextAsync("pa_eit_2026.json").GetAwaiter().GetResult();
+                registry.Register(new PaEitCalculator(new PaEitRateTable(paJson)));
             }
             registry.Register(new PaLstCalculator());
 
             // New York City
-            using (var stream = FileSystem.OpenAppPackageFileAsync("nyc_withholding_2026.json").Result)
-            using (var reader = new StreamReader(stream))
             {
-                registry.Register(new NycWithholdingCalculator(reader.ReadToEnd()));
+                var loader = sp.GetRequiredService<ITaxDataAssetLoader>();
+                var nycJson = loader.ReadAllTextAsync("nyc_withholding_2026.json").GetAwaiter().GetResult();
+                registry.Register(new NycWithholdingCalculator(nycJson));
             }
 
             // Ohio RITA + CCA
-            using (var stream = FileSystem.OpenAppPackageFileAsync("oh_rita_2026.json").Result)
-            using (var reader = new StreamReader(stream))
             {
-                registry.Register(new OhRitaCalculator(reader.ReadToEnd()));
+                var loader = sp.GetRequiredService<ITaxDataAssetLoader>();
+                var ritaJson = loader.ReadAllTextAsync("oh_rita_2026.json").GetAwaiter().GetResult();
+                registry.Register(new OhRitaCalculator(ritaJson));
             }
-            using (var stream = FileSystem.OpenAppPackageFileAsync("oh_cca_2026.json").Result)
-            using (var reader = new StreamReader(stream))
             {
-                registry.Register(new OhCcaCalculator(reader.ReadToEnd()));
+                var loader = sp.GetRequiredService<ITaxDataAssetLoader>();
+                var ccaJson = loader.ReadAllTextAsync("oh_cca_2026.json").GetAwaiter().GetResult();
+                registry.Register(new OhCcaCalculator(ccaJson));
             }
 
             // Maryland county surtax
-            using (var stream = FileSystem.OpenAppPackageFileAsync("md_county_surtax_2026.json").Result)
-            using (var reader = new StreamReader(stream))
             {
-                registry.Register(new MdCountyCalculator(reader.ReadToEnd()));
+                var loader = sp.GetRequiredService<ITaxDataAssetLoader>();
+                var mdJson = loader.ReadAllTextAsync("md_county_surtax_2026.json").GetAwaiter().GetResult();
+                registry.Register(new MdCountyCalculator(mdJson));
             }
 
             return registry;
@@ -224,9 +222,8 @@ public static class MauiProgram
         // ── Annual Form 1040 engine ─────────────────────────
         builder.Services.AddSingleton<Federal1040TaxCalculator>(sp =>
         {
-            using var stream = FileSystem.OpenAppPackageFileAsync("federal_1040_brackets_2026.json").Result;
-            using var reader = new StreamReader(stream);
-            var json = reader.ReadToEnd();
+            var json = sp.GetRequiredService<ITaxDataAssetLoader>()
+                .ReadAllTextAsync("federal_1040_brackets_2026.json").GetAwaiter().GetResult();
             return new Federal1040TaxCalculator(json);
         });
         builder.Services.AddSingleton<Schedule1Calculator>();
