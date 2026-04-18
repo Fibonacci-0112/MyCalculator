@@ -240,6 +240,7 @@ public static class MauiProgram
                 sp.GetRequiredService<QbiDeductionCalculator>(),
                 sp.GetRequiredService<FicaCalculator>(),
                 stateTax: sp.GetRequiredService<AnnualStateTaxCalculator>()));
+        builder.Services.AddSingleton<WithholdingSuggestionCalculator>();
 
         builder.Services.AddSingleton<CalculatorViewModel>();
         builder.Services.AddSingleton<SavedPaychecksViewModel>();
