@@ -355,4 +355,168 @@ public class WithholdingSuggestionCalculatorTest
         Assert.Equal(0m, result.ExtraPerPaycheckFederalWithholding);
         Assert.Equal(0m, result.SuggestedQuarterlyEstimatedPayment);
     }
+
+    // ── Round-trip verification ──────────────────────────────────────
+    //
+    // Phase 9 priority: "apply suggestion → projected result hits target
+    // within $1". Simulates the taxpayer applying the calculator's
+    // suggestion for a full tax year and verifies that the new projected
+    // refund/owe position lands at the target (within the ±$1 tolerance
+    // from W-4 Step 4c penny rounding).
+    //
+    // New projection = current + totalExtraFederal + totalExtraState
+    //                          + totalEstimatedPayments.
+
+    private const decimal RoundTripToleranceDollars = 1m;
+
+    private static decimal RoundTripProjection(
+        WithholdingSuggestionInput input,
+        WithholdingSuggestionResult result)
+        => input.CurrentProjectedRefundOrOwe
+           + result.TotalExtraFederalWithholding
+           + result.TotalExtraStateWithholding
+           + result.TotalSuggestedEstimatedPayments;
+
+    [Fact]
+    public void RoundTrip_ZeroBalanceFederalOnly_LandsOnTarget()
+    {
+        var input = new WithholdingSuggestionInput
+        {
+            CurrentProjectedRefundOrOwe = -1_040m,
+            RemainingFederalPayPeriods = 8,
+            Target = WithholdingSuggestionTarget.ZeroBalance()
+        };
+
+        var result = _calc.Calculate(input);
+        var newProjection = RoundTripProjection(input, result);
+
+        Assert.True(result.IsFeasible);
+        // -1040 + 1040.00 = 0.00 → well within $1 of target (0).
+        Assert.True(
+            Math.Abs(newProjection - result.TargetRefundOrOwe) <= RoundTripToleranceDollars,
+            $"Round-trip missed target: projected={newProjection}, target={result.TargetRefundOrOwe}");
+        Assert.Equal(0m, newProjection);
+    }
+
+    [Fact]
+    public void RoundTrip_Refund500Target_LandsOnTarget()
+    {
+        var input = new WithholdingSuggestionInput
+        {
+            CurrentProjectedRefundOrOwe = -1_500m,
+            RemainingFederalPayPeriods = 10,
+            Target = WithholdingSuggestionTarget.Refund(500m)
+        };
+
+        var result = _calc.Calculate(input);
+        var newProjection = RoundTripProjection(input, result);
+
+        Assert.True(result.IsFeasible);
+        // -1500 + 2000.00 = 500.00 = target refund exactly.
+        Assert.Equal(500m, newProjection);
+        Assert.True(Math.Abs(newProjection - 500m) <= RoundTripToleranceDollars);
+    }
+
+    [Fact]
+    public void RoundTrip_OweNoMoreThan300_LandsOnTarget()
+    {
+        var input = new WithholdingSuggestionInput
+        {
+            CurrentProjectedRefundOrOwe = -900m,
+            RemainingFederalPayPeriods = 6,
+            Target = WithholdingSuggestionTarget.OweNoMoreThan(300m)
+        };
+
+        var result = _calc.Calculate(input);
+        var newProjection = RoundTripProjection(input, result);
+
+        Assert.True(result.IsFeasible);
+        // Target = owe $300 = refund-or-owe of −$300. −900 + 600 = −300.
+        Assert.Equal(-300m, newProjection);
+        Assert.True(Math.Abs(newProjection - (-300m)) <= RoundTripToleranceDollars);
+    }
+
+    [Fact]
+    public void RoundTrip_StateOnlyAllocation_LandsOnTarget()
+    {
+        var input = new WithholdingSuggestionInput
+        {
+            CurrentProjectedRefundOrOwe = -600m,
+            RemainingStatePayPeriods = 12,
+            Target = WithholdingSuggestionTarget.ZeroBalance(),
+            Allocation = SuggestionAllocation.StateWithholdingOnly
+        };
+
+        var result = _calc.Calculate(input);
+        var newProjection = RoundTripProjection(input, result);
+
+        Assert.True(result.IsFeasible);
+        // -600 + 600.00 (state) = 0 → on target.
+        Assert.Equal(0m, newProjection);
+    }
+
+    [Fact]
+    public void RoundTrip_EstimatedPaymentsOnly_LandsOnTarget()
+    {
+        var input = new WithholdingSuggestionInput
+        {
+            CurrentProjectedRefundOrOwe = -4_000m,
+            RemainingEstimatedPaymentPeriods = 4,
+            Target = WithholdingSuggestionTarget.ZeroBalance(),
+            Allocation = SuggestionAllocation.EstimatedPaymentsOnly
+        };
+
+        var result = _calc.Calculate(input);
+        var newProjection = RoundTripProjection(input, result);
+
+        Assert.True(result.IsFeasible);
+        // -4000 + 4000 (4 × $1000 estimates) = 0.
+        Assert.Equal(0m, newProjection);
+    }
+
+    [Fact]
+    public void RoundTrip_SplitAllocation_LandsOnTarget()
+    {
+        var input = new WithholdingSuggestionInput
+        {
+            CurrentProjectedRefundOrOwe = -4_000m,
+            RemainingFederalPayPeriods = 10,
+            RemainingStatePayPeriods = 10,
+            RemainingEstimatedPaymentPeriods = 4,
+            Target = WithholdingSuggestionTarget.ZeroBalance(),
+            Allocation = SuggestionAllocation.Split,
+            FederalWeight = 2m,
+            StateWeight = 1m,
+            EstimatedPaymentWeight = 1m
+        };
+
+        var result = _calc.Calculate(input);
+        var newProjection = RoundTripProjection(input, result);
+
+        Assert.True(result.IsFeasible);
+        // -4000 + 2000 + 1000 + 1000 = 0 exactly.
+        Assert.Equal(0m, newProjection);
+        Assert.True(Math.Abs(newProjection - result.TargetRefundOrOwe) <= RoundTripToleranceDollars);
+    }
+
+    [Fact]
+    public void RoundTrip_PennyRoundingResidual_StaysWithinOneDollarTolerance()
+    {
+        // $100 across 3 paychecks → $33.33 × 3 = $99.99. Residual $0.01
+        // leaves the projection one penny short of target but well inside
+        // the Phase 9 ±$1 tolerance.
+        var input = new WithholdingSuggestionInput
+        {
+            CurrentProjectedRefundOrOwe = -100m,
+            RemainingFederalPayPeriods = 3,
+            Target = WithholdingSuggestionTarget.ZeroBalance()
+        };
+
+        var result = _calc.Calculate(input);
+        var newProjection = RoundTripProjection(input, result);
+
+        Assert.True(result.IsFeasible);
+        Assert.Equal(-0.01m, newProjection); // one-cent residual
+        Assert.True(Math.Abs(newProjection - result.TargetRefundOrOwe) <= RoundTripToleranceDollars);
+    }
 }
