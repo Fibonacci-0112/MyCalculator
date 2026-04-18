@@ -485,6 +485,136 @@ public class Form1040CalculatorTest
         Assert.Equal(500.00m, result.RefundOrOwe); // full WH refunded
     }
 
+    // ── Standard-deduction edge tests (Phase 9 priority) ──────────
+    //
+    // Single 2026 std deduction = $16,100. One dollar below → taxable = $0,
+    // tax = $0. One dollar above → taxable = $1, first-bracket tax = $0.10.
+
+    [Fact]
+    public void Single_WagesOneDollarBelowStdDeduction_ZeroTax()
+    {
+        // $16,099 AGI − $16,100 std ded → taxable floors at 0 → tax = $0.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 16_099m,
+                    FederalWithholdingBox2 = 0m,
+                    SocialSecurityWagesBox3 = 16_099m,
+                    MedicareWagesBox5 = 16_099m,
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(16_099m, result.AdjustedGrossIncome);
+        Assert.Equal(16_100m, result.StandardDeduction);
+        Assert.Equal(0m, result.TaxableIncome);
+        Assert.Equal(0m, result.IncomeTaxBeforeCredits);
+    }
+
+    [Fact]
+    public void Single_WagesExactlyAtStdDeduction_ZeroTaxableIncome()
+    {
+        // $16,100 AGI − $16,100 std ded → taxable = $0 → tax = $0.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 16_100m,
+                    SocialSecurityWagesBox3 = 16_100m,
+                    MedicareWagesBox5 = 16_100m,
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(0m, result.TaxableIncome);
+        Assert.Equal(0m, result.IncomeTaxBeforeCredits);
+    }
+
+    [Fact]
+    public void Single_WagesOneDollarAboveStdDeduction_TaxableIsOneDollar()
+    {
+        // $16,101 AGI − $16,100 std ded → taxable = $1 → tax = 10% × $1 = $0.10.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.SingleOrMarriedSeparately,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 16_101m,
+                    SocialSecurityWagesBox3 = 16_101m,
+                    MedicareWagesBox5 = 16_101m,
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(1m, result.TaxableIncome);
+        Assert.Equal(0.10m, result.IncomeTaxBeforeCredits);
+    }
+
+    [Fact]
+    public void Mfj_WagesExactlyAtStdDeduction_ZeroTaxableIncome()
+    {
+        // MFJ std deduction = $32,200. $32,200 wages → taxable = $0.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.MarriedFilingJointly,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 32_200m,
+                    SocialSecurityWagesBox3 = 32_200m,
+                    MedicareWagesBox5 = 32_200m,
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(32_200m, result.StandardDeduction);
+        Assert.Equal(0m, result.TaxableIncome);
+        Assert.Equal(0m, result.IncomeTaxBeforeCredits);
+    }
+
+    [Fact]
+    public void HoH_WagesOneDollarAboveStdDeduction_TaxableIsOneDollar()
+    {
+        // HoH std deduction = $24,150. $24,151 wages → taxable = $1, tax = $0.10.
+        var profile = new TaxYearProfile
+        {
+            FilingStatus = FederalFilingStatus.HeadOfHousehold,
+            W2Jobs = new[]
+            {
+                new W2JobInput
+                {
+                    WagesBox1 = 24_151m,
+                    SocialSecurityWagesBox3 = 24_151m,
+                    MedicareWagesBox5 = 24_151m,
+                }
+            }
+        };
+
+        var result = _calc.Calculate(profile);
+
+        Assert.Equal(24_150m, result.StandardDeduction);
+        Assert.Equal(1m, result.TaxableIncome);
+        Assert.Equal(0.10m, result.IncomeTaxBeforeCredits);
+    }
+
     [Fact]
     public void EstimatedTaxPayments_CountAsPayments()
     {

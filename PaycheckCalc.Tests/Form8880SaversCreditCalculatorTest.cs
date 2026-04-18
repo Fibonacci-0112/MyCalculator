@@ -166,4 +166,167 @@ public class Form8880SaversCreditCalculatorTest
         var result = _calc.Calculate(new SaversCreditInput(), FederalFilingStatus.SingleOrMarriedSeparately, 20_000m);
         Assert.Equal(0m, result.Credit);
     }
+
+    // ── Rate-table boundary tests (Rev. Proc. 2025-32) ───────────
+    //
+    // The bands are defined with <= at each upper edge: an AGI exactly at
+    // the top of a band keeps that band's rate; one cent above flips to
+    // the next (lower) rate. These regressions pin that behavior so a
+    // later refactor can't silently change an inclusive boundary into an
+    // exclusive one (or vice versa).
+
+    [Fact]
+    public void Single_AgiExactlyAt25000_Keeps50Percent()
+    {
+        var input = new SaversCreditInput { TaxpayerContributions = 2_000m };
+        var result = _calc.Calculate(input, FederalFilingStatus.SingleOrMarriedSeparately, 25_000.00m);
+
+        Assert.Equal(0.50m, result.Rate);
+        Assert.Equal(1_000m, result.Credit);
+    }
+
+    [Fact]
+    public void Single_AgiOnePennyAbove25000_Drops_To20Percent()
+    {
+        var input = new SaversCreditInput { TaxpayerContributions = 2_000m };
+        var result = _calc.Calculate(input, FederalFilingStatus.SingleOrMarriedSeparately, 25_000.01m);
+
+        Assert.Equal(0.20m, result.Rate);
+        Assert.Equal(400m, result.Credit);
+    }
+
+    [Fact]
+    public void Single_AgiExactlyAt27250_Keeps20Percent()
+    {
+        var input = new SaversCreditInput { TaxpayerContributions = 2_000m };
+        var result = _calc.Calculate(input, FederalFilingStatus.SingleOrMarriedSeparately, 27_250.00m);
+
+        Assert.Equal(0.20m, result.Rate);
+        Assert.Equal(400m, result.Credit);
+    }
+
+    [Fact]
+    public void Single_AgiOnePennyAbove27250_Drops_To10Percent()
+    {
+        var input = new SaversCreditInput { TaxpayerContributions = 2_000m };
+        var result = _calc.Calculate(input, FederalFilingStatus.SingleOrMarriedSeparately, 27_250.01m);
+
+        Assert.Equal(0.10m, result.Rate);
+        Assert.Equal(200m, result.Credit);
+    }
+
+    [Fact]
+    public void Single_AgiExactlyAt42000_Keeps10Percent()
+    {
+        var input = new SaversCreditInput { TaxpayerContributions = 2_000m };
+        var result = _calc.Calculate(input, FederalFilingStatus.SingleOrMarriedSeparately, 42_000.00m);
+
+        Assert.Equal(0.10m, result.Rate);
+        Assert.Equal(200m, result.Credit);
+    }
+
+    [Fact]
+    public void Single_AgiOnePennyAbove42000_DropsToZero()
+    {
+        var input = new SaversCreditInput { TaxpayerContributions = 2_000m };
+        var result = _calc.Calculate(input, FederalFilingStatus.SingleOrMarriedSeparately, 42_000.01m);
+
+        Assert.Equal(0m, result.Rate);
+        Assert.Equal(0m, result.Credit);
+    }
+
+    [Fact]
+    public void Hoh_AgiExactlyAt37500_Keeps50Percent()
+    {
+        var input = new SaversCreditInput { TaxpayerContributions = 2_000m };
+        var result = _calc.Calculate(input, FederalFilingStatus.HeadOfHousehold, 37_500.00m);
+
+        Assert.Equal(0.50m, result.Rate);
+        Assert.Equal(1_000m, result.Credit);
+    }
+
+    [Fact]
+    public void Hoh_AgiExactlyAt40875_Keeps20Percent()
+    {
+        var input = new SaversCreditInput { TaxpayerContributions = 2_000m };
+        var result = _calc.Calculate(input, FederalFilingStatus.HeadOfHousehold, 40_875.00m);
+
+        Assert.Equal(0.20m, result.Rate);
+        Assert.Equal(400m, result.Credit);
+    }
+
+    [Fact]
+    public void Hoh_AgiExactlyAt63000_Keeps10Percent()
+    {
+        var input = new SaversCreditInput { TaxpayerContributions = 2_000m };
+        var result = _calc.Calculate(input, FederalFilingStatus.HeadOfHousehold, 63_000.00m);
+
+        Assert.Equal(0.10m, result.Rate);
+        Assert.Equal(200m, result.Credit);
+    }
+
+    [Fact]
+    public void Hoh_AgiOnePennyAbove63000_DropsToZero()
+    {
+        var input = new SaversCreditInput { TaxpayerContributions = 2_000m };
+        var result = _calc.Calculate(input, FederalFilingStatus.HeadOfHousehold, 63_000.01m);
+
+        Assert.Equal(0m, result.Credit);
+    }
+
+    [Fact]
+    public void Mfj_AgiExactlyAt50000_Keeps50Percent()
+    {
+        var input = new SaversCreditInput
+        {
+            TaxpayerContributions = 2_000m,
+            SpouseContributions = 2_000m
+        };
+        var result = _calc.Calculate(input, FederalFilingStatus.MarriedFilingJointly, 50_000.00m);
+
+        Assert.Equal(0.50m, result.Rate);
+        // 50% × ($2,000 + $2,000) = $2,000
+        Assert.Equal(2_000m, result.Credit);
+    }
+
+    [Fact]
+    public void Mfj_AgiExactlyAt54500_Keeps20Percent()
+    {
+        var input = new SaversCreditInput
+        {
+            TaxpayerContributions = 2_000m,
+            SpouseContributions = 2_000m
+        };
+        var result = _calc.Calculate(input, FederalFilingStatus.MarriedFilingJointly, 54_500.00m);
+
+        Assert.Equal(0.20m, result.Rate);
+        Assert.Equal(800m, result.Credit);
+    }
+
+    [Fact]
+    public void Mfj_AgiExactlyAt84000_Keeps10Percent()
+    {
+        var input = new SaversCreditInput
+        {
+            TaxpayerContributions = 2_000m,
+            SpouseContributions = 2_000m
+        };
+        var result = _calc.Calculate(input, FederalFilingStatus.MarriedFilingJointly, 84_000.00m);
+
+        Assert.Equal(0.10m, result.Rate);
+        Assert.Equal(400m, result.Credit);
+    }
+
+    [Fact]
+    public void Mfj_AgiOnePennyAbove84000_DropsToZero()
+    {
+        var input = new SaversCreditInput
+        {
+            TaxpayerContributions = 2_000m,
+            SpouseContributions = 2_000m
+        };
+        var result = _calc.Calculate(input, FederalFilingStatus.MarriedFilingJointly, 84_000.01m);
+
+        Assert.Equal(0m, result.Credit);
+    }
 }
