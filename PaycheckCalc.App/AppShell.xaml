@@ -31,8 +31,23 @@
     <FlyoutItem Title="SE Results" Route="SEResults">
         <ShellContent ContentTemplate="{DataTemplate views:SelfEmploymentResultsPage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Annual Tax" Route="AnnualTax">
-        <ShellContent ContentTemplate="{DataTemplate views:AnnualTaxPage}" />
+    <FlyoutItem Title="Annual Projection" Route="AnnualProjection">
+        <ShellContent ContentTemplate="{DataTemplate views:AnnualProjectionPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Jobs &amp; YTD" Route="JobsAndYtd">
+        <ShellContent ContentTemplate="{DataTemplate views:JobsAndYtdPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Other Income &amp; Adjustments" Route="OtherIncomeAdjustments">
+        <ShellContent ContentTemplate="{DataTemplate views:OtherIncomeAdjustmentsPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Credits" Route="Credits">
+        <ShellContent ContentTemplate="{DataTemplate views:CreditsPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Quarterly Estimates" Route="QuarterlyEstimates">
+        <ShellContent ContentTemplate="{DataTemplate views:QuarterlyEstimatesPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="What-If" Route="WhatIf">
+        <ShellContent ContentTemplate="{DataTemplate views:WhatIfPage}" />
     </FlyoutItem>
     <FlyoutItem Title="Annual Results" Route="AnnualResults">
         <ShellContent ContentTemplate="{DataTemplate views:AnnualTaxResultsPage}" />

@@ -242,10 +242,24 @@ public static class MauiProgram
                 stateTax: sp.GetRequiredService<AnnualStateTaxCalculator>()));
         builder.Services.AddSingleton<WithholdingSuggestionCalculator>();
 
+        // 1040-ES engine and Phase-8 annual-scenario persistence.
+        builder.Services.AddSingleton<Form1040ESCalculator>();
+        builder.Services.AddSingleton<IAnnualScenarioRepository>(
+            new JsonAnnualScenarioRepository(FileSystem.AppDataDirectory));
+
+        // Shared annual state consumed by every Phase 8 flyout view-model.
+        builder.Services.AddSingleton<AnnualTaxSession>();
+
         builder.Services.AddSingleton<CalculatorViewModel>();
         builder.Services.AddSingleton<SavedPaychecksViewModel>();
         builder.Services.AddSingleton<SelfEmploymentViewModel>();
         builder.Services.AddSingleton<AnnualTaxViewModel>();
+        builder.Services.AddSingleton<AnnualProjectionViewModel>();
+        builder.Services.AddSingleton<JobsAndYtdViewModel>();
+        builder.Services.AddSingleton<OtherIncomeAdjustmentsViewModel>();
+        builder.Services.AddSingleton<CreditsViewModel>();
+        builder.Services.AddSingleton<QuarterlyEstimatesViewModel>();
+        builder.Services.AddSingleton<WhatIfViewModel>();
         builder.Services.AddSingleton<InputsPage>();
         builder.Services.AddSingleton<PayHoursPage>();
         builder.Services.AddSingleton<FederalPage>();
@@ -256,7 +270,12 @@ public static class MauiProgram
         builder.Services.AddSingleton<SavedPaychecksPage>();
         builder.Services.AddSingleton<SelfEmploymentPage>();
         builder.Services.AddSingleton<SelfEmploymentResultsPage>();
-        builder.Services.AddSingleton<AnnualTaxPage>();
+        builder.Services.AddSingleton<AnnualProjectionPage>();
+        builder.Services.AddSingleton<JobsAndYtdPage>();
+        builder.Services.AddSingleton<OtherIncomeAdjustmentsPage>();
+        builder.Services.AddSingleton<CreditsPage>();
+        builder.Services.AddSingleton<QuarterlyEstimatesPage>();
+        builder.Services.AddSingleton<WhatIfPage>();
         builder.Services.AddSingleton<AnnualTaxResultsPage>();
         builder.Services.AddSingleton<AppShell>();
 
