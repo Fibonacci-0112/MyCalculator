@@ -1,0 +1,107 @@
+@*
+    Editor for the per-paycheck deductions list. Each row maps to a Core
+    Deduction (PreTax/PostTax, Dollar/Percentage, ReducesStateTaxableWages).
+    The component mutates the supplied List<DeductionDraft> in place.
+*@
+
+<div class="deductions">
+    @if (Items is null || Items.Count == 0)
+    {
+        <p class="muted">No deductions yet.</p>
+    }
+    else
+    {
+        <table class="deductions-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Unit</th>
+                    <th title="When checked, this pre-tax deduction reduces wages used for state-tax calculation.">Reduces State Wages</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Items)
+                {
+                    var captured = item;
+                    <tr>
+                        <td><input class="input" value="@captured.Name"
+                                   @onchange="e => captured.Name = e.Value?.ToString() ?? string.Empty" /></td>
+                        <td>
+                            <select class="input" value="@captured.Type"
+                                    @onchange="e => captured.Type = Enum.Parse<DeductionType>(e.Value?.ToString() ?? nameof(DeductionType.PreTax))">
+                                <option value="@nameof(DeductionType.PreTax)">Pre-tax</option>
+                                <option value="@nameof(DeductionType.PostTax)">Post-tax</option>
+                            </select>
+                        </td>
+                        <td><input class="input" type="number" step="0.01" inputmode="decimal"
+                                   value="@captured.Amount"
+                                   @onchange="e => captured.Amount = ParseDecimal(e.Value?.ToString())" /></td>
+                        <td>
+                            <select class="input" value="@captured.AmountType"
+                                    @onchange="e => captured.AmountType = Enum.Parse<DeductionAmountType>(e.Value?.ToString() ?? nameof(DeductionAmountType.Dollar))">
+                                <option value="@nameof(DeductionAmountType.Dollar)">$</option>
+                                <option value="@nameof(DeductionAmountType.Percentage)">%</option>
+                            </select>
+                        </td>
+                        <td style="text-align:center">
+                            <input type="checkbox" checked="@captured.ReducesStateTaxableWages"
+                                   disabled="@(captured.Type != DeductionType.PreTax)"
+                                   @onchange="e => captured.ReducesStateTaxableWages = (bool)(e.Value ?? false)" />
+                        </td>
+                        <td><button type="button" class="btn btn-link" @onclick="() => Remove(captured)">Remove</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <button type="button" class="btn" @onclick="Add">+ Add Deduction</button>
+</div>
+
+@code {
+    /// <summary>
+    /// Mutable draft view of <see cref="Deduction"/> used because the Core
+    /// type is init-only. Map back to <see cref="Deduction"/> when ready
+    /// to call the calculator.
+    /// </summary>
+    public sealed class DeductionDraft
+    {
+        public string Name { get; set; } = "";
+        public DeductionType Type { get; set; } = DeductionType.PreTax;
+        public decimal Amount { get; set; }
+        public DeductionAmountType AmountType { get; set; } = DeductionAmountType.Dollar;
+        public bool ReducesStateTaxableWages { get; set; } = true;
+
+        public Deduction ToDeduction() => new()
+        {
+            Name = Name,
+            Type = Type,
+            Amount = Amount,
+            AmountType = AmountType,
+            // Per Core: only pre-tax deductions can reduce state taxable wages.
+            ReducesStateTaxableWages = Type == DeductionType.PreTax && ReducesStateTaxableWages
+        };
+
+        public static DeductionDraft From(Deduction d) => new()
+        {
+            Name = d.Name,
+            Type = d.Type,
+            Amount = d.Amount,
+            AmountType = d.AmountType,
+            ReducesStateTaxableWages = d.ReducesStateTaxableWages
+        };
+    }
+
+    [Parameter, EditorRequired] public List<DeductionDraft> Items { get; set; } = new();
+
+    private void Add() => Items.Add(new DeductionDraft());
+
+    private void Remove(DeductionDraft item) => Items.Remove(item);
+
+    private static decimal ParseDecimal(string? raw) =>
+        decimal.TryParse(raw, System.Globalization.NumberStyles.Number,
+                         System.Globalization.CultureInfo.InvariantCulture, out var d) ? d : 0m;
+}

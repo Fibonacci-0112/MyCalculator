@@ -1,0 +1,70 @@
+# Publishes the Blazor WebAssembly head (PaycheckCalc.Web) as a static site
+# to GitHub Pages on every push to main.
+#
+# This is the only deployable workflow today — the MAUI heads are built
+# locally/CI per platform.
+name: Publish Web (GitHub Pages)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Allow only one concurrent deployment, skipping runs queued between the run
+# in-progress and the latest queued.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Pin the SDK version through global.json so this workflow keeps working
+      # when the rest of the repo bumps to a new preview.
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore PaycheckCalc.Web/PaycheckCalc.Web.csproj
+
+      - name: Publish
+        run: dotnet publish PaycheckCalc.Web/PaycheckCalc.Web.csproj -c Release -o publish --nologo
+
+      # GitHub Pages serves the project from a sub-path (e.g.
+      # https://<owner>.github.io/<repo>/), so the <base href> baked into
+      # index.html ("/") needs to be rewritten to match the deployed path.
+      # Also drop a 404.html copy so SPA deep-links work on hard refresh.
+      - name: Rewrite base href and add SPA fallback
+        run: |
+          set -euo pipefail
+          BASE_HREF="/${GITHUB_REPOSITORY##*/}/"
+          echo "Setting <base href> to '${BASE_HREF}'"
+          sed -i "s|<base href=\"/\"|<base href=\"${BASE_HREF}\"|" publish/wwwroot/index.html
+          cp publish/wwwroot/index.html publish/wwwroot/404.html
+          # Disable Jekyll so files starting with "_" (e.g. _framework) are served.
+          touch publish/wwwroot/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: publish/wwwroot
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

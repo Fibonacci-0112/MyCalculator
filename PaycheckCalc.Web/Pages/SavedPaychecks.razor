@@ -1,0 +1,112 @@
+@page "/saved"
+@inject IPaycheckRepository Repository
+@inject LocalStoragePaycheckRepository BrowserRepository
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>PaycheckCalc — Saved</PageTitle>
+
+<h1>Saved Paychecks</h1>
+
+<div class="actions">
+    <button type="button" class="btn" @onclick="ExportAsync">Export to JSON…</button>
+    <InputFile OnChange="ImportAsync" accept=".json" class="btn" />
+</div>
+
+@if (!string.IsNullOrEmpty(_status))
+{
+    <p class="success">@_status</p>
+}
+
+@if (_paychecks is null)
+{
+    <p>Loading…</p>
+}
+else if (_paychecks.Count == 0)
+{
+    <p class="muted">No saved paychecks yet. Calculate one and click <strong>Save…</strong>.</p>
+}
+else
+{
+    <table class="saved-table">
+        <thead>
+            <tr><th>Name</th><th>State</th><th>Net Pay</th><th>Saved</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var p in _paychecks.OrderByDescending(x => x.UpdatedAt))
+            {
+                var captured = p;
+                <tr>
+                    <td>@captured.Name</td>
+                    <td>@captured.Result.State</td>
+                    <td>@captured.Result.NetPay.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td>
+                    <td>@captured.UpdatedAt.LocalDateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        <button type="button" class="btn btn-link" @onclick="() => Load(captured)">Open</button>
+                        <button type="button" class="btn btn-link" @onclick="() => DeleteAsync(captured)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IReadOnlyList<SavedPaycheck>? _paychecks;
+    private string? _status;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Reload();
+    }
+
+    private async Task Reload()
+    {
+        _paychecks = await Repository.GetAllAsync();
+    }
+
+    private void Load(SavedPaycheck p)
+    {
+        // Stash the chosen id and jump back to the calculator. The calculator
+        // page reads ?load=<id> on initialization to hydrate from storage.
+        Nav.NavigateTo($"./?load={p.Id}");
+    }
+
+    private async Task DeleteAsync(SavedPaycheck p)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", $"Delete \"{p.Name}\"?"))
+            return;
+
+        await Repository.DeleteAsync(p.Id);
+        _status = $"Deleted \"{p.Name}\".";
+        await Reload();
+    }
+
+    private async Task ExportAsync()
+    {
+        var json = await BrowserRepository.ExportJsonAsync();
+        // Trigger a browser download. The JSON format matches saved_paychecks.json
+        // produced by the desktop/mobile heads, so it's portable.
+        await JS.InvokeVoidAsync("paycheckcalc.downloadJson",
+            LocalStoragePaycheckRepository.ExportFileName, json);
+        _status = "Exported saved paychecks.";
+    }
+
+    private async Task ImportAsync(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            // 5 MB cap is plenty — saved JSON is small.
+            await using var stream = e.File.OpenReadStream(maxAllowedSize: 5L * 1024 * 1024);
+            using var reader = new StreamReader(stream);
+            var json = await reader.ReadToEndAsync();
+            var count = await BrowserRepository.ImportJsonAsync(json);
+            _status = $"Imported {count} paycheck(s) from {e.File.Name}.";
+            await Reload();
+        }
+        catch (Exception ex)
+        {
+            _status = $"Import failed: {ex.Message}";
+        }
+    }
+}

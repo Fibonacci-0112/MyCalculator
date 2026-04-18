@@ -60,6 +60,13 @@ PaycheckCalc.slnx
 │       ├── Oklahoma/          # Oklahoma OW-2 percentage calculator
 │       └── Pennsylvania/      # Pennsylvania flat-rate calculator
 ├── PaycheckCalc.Tests/        # xUnit test suite
+├── PaycheckCalc.Web/          # Blazor WebAssembly head (browser-hosted)
+│   ├── Pages/                 # Razor pages (Calculator, SavedPaychecks, About)
+│   ├── Components/            # Reusable Razor components (SchemaFieldEditor, FederalW4Editor, DeductionsEditor, ResultsCard)
+│   ├── Layout/                # MainLayout + NavMenu
+│   ├── Services/              # HttpClientTaxDataAssetLoader + LocalStorage{Paycheck,AnnualScenario}Repository
+│   ├── wwwroot/               # Static site (linked tax JSON tables under wwwroot/data/)
+│   └── Program.cs             # WASM startup & DI configuration
 └── docs/                      # Class diagrams and documentation
 ```
 
@@ -67,8 +74,8 @@ PaycheckCalc.slnx
 
 | Component | Technology |
 |---|---|
-| **Framework** | .NET 11 Preview / .NET MAUI |
-| **Target Platforms** | Android, Windows 10+ |
+| **Framework** | .NET 11 Preview / .NET MAUI (desktop & mobile) + Blazor WebAssembly (web) |
+| **Target Platforms** | Android, Windows 10+, modern web browsers (WASM) |
 | **UI Pattern** | MVVM with [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) |
 | **Test Framework** | xUnit 2.9.3 |
 | **PDF Export** | [QuestPDF](https://www.questpdf.com/) 2025.12.4 |
@@ -104,6 +111,42 @@ dotnet run --project PaycheckCalc.App
 ```
 
 > **Note:** The MAUI app requires the `maui` workload and a supported target platform (Android emulator/device or Windows).
+
+### Run the Web head locally
+
+The repository also includes a Blazor WebAssembly head, **PaycheckCalc.Web**, that
+runs entirely in the browser and reuses the same `PaycheckCalc.Core` engine.
+
+```bash
+dotnet run --project PaycheckCalc.Web
+```
+
+This serves the app at `http://localhost:5000` by default. No MAUI workload is
+required for the Web head.
+
+The Web head is automatically published to GitHub Pages on every push to `main`
+by the [`Publish Web (GitHub Pages)`](.github/workflows/publish-web.yml) workflow.
+After enabling Pages in the repository settings (Source: *GitHub Actions*), the
+live site will be available at `https://<owner>.github.io/<repo>/`.
+
+#### What's available on the Web today
+
+- Single-paycheck calculation across all 50 states + DC, including the schema-driven
+  state and locality input forms (CA Method B, OK OW-2, AR DFA, CO DR-0004, CT TPG-211,
+  DE percentage method, AL annualized, IL flat, PA flat, plus PA EIT/LST, NYC, OH RITA/CCA,
+  MD county surtax).
+- Saved paychecks persisted to the browser's `localStorage` with **JSON
+  export/import** that round-trips through the desktop and mobile heads
+  (file name: `saved_paychecks.json`).
+
+#### Not yet ported to the Web (use the desktop/mobile heads for these)
+
+- Annual Form 1040 projection flow (Jobs & YTD, Other Income, Credits,
+  Quarterly Estimates, What-If) — the Core engine is wired up in DI and ready
+  for follow-up Razor pages.
+- Self-Employment / Schedule SE / QBI flow — likewise.
+- Side-by-side scenario comparison.
+- Address-based locality lookup (geocoding).
 
 ## How It Works
 
