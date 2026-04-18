@@ -39,8 +39,6 @@ builder.Services.AddScoped(sp => new HttpClient
 {
     BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
 });
-
-// ── Asset loader (browser-side) ─────────────────────────
 builder.Services.AddSingleton<ITaxDataAssetLoader, HttpClientTaxDataAssetLoader>();
 
 // ── Pre-load JSON tax tables at startup ────────────────
@@ -50,10 +48,12 @@ builder.Services.AddSingleton<ITaxDataAssetLoader, HttpClientTaxDataAssetLoader>
 // constructor below is fed JSON synchronously, which mirrors how the MAUI
 // head registers them.
 //
-// We resolve the loader from a temporary host so it picks up the
-// HttpClient-backed implementation registered above.
-var bootstrapHost = builder.Build();
-var bootstrapLoader = bootstrapHost.Services.GetRequiredService<ITaxDataAssetLoader>();
+// We instantiate the loader directly with a one-off HttpClient instead of
+// building a temporary host: it avoids paying for a second IServiceProvider
+// just to read static files, and the same DI registration above still
+// supplies the runtime loader to any future caller.
+var bootstrapHttp = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
+ITaxDataAssetLoader bootstrapLoader = new HttpClientTaxDataAssetLoader(bootstrapHttp);
 
 var arJson  = await bootstrapLoader.ReadAllTextAsync("ar_withholding_2026.json");
 var okJson  = await bootstrapLoader.ReadAllTextAsync("ok_ow2_2026_percentage.json");
@@ -68,17 +68,7 @@ var ccaJson  = await bootstrapLoader.ReadAllTextAsync("oh_cca_2026.json");
 var mdJson   = await bootstrapLoader.ReadAllTextAsync("md_county_surtax_2026.json");
 var f1040Json = await bootstrapLoader.ReadAllTextAsync("federal_1040_brackets_2026.json");
 
-// Re-create a fresh builder and register everything against it. We can't
-// reuse the bootstrap builder because Build() was already called above.
-builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
-
-builder.Services.AddScoped(sp => new HttpClient
-{
-    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
-});
-builder.Services.AddSingleton<ITaxDataAssetLoader, HttpClientTaxDataAssetLoader>();
+bootstrapHttp.Dispose();
 
 // ── Calculators ────────────────────────────────────────
 builder.Services.AddSingleton(new ArkansasFormulaCalculator(arJson));

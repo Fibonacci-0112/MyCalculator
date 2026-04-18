@@ -48,9 +48,32 @@ jobs:
         run: |
           set -euo pipefail
           BASE_HREF="/${GITHUB_REPOSITORY##*/}/"
-          echo "Setting <base href> to '${BASE_HREF}'"
-          sed -i "s|<base href=\"/\"|<base href=\"${BASE_HREF}\"|" publish/wwwroot/index.html
-          cp publish/wwwroot/index.html publish/wwwroot/404.html
+          INDEX="publish/wwwroot/index.html"
+          echo "Setting <base href> to '${BASE_HREF}' in ${INDEX}"
+
+          # Tolerate any whitespace and either quote style around the href
+          # value so a future edit to index.html doesn't silently break the
+          # rewrite. Verify the substitution actually happened before
+          # proceeding so we fail loudly rather than ship a broken site.
+          python3 - "$INDEX" "$BASE_HREF" <<'PY'
+          import re, sys
+          path, href = sys.argv[1], sys.argv[2]
+          with open(path, encoding="utf-8") as f:
+              html = f.read()
+          new_html, count = re.subn(
+              r'<base\s+href\s*=\s*["\'][^"\']*["\']\s*/?>',
+              f'<base href="{href}" />',
+              html,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit(f"Expected exactly 1 <base> tag in {path}, found {count}")
+          with open(path, "w", encoding="utf-8") as f:
+              f.write(new_html)
+          print(f"Rewrote <base href> in {path}")
+          PY
+
+          cp "$INDEX" publish/wwwroot/404.html
           # Disable Jekyll so files starting with "_" (e.g. _framework) are served.
           touch publish/wwwroot/.nojekyll
 

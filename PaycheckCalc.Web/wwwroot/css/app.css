@@ -1,6 +1,6 @@
-/* PaycheckCalc Web — minimal first-party stylesheet. Bootstrap is loaded
-   from the scaffold for table/grid resets but every component below is
-   designed to look fine on its own. */
+/* PaycheckCalc Web — minimal first-party stylesheet. No external CSS
+   framework is used; every component below is designed to look fine on
+   its own. */
 
 :root {
     --color-bg: #f7f7fb;

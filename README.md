@@ -121,8 +121,9 @@ runs entirely in the browser and reuses the same `PaycheckCalc.Core` engine.
 dotnet run --project PaycheckCalc.Web
 ```
 
-This serves the app at `http://localhost:5000` by default. No MAUI workload is
-required for the Web head.
+This serves the app at the URL printed by `dotnet run` (typically
+`http://localhost:5077` from `Properties/launchSettings.json`). No MAUI
+workload is required for the Web head.
 
 The Web head is automatically published to GitHub Pages on every push to `main`
 by the [`Publish Web (GitHub Pages)`](.github/workflows/publish-web.yml) workflow.

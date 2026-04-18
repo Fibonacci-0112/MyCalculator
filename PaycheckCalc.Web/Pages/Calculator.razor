@@ -211,12 +211,6 @@
         }
     }
 
-    protected override void OnInitialized()
-    {
-        // Intentionally empty — see OnInitializedAsync above. Kept so subclasses
-        // and overrides remain valid; component initialization is async.
-    }
-
     private void OnStateChanged(ChangeEventArgs e)
     {
         if (Enum.TryParse<UsState>(e.Value?.ToString(), out var s))
@@ -333,7 +327,7 @@
     {
         _saveDialogOpen = true;
         if (string.IsNullOrEmpty(_saveName))
-            _saveName = $"Paycheck {_state} {DateTime.Now:yyyy-MM-dd}";
+            _saveName = $"Paycheck {_state} {DateTimeOffset.UtcNow.LocalDateTime:yyyy-MM-dd}";
     }
 
     private async Task ConfirmSave()
