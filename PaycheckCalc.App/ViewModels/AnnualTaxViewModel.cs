@@ -85,7 +85,18 @@ public partial class AnnualTaxViewModel : ObservableObject
                 : Session.LoadedScenarioName)
             : ScenarioNameEntry.Trim();
 
-        var scenario = AnnualScenarioMapper.ToSaved(Session, name, Session.LoadedScenarioId);
+        // Preserve the original CreatedAt when overwriting so the saved
+        // scenario's creation timestamp doesn't silently roll forward on
+        // every save. New scenarios fall back to "now" inside the mapper.
+        DateTimeOffset? originalCreatedAt = null;
+        if (Session.LoadedScenarioId is { } existingId)
+        {
+            var existing = await _repo.GetByIdAsync(existingId);
+            originalCreatedAt = existing?.CreatedAt;
+        }
+
+        var scenario = AnnualScenarioMapper.ToSaved(
+            Session, name, Session.LoadedScenarioId, originalCreatedAt);
         await _repo.SaveAsync(scenario);
 
         Session.LoadedScenarioId = scenario.Id;

@@ -14,8 +14,14 @@ public static class AnnualScenarioMapper
     /// Builds a new <see cref="SavedAnnualScenario"/> from the session.
     /// If <paramref name="existingId"/> is provided the returned scenario
     /// keeps the same Id (overwrite-on-save); otherwise a new Id is created.
+    /// Pass <paramref name="createdAt"/> to preserve the original creation
+    /// timestamp when overwriting; otherwise the current time is used.
     /// </summary>
-    public static SavedAnnualScenario ToSaved(AnnualTaxSession s, string name, Guid? existingId = null)
+    public static SavedAnnualScenario ToSaved(
+        AnnualTaxSession s,
+        string name,
+        Guid? existingId = null,
+        DateTimeOffset? createdAt = null)
     {
         var now = DateTimeOffset.UtcNow;
         var id = existingId ?? Guid.NewGuid();
@@ -24,7 +30,7 @@ public static class AnnualScenarioMapper
         {
             Id = id,
             Name = name,
-            CreatedAt = now,
+            CreatedAt = createdAt ?? now,
             UpdatedAt = now,
             Profile = AnnualTaxInputMapper.Map(s)
         };
