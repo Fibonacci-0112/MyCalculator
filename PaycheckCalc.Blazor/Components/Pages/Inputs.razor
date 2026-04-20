@@ -324,7 +324,7 @@
 
     private void SetStateValue(StateFieldDefinition field, object? raw)
     {
-        // Coerce raw string values from &lt;input&gt; into the appropriate primitive
+        // Coerce raw string values from <input> into the appropriate primitive
         // so Core's calculators don't have to re-parse them every calculation.
         object? typed = field.FieldType switch
         {
