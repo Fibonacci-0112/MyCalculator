@@ -52,6 +52,29 @@ public sealed class PaycheckResult
                                 + FederalWithholding
                                 + LocalWithholding + LocalHeadTax;
     public decimal NetPay { get; init; }
+
+    // ── Drill-down explanations ────────────────────────────────
+    // UI layers should surface these through ResultCardModel rather than
+    // read raw tax-logic details. Any of these may be null if the calculation
+    // path chose not to produce an explanation (e.g., zero-dollar line item).
+
+    /// <summary>Explanation of how <see cref="FederalWithholding"/> was computed.</summary>
+    public LineItemExplanation? FederalExplanation { get; init; }
+
+    /// <summary>Explanation of how <see cref="SocialSecurityWithholding"/> was computed.</summary>
+    public LineItemExplanation? SocialSecurityExplanation { get; init; }
+
+    /// <summary>Explanation of how <see cref="MedicareWithholding"/> was computed.</summary>
+    public LineItemExplanation? MedicareExplanation { get; init; }
+
+    /// <summary>
+    /// Explanation of how <see cref="AdditionalMedicareWithholding"/> was computed.
+    /// <c>null</c> when Additional Medicare withholding is not triggered.
+    /// </summary>
+    public LineItemExplanation? AdditionalMedicareExplanation { get; init; }
+
+    /// <summary>Explanation of how <see cref="StateWithholding"/> was computed.</summary>
+    public LineItemExplanation? StateExplanation { get; init; }
 }
 
 /// <summary>One entry in <see cref="PaycheckResult.LocalBreakdown"/>.</summary>
