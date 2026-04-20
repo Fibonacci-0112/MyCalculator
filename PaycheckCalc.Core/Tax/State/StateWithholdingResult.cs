@@ -1,5 +1,3 @@
-using PaycheckCalc.Core.Models;
-
 namespace PaycheckCalc.Core.Tax.State;
 
 /// <summary>
@@ -33,14 +31,4 @@ public sealed class StateWithholdingResult
     /// "Includes local tax surcharge").
     /// </summary>
     public string? Description { get; init; }
-
-    /// <summary>
-    /// Optional drill-down explanation describing which method/table was used
-    /// and the key inputs that drove this state's withholding calculation.
-    /// <para>
-    /// When <c>null</c>, the <see cref="Pay.PayCalculator"/> synthesises a
-    /// generic fallback so the UI can still display a drill-down.
-    /// </para>
-    /// </summary>
-    public LineItemExplanation? Explanation { get; init; }
 }

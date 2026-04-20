@@ -40,14 +40,4 @@ public sealed class ResultCardModel
 
     /// <summary>Human-readable state name for display (e.g., "California").</summary>
     public string StateName { get; init; } = "";
-
-    // ── Drill-down explanations (UI "info" affordances) ─────
-    // Surfaced from domain LineItemExplanation via the mapper. All may be null
-    // if the calculation produced no explanation (e.g., zero-dollar line).
-
-    public LineItemExplanationModel? FederalExplanation { get; init; }
-    public LineItemExplanationModel? SocialSecurityExplanation { get; init; }
-    public LineItemExplanationModel? MedicareExplanation { get; init; }
-    public LineItemExplanationModel? AdditionalMedicareExplanation { get; init; }
-    public LineItemExplanationModel? StateExplanation { get; init; }
 }
