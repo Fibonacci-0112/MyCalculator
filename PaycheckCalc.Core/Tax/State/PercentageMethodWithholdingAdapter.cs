@@ -58,47 +58,24 @@ public sealed class PercentageMethodWithholdingAdapter : IStateWithholdingCalcul
 
     public StateWithholdingResult Calculate(CommonWithholdingContext context, StateInputValues values)
     {
-        var filingStatusStr = values.GetValueOrDefault("FilingStatus", "Single");
-        var filingStatus = filingStatusStr == "Married"
+        var filingStatus = values.GetValueOrDefault("FilingStatus", "Single") == "Married"
             ? FilingStatus.Married
             : FilingStatus.Single;
-        var allowances = values.GetValueOrDefault("Allowances", 0);
-        var additionalWithholding = values.GetValueOrDefault("AdditionalWithholding", 0m);
 
         var result = _inner.CalculateWithholding(new StateTaxInput
         {
             GrossWages = context.GrossWages,
             Frequency = context.PayPeriod,
             FilingStatus = filingStatus,
-            Allowances = allowances,
-            AdditionalWithholding = additionalWithholding,
+            Allowances = values.GetValueOrDefault("Allowances", 0),
+            AdditionalWithholding = values.GetValueOrDefault("AdditionalWithholding", 0m),
             PreTaxDeductionsReducingStateWages = context.PreTaxDeductionsReducingStateWages
         });
-
-        var inputs = new List<ExplanationInput>
-        {
-            new("State", _inner.State.ToString()),
-            new("Filing Status", filingStatus.ToString()),
-            new("Pay Frequency", context.PayPeriod.ToString()),
-            new("Gross Wages (period)", FormatMoney(context.GrossWages)),
-            new("Pre-tax Deductions Reducing State Wages", FormatMoney(context.PreTaxDeductionsReducingStateWages)),
-            new("State Taxable Wages (period)", FormatMoney(result.TaxableWages)),
-            new("State Allowances", allowances.ToString()),
-            new("Extra Withholding (period)", FormatMoney(additionalWithholding)),
-        };
 
         return new StateWithholdingResult
         {
             TaxableWages = result.TaxableWages,
-            Withholding = result.Withholding,
-            Explanation = new LineItemExplanation(
-                Title: "State Income Tax",
-                Method: "Annualized percentage method (state bracket schedule)",
-                Table: $"{_inner.State} {context.Year} — {filingStatus} brackets",
-                Inputs: inputs)
+            Withholding = result.Withholding
         };
     }
-
-    private static string FormatMoney(decimal v) =>
-        v.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"));
 }

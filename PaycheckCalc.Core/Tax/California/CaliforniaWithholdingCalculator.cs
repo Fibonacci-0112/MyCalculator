@@ -91,37 +91,14 @@ public sealed class CaliforniaWithholdingCalculator : IStateWithholdingCalculato
         // California SDI: 1.3% of ALL gross wages (no wage cap)
         var sdi = Math.Round(Math.Max(0m, context.GrossWages) * SdiRate, 2, MidpointRounding.AwayFromZero);
 
-        var inputs = new List<ExplanationInput>
-        {
-            new("State", "CA"),
-            new("Filing Status (DE 4)", filingStatusStr),
-            new("Pay Frequency", context.PayPeriod.ToString()),
-            new("Gross Wages (period)", FormatMoney(context.GrossWages)),
-            new("Pre-tax Deductions Reducing State Wages", FormatMoney(context.PreTaxDeductionsReducingStateWages)),
-            new("State Taxable Wages (period)", FormatMoney(grossWages)),
-            new("Regular Allowances (DE 4 Line 1)", regularAllowances.ToString()),
-            new("Estimated Deduction Allowances (DE 4 Line 2)", estimatedDeductionAllowances.ToString()),
-            new("Extra Withholding (period)", FormatMoney(additionalWithholding)),
-            new("SDI Rate", SdiRate.ToString("P1", System.Globalization.CultureInfo.InvariantCulture)),
-        };
-
         return new StateWithholdingResult
         {
             TaxableWages = grossWages,
             Withholding = withholding + additionalWithholding,
             DisabilityInsurance = sdi,
-            DisabilityInsuranceLabel = "State Disability Insurance (SDI)",
-            Explanation = new LineItemExplanation(
-                Title: "California Income Tax",
-                Method: "California DE 44 Method B — Exact Calculation",
-                Table: $"CA {context.Year} — {filingStatusStr} annualized percentage schedule",
-                Inputs: inputs,
-                Note: "Also withholds State Disability Insurance (SDI) at 1.3% of all gross wages (no cap).")
+            DisabilityInsuranceLabel = "State Disability Insurance (SDI)"
         };
     }
-
-    private static string FormatMoney(decimal v) =>
-        v.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"));
 
     private static CaliforniaFilingStatus MapFilingStatus(string status) => status switch
     {
