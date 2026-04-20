@@ -4,4 +4,5 @@
   </Project>
   <Project Path="PaycheckCalc.Core/PaycheckCalc.Core.csproj" />
   <Project Path="PaycheckCalc.Tests/PaycheckCalc.Tests.csproj" />
+  <Project Path="PaycheckCalc.Web/PaycheckCalc.Web.csproj" />
 </Solution>

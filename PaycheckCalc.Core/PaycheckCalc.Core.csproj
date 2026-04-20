@@ -1,6 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <!--
+      Dynamically select target frameworks based on the installed SDK.
+      - SDK >= .NET 11: build net11.0 (MAUI/Tests) AND net9.0 (Blazor WASM Web).
+      - SDK <  .NET 11: build net9.0 only (Blazor WASM Web; MAUI/Tests require .NET 11+).
+      This avoids NETSDK1045 "unsupported target framework" when building the Web project
+      with the stable .NET 9 SDK on CI or developer machines.
+    -->
+    <TargetFrameworks Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(BundledNETCoreAppTargetFrameworkVersion)', '11.0'))">net11.0;net9.0</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::VersionLessThan('$(BundledNETCoreAppTargetFrameworkVersion)', '11.0'))">net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -41,10 +49,16 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- net11.0-only packages (preview package, QuestPDF PDF rendering) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0-preview.3.26207.106" />
     <PackageReference Include="QuestPDF" Version="2026.2.4" />
   </ItemGroup>
 
+  <!-- net9.0 (Web/WASM) build: exclude QuestPDF and the PDF exporters that depend on it -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <Compile Remove="Export/PdfPaycheckExporter.cs" />
+    <Compile Remove="Export/PdfSelfEmploymentExporter.cs" />
+  </ItemGroup>
 
 </Project>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>PaycheckCalc</title>
+    <script>
+        // Redirect script for GitHub Pages SPA client-side routing.
+        // When GitHub Pages returns a 404 for a deep link, this page redirects
+        // to index.html encoding the original path in the query string.
+        // The companion script in index.html decodes it back to a proper URL.
+        var segmentCount = 1; // 1 for project sites (e.g. /MyCalculator/)
+        var l = window.location;
+        l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/?/' +
+            l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
+            (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+            l.hash
+        );
+    </script>
+</head>
+<body></body>
+</html>

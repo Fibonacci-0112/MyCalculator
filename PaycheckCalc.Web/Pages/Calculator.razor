@@ -1,0 +1,283 @@
+@page "/calculator"
+@inject PayCalculator PayCalculator
+@inject StateCalculatorRegistry StateRegistry
+@inject IPaycheckRepository PaycheckRepository
+@inject IJSRuntime JS
+
+<PageTitle>Calculator — PaycheckCalc</PageTitle>
+
+<h1>Paycheck Calculator</h1>
+
+<div class="row">
+    <div class="col-md-5">
+        <div class="card mb-4">
+            <div class="card-header"><strong>Pay &amp; Hours</strong></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Hourly Rate ($)</label>
+                    <input class="form-control" type="number" min="0" step="0.01"
+                           @bind="_hourlyRate" @bind:event="oninput" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Regular Hours</label>
+                    <input class="form-control" type="number" min="0" step="0.5"
+                           @bind="_regularHours" @bind:event="oninput" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Overtime Hours</label>
+                    <input class="form-control" type="number" min="0" step="0.5"
+                           @bind="_overtimeHours" @bind:event="oninput" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Pay Frequency</label>
+                    <select class="form-select" @bind="_frequency">
+                        @foreach (var f in Enum.GetValues<PayFrequency>())
+                        {
+                            <option value="@f">@FrequencyLabel(f)</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><strong>Federal W-4</strong></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Filing Status</label>
+                    <select class="form-select" @bind="_filingStatus">
+                        <option value="@FederalFilingStatus.SingleOrMarriedSeparately">Single / Married Filing Separately</option>
+                        <option value="@FederalFilingStatus.MarriedFilingJointly">Married Filing Jointly</option>
+                        <option value="@FederalFilingStatus.HeadOfHousehold">Head of Household</option>
+                    </select>
+                </div>
+                <div class="mb-3 form-check">
+                    <input class="form-check-input" type="checkbox" id="step2" @bind="_step2Checked" />
+                    <label class="form-check-label" for="step2">Step 2: Multiple jobs or spouse works</label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Step 3: Tax Credits ($, annual)</label>
+                    <input class="form-control" type="number" min="0" step="0.01"
+                           @bind="_step3Credits" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Step 4(c): Extra Withholding ($/period)</label>
+                    <input class="form-control" type="number" min="0" step="0.01"
+                           @bind="_extraWithholding" />
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><strong>State</strong></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">State</label>
+                    <select class="form-select" @bind="_selectedState">
+                        @foreach (var s in StateRegistry.SupportedStates)
+                        {
+                            <option value="@s">@s.ToString()</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary w-100 mb-2" @onclick="Calculate">Calculate</button>
+    </div>
+
+    <div class="col-md-7">
+        @if (_result is not null)
+        {
+            <div class="card mb-3">
+                <div class="card-header"><strong>Results</strong></div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr class="table-success">
+                                <th>Gross Pay</th>
+                                <td class="text-end">@_result.GrossPay.ToString("C")</td>
+                            </tr>
+                            @if (_result.PreTaxDeductions != 0)
+                            {
+                                <tr>
+                                    <td>Pre-Tax Deductions</td>
+                                    <td class="text-end text-danger">(@_result.PreTaxDeductions.ToString("C"))</td>
+                                </tr>
+                            }
+                            <tr>
+                                <td>Federal Withholding</td>
+                                <td class="text-end text-danger">(@_result.FederalWithholding.ToString("C"))</td>
+                            </tr>
+                            <tr>
+                                <td>Social Security</td>
+                                <td class="text-end text-danger">(@_result.SocialSecurityWithholding.ToString("C"))</td>
+                            </tr>
+                            <tr>
+                                <td>Medicare</td>
+                                <td class="text-end text-danger">(@_result.MedicareWithholding.ToString("C"))</td>
+                            </tr>
+                            @if (_result.AdditionalMedicareWithholding != 0)
+                            {
+                                <tr>
+                                    <td>Additional Medicare</td>
+                                    <td class="text-end text-danger">(@_result.AdditionalMedicareWithholding.ToString("C"))</td>
+                                </tr>
+                            }
+                            @if (_result.StateWithholding != 0 || _result.StateDisabilityInsurance != 0)
+                            {
+                                <tr>
+                                    <td>State Tax (@_result.State)</td>
+                                    <td class="text-end text-danger">(@_result.StateWithholding.ToString("C"))</td>
+                                </tr>
+                            }
+                            @if (_result.StateDisabilityInsurance != 0)
+                            {
+                                <tr>
+                                    <td>@_result.StateDisabilityInsuranceLabel</td>
+                                    <td class="text-end text-danger">(@_result.StateDisabilityInsurance.ToString("C"))</td>
+                                </tr>
+                            }
+                            @if (_result.LocalWithholding != 0 || _result.LocalHeadTax != 0)
+                            {
+                                <tr>
+                                    <td>Local Tax (@_result.LocalityLabel)</td>
+                                    <td class="text-end text-danger">(@(_result.LocalWithholding + _result.LocalHeadTax).ToString("C"))</td>
+                                </tr>
+                            }
+                            @if (_result.PostTaxDeductions != 0)
+                            {
+                                <tr>
+                                    <td>Post-Tax Deductions</td>
+                                    <td class="text-end text-danger">(@_result.PostTaxDeductions.ToString("C"))</td>
+                                </tr>
+                            }
+                            <tr class="table-primary fw-bold">
+                                <th>Net Pay</th>
+                                <td class="text-end">@_result.NetPay.ToString("C")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mb-3">
+                <button class="btn btn-outline-secondary btn-sm" @onclick="ExportCsv">
+                    ⬇ Export CSV
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" @onclick="SavePaycheck">
+                    💾 Save Paycheck
+                </button>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_saveMessage))
+            {
+                <div class="alert alert-success alert-sm py-1">@_saveMessage</div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">
+                Enter your pay details and click <strong>Calculate</strong> to see results.
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    // ── Input state ──────────────────────────────────────────────────────────
+    private decimal _hourlyRate       = 25m;
+    private decimal _regularHours     = 80m;
+    private decimal _overtimeHours    = 0m;
+    private PayFrequency _frequency   = PayFrequency.Biweekly;
+    private FederalFilingStatus _filingStatus = FederalFilingStatus.SingleOrMarriedSeparately;
+    private bool    _step2Checked     = false;
+    private decimal _step3Credits     = 0m;
+    private decimal _extraWithholding = 0m;
+    private UsState _selectedState    = UsState.TX;
+
+    // ── Output state ─────────────────────────────────────────────────────────
+    private PaycheckResult? _result;
+    private string _saveMessage = string.Empty;
+
+    // ── Calculate ────────────────────────────────────────────────────────────
+    private void Calculate()
+    {
+        _saveMessage = string.Empty;
+
+        var input = new PaycheckInput
+        {
+            HourlyRate        = _hourlyRate,
+            RegularHours      = _regularHours,
+            OvertimeHours     = _overtimeHours,
+            Frequency         = _frequency,
+            State             = _selectedState,
+            // Provide minimal default state inputs (filing status) where relevant.
+            // The state calculators fall back gracefully when StateInputValues is null.
+            StateInputValues  = null,
+            FederalW4 = new FederalW4Input
+            {
+                FilingStatus         = _filingStatus,
+                Step2Checked         = _step2Checked,
+                Step3TaxCredits      = _step3Credits,
+                Step4cExtraWithholding = _extraWithholding,
+            },
+        };
+
+        _result = PayCalculator.Calculate(input);
+    }
+
+    // ── CSV export via JSInterop ──────────────────────────────────────────────
+    private async Task ExportCsv()
+    {
+        if (_result is null) return;
+
+        var csv = PaycheckCalc.Core.Export.CsvPaycheckExporter.Generate(_result);
+        var bytes = System.Text.Encoding.UTF8.GetBytes(csv);
+        await JS.InvokeVoidAsync("downloadFile", "paycheck.csv", "text/csv", bytes);
+    }
+
+    // ── Save to localStorage ─────────────────────────────────────────────────
+    private async Task SavePaycheck()
+    {
+        if (_result is null) return;
+
+        var saved = new SavedPaycheck
+        {
+            Name   = $"Paycheck {DateTime.Now:yyyy-MM-dd HH:mm}",
+            Input  = new PaycheckInput
+            {
+                HourlyRate   = _hourlyRate,
+                RegularHours = _regularHours,
+                OvertimeHours = _overtimeHours,
+                Frequency    = _frequency,
+                State        = _selectedState,
+                FederalW4    = new FederalW4Input
+                {
+                    FilingStatus           = _filingStatus,
+                    Step2Checked           = _step2Checked,
+                    Step3TaxCredits        = _step3Credits,
+                    Step4cExtraWithholding = _extraWithholding,
+                },
+            },
+            Result = _result,
+        };
+
+        await PaycheckRepository.SaveAsync(saved);
+        _saveMessage = $"Saved as \"{saved.Name}\"";
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    private static string FrequencyLabel(PayFrequency f) => f switch
+    {
+        PayFrequency.Weekly      => "Weekly (52/yr)",
+        PayFrequency.Biweekly    => "Bi-Weekly (26/yr)",
+        PayFrequency.Semimonthly => "Semi-Monthly (24/yr)",
+        PayFrequency.Monthly     => "Monthly (12/yr)",
+        PayFrequency.Quarterly   => "Quarterly (4/yr)",
+        PayFrequency.Semiannual  => "Semi-Annual (2/yr)",
+        PayFrequency.Annual      => "Annual (1/yr)",
+        PayFrequency.Daily       => "Daily (260/yr)",
+        _                        => f.ToString()
+    };
+}
