@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net11.0-android36.1;net11.0-windows10.0.19041.0</TargetFrameworks>
     <UseMaui>true</UseMaui>
@@ -39,9 +39,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0-preview.2.26159.112" />
-	<PackageReference Include="Microsoft.Maui.Controls" Version="11.0.0-preview.2.26152.10" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0-preview.3.26207.106" />
+	<PackageReference Include="Microsoft.Maui.Controls" Version="11.0.0-preview.3.26203.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,6 +53,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls" Version="11.0.0-preview.2.26152.10" />
+    <PackageReference Update="Microsoft.Maui.Controls" Version="11.0.0-preview.3.26203.7" />
   </ItemGroup>
 </Project>
