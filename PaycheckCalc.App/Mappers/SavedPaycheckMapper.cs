@@ -35,8 +35,15 @@ public static class SavedPaycheckMapper
     /// </summary>
     public static ScenarioSnapshot MapToScenarioSnapshot(SavedPaycheck saved)
     {
+        var siv = saved.Input.StateInputValues;
+        string stateFiling = siv?.GetValueOrDefault<string>("FilingStatus") ?? "";
+        string stateAllowances = "";
+        if (siv is not null && siv.ContainsKey("Allowances"))
+            stateAllowances = siv.GetValueOrDefault<int>("Allowances").ToString();
+
         return new ScenarioSnapshot
         {
+            Name = saved.Name,
             Frequency = saved.Input.Frequency,
             HourlyRate = saved.Input.HourlyRate,
             RegularHours = saved.Input.RegularHours,
@@ -45,6 +52,9 @@ public static class SavedPaycheckMapper
             State = saved.Input.State,
             PretaxDeductions = saved.Result.PreTaxDeductions,
             PosttaxDeductions = saved.Result.PostTaxDeductions,
+            FederalFilingStatusDisplay = EnumDisplay.FederalFilingStatus(saved.Input.FederalW4.FilingStatus.ToString()),
+            StateFilingStatusDisplay = stateFiling,
+            StateAllowancesDisplay = stateAllowances,
             ResultCard = ResultCardMapper.Map(saved.Result)
         };
     }

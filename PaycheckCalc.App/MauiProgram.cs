@@ -256,8 +256,12 @@ public static class MauiProgram
         // Shared annual state consumed by every Phase 8 flyout view-model.
         builder.Services.AddSingleton<AnnualTaxSession>();
 
+        // Shared paycheck multi-scenario compare session.
+        builder.Services.AddSingleton<ComparisonSession>();
+
         builder.Services.AddSingleton<CalculatorViewModel>();
         builder.Services.AddSingleton<SavedPaychecksViewModel>();
+        builder.Services.AddSingleton<CompareViewModel>();
         builder.Services.AddSingleton<SelfEmploymentViewModel>();
         builder.Services.AddSingleton<AnnualTaxViewModel>();
         builder.Services.AddSingleton<AnnualProjectionViewModel>();
