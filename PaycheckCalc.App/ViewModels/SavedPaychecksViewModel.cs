@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PaycheckCalc.App.Helpers;
 using PaycheckCalc.App.Mappers;
+using PaycheckCalc.App.Services;
 using PaycheckCalc.Core.Export;
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Storage;
@@ -18,16 +19,58 @@ public partial class SavedPaychecksViewModel : ObservableObject
 {
     private readonly IPaycheckRepository _repo;
     private readonly CalculatorViewModel _calculatorVm;
+    private readonly ComparisonSession _comparisonSession;
 
-    public SavedPaychecksViewModel(IPaycheckRepository repo, CalculatorViewModel calculatorVm)
+    public SavedPaychecksViewModel(
+        IPaycheckRepository repo,
+        CalculatorViewModel calculatorVm,
+        ComparisonSession comparisonSession)
     {
         _repo = repo;
         _calculatorVm = calculatorVm;
+        _comparisonSession = comparisonSession;
     }
 
     public ObservableCollection<SavedPaycheckViewModel> SavedPaychecks { get; } = new();
 
     [ObservableProperty] public partial bool IsEmpty { get; set; } = true;
+
+    // ── Multi-scenario selection mode ────────────────────────────
+    /// <summary>
+    /// When true, the page shows a checkbox per item, the action buttons
+    /// hide, and the user can select several saved paychecks to compare
+    /// side-by-side on the Compare page.
+    /// </summary>
+    [ObservableProperty] public partial bool IsSelectionMode { get; set; }
+
+    /// <summary>Count of currently selected saved paychecks.</summary>
+    [ObservableProperty] public partial int SelectedCount { get; set; }
+
+    /// <summary>True when enough items are selected to run a comparison.</summary>
+    public bool CanCompareSelected => SelectedCount >= 2;
+
+    partial void OnIsSelectionModeChanged(bool value)
+    {
+        // Leaving selection mode: clear all check marks so the row buttons
+        // return to their normal "action buttons" state.
+        if (!value)
+        {
+            foreach (var p in SavedPaychecks)
+                p.IsSelected = false;
+            SelectedCount = 0;
+        }
+        OnPropertyChanged(nameof(ShowActionButtons));
+    }
+
+    partial void OnSelectedCountChanged(int value)
+        => OnPropertyChanged(nameof(CanCompareSelected));
+
+    /// <summary>
+    /// Inverse of <see cref="IsSelectionMode"/> for XAML binding: the
+    /// per-row action buttons (Load / Compare / CSV / PDF / Rename / Delete)
+    /// are visible only outside selection mode.
+    /// </summary>
+    public bool ShowActionButtons => !IsSelectionMode;
 
     [RelayCommand]
     public async Task LoadListAsync()
@@ -35,8 +78,51 @@ public partial class SavedPaychecksViewModel : ObservableObject
         var all = await _repo.GetAllAsync();
         SavedPaychecks.Clear();
         foreach (var item in all.OrderByDescending(p => p.UpdatedAt))
-            SavedPaychecks.Add(SavedPaycheckMapper.MapToListItem(item));
+        {
+            var vm = SavedPaycheckMapper.MapToListItem(item);
+            vm.SelectionChanged = OnSelectionChanged;
+            SavedPaychecks.Add(vm);
+        }
         IsEmpty = SavedPaychecks.Count == 0;
+        SelectedCount = 0;
+    }
+
+    private void OnSelectionChanged()
+    {
+        SelectedCount = SavedPaychecks.Count(p => p.IsSelected);
+    }
+
+    [RelayCommand]
+    public void ToggleSelectionMode()
+        => IsSelectionMode = !IsSelectionMode;
+
+    /// <summary>
+    /// Publishes the selected saved paychecks to the shared
+    /// <see cref="ComparisonSession"/> so the Compare page can render them
+    /// side-by-side. No-op if fewer than two are selected.
+    /// </summary>
+    [RelayCommand]
+    public async Task CompareSelectedAsync()
+    {
+        if (!CanCompareSelected) return;
+
+        var selectedIds = SavedPaychecks
+            .Where(p => p.IsSelected)
+            .Select(p => p.Id)
+            .ToList();
+
+        var all = await _repo.GetAllAsync();
+        var byId = all.ToDictionary(p => p.Id);
+
+        var snapshots = selectedIds
+            .Where(byId.ContainsKey)
+            .Select(id => SavedPaycheckMapper.MapToScenarioSnapshot(byId[id]))
+            .ToList();
+
+        _comparisonSession.SetScenarios(snapshots);
+
+        // Leave selection mode now that the compare set is published.
+        IsSelectionMode = false;
     }
 
     [RelayCommand]
@@ -138,5 +224,11 @@ public partial class SavedPaychecksViewModel : ObservableObject
         if (paycheck is null) return;
 
         _calculatorVm.SavedScenario = SavedPaycheckMapper.MapToScenarioSnapshot(paycheck);
+
+        // 1-vs-1 (Saved vs Current) mode takes over; clear any stale
+        // multi-scenario set from the session so the Compare page does not
+        // show both views at once.
+        _comparisonSession.Clear();
     }
 }
+

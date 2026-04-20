@@ -46,6 +46,12 @@ public partial class SavedPaychecksPage : ContentPage
         }
     }
 
+    private async void OnCompareSelectedClicked(object? sender, EventArgs e)
+    {
+        await _vm.CompareSelectedCommand.ExecuteAsync(null);
+        await Shell.Current.GoToAsync("//Compare");
+    }
+
     private async void OnExportCsvClicked(object? sender, EventArgs e)
     {
         if (sender is Button btn && btn.CommandParameter is Guid id)

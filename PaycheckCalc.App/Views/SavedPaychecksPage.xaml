@@ -10,19 +10,53 @@
         <helpers:InvertBoolConverter x:Key="InvertBoolConverter" />
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
 
         <!-- Page Header -->
-        <Grid Grid.Row="0" BackgroundColor="#1565C0" Padding="16,20,16,20">
+        <Grid Grid.Row="0" BackgroundColor="#1565C0" Padding="16,20,16,20"
+              ColumnDefinitions="*,Auto">
             <Label Text="Saved Paychecks"
                    TextColor="White"
                    FontSize="22"
                    FontAttributes="Bold"
-                   HorizontalTextAlignment="Center" />
+                   VerticalTextAlignment="Center" />
+            <!-- Selection-mode toggle -->
+            <Button Grid.Column="1"
+                    Command="{Binding ToggleSelectionModeCommand}"
+                    BackgroundColor="#0D47A1" TextColor="White"
+                    FontSize="12" FontAttributes="Bold"
+                    CornerRadius="8" Padding="12,6" HeightRequest="32"
+                    IsVisible="{Binding IsEmpty, Converter={StaticResource InvertBoolConverter}}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsSelectionMode}" Value="True">
+                        <Setter Property="Text" Value="Done" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsSelectionMode}" Value="False">
+                        <Setter Property="Text" Value="Select" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
         </Grid>
 
+        <!-- Selection-mode helper banner -->
+        <Border Grid.Row="1" BackgroundColor="#E3F2FD" StrokeThickness="0"
+                Padding="16,10" IsVisible="{Binding IsSelectionMode}">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <Label VerticalTextAlignment="Center"
+                       TextColor="#0D47A1" FontSize="13">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Selected: " />
+                            <Span Text="{Binding SelectedCount}" FontAttributes="Bold" />
+                            <Span Text=" — pick 2 or more scenarios to compare side-by-side." />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </Grid>
+        </Border>
+
         <!-- Empty state -->
-        <VerticalStackLayout Grid.Row="1" IsVisible="{Binding IsEmpty}"
+        <VerticalStackLayout Grid.Row="2" IsVisible="{Binding IsEmpty}"
                              VerticalOptions="Center" HorizontalOptions="Center" Spacing="8" Padding="32">
             <Label Text="No Saved Paychecks"
                    TextColor="#78909C" FontSize="20" FontAttributes="Bold"
@@ -33,7 +67,7 @@
         </VerticalStackLayout>
 
         <!-- Saved paychecks list -->
-        <CollectionView Grid.Row="1"
+        <CollectionView Grid.Row="2"
                          ItemsSource="{Binding SavedPaychecks}"
                          IsVisible="{Binding IsEmpty, Converter={StaticResource InvertBoolConverter}}"
                          SelectionMode="None"
@@ -46,22 +80,29 @@
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnPaycheckTapped" CommandParameter="{Binding Id}" />
                         </Border.GestureRecognizers>
-                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="4">
+                        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="10">
+
+                            <!-- Selection checkbox (visible only in selection mode) -->
+                            <CheckBox Grid.RowSpan="2"
+                                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                      Color="#1565C0"
+                                      VerticalOptions="Center"
+                                      IsVisible="{Binding BindingContext.IsSelectionMode, Source={RelativeSource AncestorType={x:Type CollectionView}}}" />
 
                             <!-- Name -->
-                            <Label Grid.Row="0" Grid.Column="0"
+                            <Label Grid.Row="0" Grid.Column="1"
                                    Text="{Binding Name}"
                                    TextColor="#37474F" FontSize="16" FontAttributes="Bold"
                                    LineBreakMode="TailTruncation" />
 
                             <!-- Net Pay -->
-                            <Label Grid.Row="0" Grid.Column="1"
+                            <Label Grid.Row="0" Grid.Column="2"
                                    Text="{Binding NetPay, StringFormat='{0:C}'}"
                                    TextColor="#2E7D32" FontSize="16" FontAttributes="Bold"
                                    HorizontalTextAlignment="End" />
 
                             <!-- State + Gross -->
-                            <Label Grid.Row="1" Grid.Column="0"
+                            <Label Grid.Row="1" Grid.Column="1"
                                    TextColor="#78909C" FontSize="13">
                                 <Label.FormattedText>
                                     <FormattedString>
@@ -73,13 +114,15 @@
                             </Label>
 
                             <!-- Date -->
-                            <Label Grid.Row="1" Grid.Column="1"
+                            <Label Grid.Row="1" Grid.Column="2"
                                    Text="{Binding DateDisplay}"
                                    TextColor="#90A4AE" FontSize="11"
                                    HorizontalTextAlignment="End" />
 
-                            <!-- Action buttons -->
-                            <HorizontalStackLayout Grid.Row="2" Grid.ColumnSpan="2" Spacing="8" Margin="0,4,0,0">
+                            <!-- Action buttons (hidden in selection mode) -->
+                            <HorizontalStackLayout Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                                                   Spacing="8" Margin="0,4,0,0"
+                                                   IsVisible="{Binding BindingContext.ShowActionButtons, Source={RelativeSource AncestorType={x:Type CollectionView}}}">
                                 <Button Text="Load"
                                         Clicked="OnLoadClicked" CommandParameter="{Binding Id}"
                                         BackgroundColor="#1565C0" TextColor="White"
@@ -116,6 +159,17 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+
+        <!-- Compare Selected CTA (only in selection mode) -->
+        <Button Grid.Row="3"
+                Text="Compare Selected"
+                Clicked="OnCompareSelectedClicked"
+                IsEnabled="{Binding CanCompareSelected}"
+                IsVisible="{Binding IsSelectionMode}"
+                BackgroundColor="#7B1FA2" TextColor="White"
+                FontSize="15" FontAttributes="Bold"
+                CornerRadius="12" Padding="16,12"
+                Margin="16,8,16,16" HeightRequest="48" />
 
     </Grid>
 

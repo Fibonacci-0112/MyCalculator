@@ -4,9 +4,10 @@ namespace PaycheckCalc.App.Views;
 
 public partial class ComparePage : ContentPage
 {
-    public ComparePage(CalculatorViewModel vm)
+    public ComparePage(CompareViewModel vm)
     {
         InitializeComponent();
         BindingContext = vm;
     }
 }
+
