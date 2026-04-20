@@ -48,7 +48,10 @@ jobs:
         working-directory: PaycheckCalc.Web
         run: dotnet publish PaycheckCalc.Web.csproj -c Release -o ../publish
 
-      # Ensure 404.html exists for GitHub Pages SPA deep-link support.
+      # Overwrite the source 404.html with the freshly-published index.html so
+      # they are always identical. GitHub Pages serves 404.html for unknown paths;
+      # Blazor boots from 404.html (which is a copy of index.html) and the Router
+      # navigates to the correct page using the actual URL path.
       - name: Copy index.html → 404.html (idempotent)
         run: cp publish/wwwroot/index.html publish/wwwroot/404.html
 
