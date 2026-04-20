@@ -94,4 +94,27 @@ public partial class ResultsPage : ContentPage
             await DisplayAlert("Saved", $"Paycheck \"{name.Trim()}\" saved.", "OK");
         }
     }
+
+    // ── Line-item drill-down handlers ──────────────────────
+    // Each handler surfaces the presentation-layer LineItemExplanationModel
+    // (already mapped from the domain) via a simple DisplayAlert so users can
+    // see which method/table was used and the key inputs behind the number.
+
+    private Task OnFederalExplainClicked(object? sender, EventArgs e)
+        => ShowExplanationAsync(_vm.ResultCard?.FederalExplanation);
+
+    private Task OnSocialSecurityExplainClicked(object? sender, EventArgs e)
+        => ShowExplanationAsync(_vm.ResultCard?.SocialSecurityExplanation);
+
+    private Task OnMedicareExplainClicked(object? sender, EventArgs e)
+        => ShowExplanationAsync(_vm.ResultCard?.MedicareExplanation);
+
+    private Task OnStateExplainClicked(object? sender, EventArgs e)
+        => ShowExplanationAsync(_vm.ResultCard?.StateExplanation);
+
+    private Task ShowExplanationAsync(Models.LineItemExplanationModel? explanation)
+    {
+        if (explanation is null) return Task.CompletedTask;
+        return DisplayAlert(explanation.Title, explanation.DisplayText, "Close");
+    }
 }
