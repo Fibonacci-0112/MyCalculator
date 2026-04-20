@@ -48,9 +48,6 @@ public partial class SavedPaychecksPage : ContentPage
 
     private async void OnCompareSelectedClicked(object? sender, EventArgs e)
     {
-        if (!_vm.CanCompareSelected)
-            return;
-
         await _vm.CompareSelectedCommand.ExecuteAsync(null);
         await Shell.Current.GoToAsync("//Compare");
     }
