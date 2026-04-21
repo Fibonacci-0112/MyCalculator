@@ -22,6 +22,7 @@ using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
 using PaycheckCalc.Core.Tax.Local.Pennsylvania;
+using PaycheckCalc.Core.Tax.Michigan;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.Federal;
@@ -128,6 +129,10 @@ public static class MauiProgram
 
             // Illinois — flat 4.95% with IL-W-4 basic and additional allowances
             registry.Register(new IllinoisWithholdingCalculator());
+
+            // Michigan — flat 4.25% with MI-W4 personal/dependent exemptions
+            // ($5,900 per exemption, 2026 Form 446 Withholding Guide)
+            registry.Register(new MichiganWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

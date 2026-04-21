@@ -351,7 +351,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
             UsState.AZ,
             UsState.DC, UsState.HI, UsState.IA,
             UsState.ID, UsState.IN, UsState.KS, UsState.KY,
-            UsState.LA, UsState.MA, UsState.MD, UsState.ME, UsState.MI,
+            UsState.LA, UsState.MA, UsState.MD, UsState.ME,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
             UsState.ND, UsState.NE, UsState.NJ, UsState.NM, UsState.NY,
             UsState.OH, UsState.OR, UsState.RI, UsState.SC, UsState.UT,
