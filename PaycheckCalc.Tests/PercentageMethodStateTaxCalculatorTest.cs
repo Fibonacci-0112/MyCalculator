@@ -370,11 +370,16 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // IowaWithholdingCalculator (flat 3.65% with optional extra
         // withholding per IA W-4 Line 6).
         //
+        // Kansas is also absent: it uses the dedicated
+        // KansasWithholdingCalculator (K-4 filing status, $3,605/$8,240
+        // standard deduction, $2,250 per K-4 allowance, two graduated
+        // brackets 5.20%/5.58%).
+        //
         // Michigan is also absent: it uses the dedicated
         // MichiganWithholdingCalculator (flat 4.25% with MI-W4 exemptions).
         UsState[] expectedStates =
         [
-            UsState.KS, UsState.KY,
+            UsState.KY,
             UsState.LA, UsState.MA, UsState.MD, UsState.ME,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
             UsState.ND, UsState.NE, UsState.NJ, UsState.NM, UsState.NY,
@@ -402,6 +407,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.IN),
             "IN should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.KS),
+            "KS should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MI),
             "MI should not be in StateTaxConfigs2026 — it has a dedicated calculator.");

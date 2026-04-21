@@ -110,22 +110,10 @@ public static class StateTaxConfigs2026
             // deduction ($2,200 / $4,400), $1,144 per HW-4 allowance, and
             // the 2026 annual graduated brackets (1.4%–11.0%).
 
-            [UsState.KS] = new()
-            {
-                StandardDeductionSingle = 3_605m,
-                StandardDeductionMarried = 8_240m,
-                AllowanceAmount = 2_250m,
-                BracketsSingle =
-                [
-                    B(0, 23_000m, 0.052m),
-                    B(23_000m, null, 0.0558m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 46_000m, 0.052m),
-                    B(46_000m, null, 0.0558m)
-                ]
-            },
+            // Kansas uses a dedicated calculator (KansasWithholdingCalculator)
+            // — K-4 filing status (Single/Married), $3,605/$8,240 standard
+            // deduction, $2,250 per K-4 allowance, and two brackets
+            // (5.20% up to $23,000/$46,000, then 5.58%).
 
             [UsState.LA] = new()
             {
