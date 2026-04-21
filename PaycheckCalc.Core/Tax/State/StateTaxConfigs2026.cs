@@ -17,13 +17,9 @@ public static class StateTaxConfigs2026
         {
             // ── Flat-rate states ─────────────────────────────────────────
 
-            [UsState.AZ] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                BracketsSingle = [B(0, null, 0.025m)],
-                BracketsMarried = [B(0, null, 0.025m)]
-            },
+            // Arizona uses a dedicated calculator (ArizonaWithholdingCalculator)
+            // — Form A-4 percentage-election method (0.5%–3.5% on gross
+            // taxable wages, 2.0% default when no A-4 is on file).
 
             // Colorado uses a dedicated calculator (ColoradoWithholdingCalculator)
 

@@ -10,6 +10,7 @@ using PaycheckCalc.Core.Pay;
 using PaycheckCalc.Core.Storage;
 using PaycheckCalc.Core.Tax.Fica;
 using PaycheckCalc.Core.Tax.Alabama;
+using PaycheckCalc.Core.Tax.Arizona;
 using PaycheckCalc.Core.Tax.Arkansas;
 using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Colorado;
@@ -102,6 +103,10 @@ public static class MauiProgram
 
             // Alabama — unique filing statuses, dependents, federal withholding
             registry.Register(new AlabamaWithholdingCalculator());
+
+            // Arizona — Form A-4 percentage-election method (0.5%–3.5%,
+            // 2.0% default when no A-4 is on file)
+            registry.Register(new ArizonaWithholdingCalculator());
 
             // Arkansas — DFA formula method with transitional zone brackets
             var arCalc = sp.GetRequiredService<ArkansasFormulaCalculator>();
