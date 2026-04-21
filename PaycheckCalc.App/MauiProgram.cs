@@ -26,10 +26,17 @@ using PaycheckCalc.Core.Tax.Iowa;
 using PaycheckCalc.Core.Tax.Kansas;
 using PaycheckCalc.Core.Tax.Kentucky;
 using PaycheckCalc.Core.Tax.Local;
+using PaycheckCalc.Core.Tax.Louisiana;
+using PaycheckCalc.Core.Tax.Maine;
+using PaycheckCalc.Core.Tax.Maryland;
+using PaycheckCalc.Core.Tax.Missouri;
+using PaycheckCalc.Core.Tax.Mississippi;
+using PaycheckCalc.Core.Tax.Minnesota;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
 using PaycheckCalc.Core.Tax.Local.Pennsylvania;
+using PaycheckCalc.Core.Tax.Massachusetts;
 using PaycheckCalc.Core.Tax.Michigan;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
@@ -173,10 +180,48 @@ public static class MauiProgram
             // Kentucky — flat 4.0% with $3,160 standard deduction and $10
             // K-4 allowance credit per the 2026 Form 42A003 withholding formula
             registry.Register(new KentuckyWithholdingCalculator());
+            // Louisiana — L-4 filing statuses (Single/Married/Head of Household),
+            // $4,500/$9,000 personal exemption, $1,000 per-dependent deduction,
+            // and three graduated brackets (1.85%/3.50%/4.25%) per R-1306
+            registry.Register(new LouisianaWithholdingCalculator());
+
+            // Maine — W-4ME filing statuses (Single/Married), $15,300/$30,600
+            // standard deduction, $5,300 per W-4ME allowance, and three graduated
+            // brackets (5.80%/6.75%/7.15%) per Maine Revenue Services 2026
+            // Withholding Tables
+            registry.Register(new MaineWithholdingCalculator());
+
+            // Maryland — MW507 filing statuses (Single/Married/Head of Household),
+            // variable standard deduction (15% of wages, min $1,600/$3,200,
+            // max $2,550/$5,100), $3,200 per exemption, and ten graduated brackets
+            // (2%–6.5%) per the Comptroller of Maryland 2026 Employer Withholding Guide
+            registry.Register(new MarylandWithholdingCalculator());
+
+            // Massachusetts — M-4 filing statuses (Single/Married/Head of Household),
+            // personal/dependent/blind/age exemptions, flat 5% with 4% surtax above $1M
+            registry.Register(new MassachusettsWithholdingCalculator());
 
             // Michigan — flat 4.25% with MI-W4 personal/dependent exemptions
             // ($5,900 per exemption, 2026 Form 446 Withholding Guide)
             registry.Register(new MichiganWithholdingCalculator());
+
+            // Minnesota — W-4MN filing statuses (Single/Married/Head of Household),
+            // $15,300/$30,600/$23,000 standard deduction, $5,300 per W-4MN allowance,
+            // and four graduated brackets (5.35%/6.80%/7.85%/9.85%) per the Minnesota
+            // Department of Revenue 2026 Withholding Tax Instructions and Tables (Pub. 89)
+            registry.Register(new MinnesotaWithholdingCalculator());
+
+            // Mississippi — 89-350 filing statuses (Single/Married/Head of Household),
+            // standard deduction ($2,300/$4,600/$3,400), personal exemption
+            // ($6,000/$12,000/$9,500), $1,500 per dependent, and two brackets
+            // (0% on $0–$10,000, 4% over $10,000) per MS Pub 89-105 and HB 1 (2023)
+            registry.Register(new MississippiWithholdingCalculator());
+
+            // Missouri — MO W-4 filing statuses (Single/Married/Head of Household),
+            // $15,750/$31,500/$23,625 standard deduction (mirrors federal),
+            // $2,100 per MO W-4 allowance, and eight graduated brackets (0%–4.7%)
+            // per the Missouri DOR 2026 Employer's Withholding Tax Guide
+            registry.Register(new MissouriWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

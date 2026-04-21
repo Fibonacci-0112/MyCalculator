@@ -47,27 +47,21 @@ public static class StateTaxConfigs2026
             // — flat 4.0% with $3,160 standard deduction and $10 K-4 allowance
             // credit per the 2026 Form 42A003 withholding formula.
 
-            [UsState.MA] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                AllowanceAmount = 4_400m,
-                BracketsSingle = [B(0, null, 0.05m)],
-                BracketsMarried = [B(0, null, 0.05m)]
-            },
+            // Massachusetts uses a dedicated calculator (MassachusettsWithholdingCalculator)
+            // — M-4 filing statuses (Single/Married/Head of Household), personal
+            // exemptions ($4,400/$8,800/$6,800), $1,000 per dependent, $2,200 per
+            // blind exemption, $700 per age-65+ exemption, flat 5% rate with a 4%
+            // surtax on annual taxable income above $1,000,000.
 
             // Michigan uses a dedicated calculator (MichiganWithholdingCalculator)
             // — flat 4.25% with MI-W4 exemptions at $5,900 per exemption per the
             // 2026 Form 446 Withholding Guide.
 
-            [UsState.MS] = new()
-            {
-                StandardDeductionSingle = 2_300m,
-                StandardDeductionMarried = 4_600m,
-                AllowanceAmount = 6_000m,
-                BracketsSingle = [B(0, null, 0.05m)],
-                BracketsMarried = [B(0, null, 0.05m)]
-            },
+            // Mississippi uses a dedicated calculator (MississippiWithholdingCalculator)
+            // — 89-350 filing statuses (Single/Married/Head of Household), filing-status
+            // standard deduction ($2,300/$4,600/$3,400), filing-status personal exemption
+            // ($6,000/$12,000/$9,500), $1,500 per dependent (Line 6), and two brackets
+            // (0% on $0–$10,000, 4% over $10,000) per MS Pub 89-105 and HB 1 (2023).
 
             [UsState.NC] = new()
             {
@@ -111,124 +105,33 @@ public static class StateTaxConfigs2026
             // deduction, $2,250 per K-4 allowance, and two brackets
             // (5.20% up to $23,000/$46,000, then 5.58%).
 
-            [UsState.LA] = new()
-            {
-                StandardDeductionSingle = 4_500m,
-                StandardDeductionMarried = 9_000m,
-                BracketsSingle =
-                [
-                    B(0, 12_500m, 0.0185m),
-                    B(12_500m, 50_000m, 0.035m),
-                    B(50_000m, null, 0.0425m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 25_000m, 0.0185m),
-                    B(25_000m, 100_000m, 0.035m),
-                    B(100_000m, null, 0.0425m)
-                ]
-            },
+            // Louisiana uses a dedicated calculator (LouisianaWithholdingCalculator)
+            // — L-4 filing statuses (Single/Married/Head of Household), $4,500/$9,000
+            // personal exemption, $1,000 per-dependent deduction, and three graduated
+            // brackets (1.85%/3.50%/4.25%) per Louisiana R-1306.
 
-            [UsState.ME] = new()
-            {
-                StandardDeductionSingle = 15_300m,
-                StandardDeductionMarried = 30_600m,
-                AllowanceAmount = 5_300m,
-                BracketsSingle =
-                [
-                    B(0, 27_400m, 0.058m),
-                    B(27_400m, 64_850m, 0.0675m),
-                    B(64_850m, null, 0.0715m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 54_850m, 0.058m),
-                    B(54_850m, 129_750m, 0.0675m),
-                    B(129_750m, null, 0.0715m)
-                ]
-            },
+            // Maine uses a dedicated calculator (MaineWithholdingCalculator)
+            // — W-4ME filing statuses (Single/Married), $15,300/$30,600 standard
+            // deduction, $5,300 per W-4ME allowance, and three graduated brackets
+            // (5.80%/6.75%/7.15%) per Maine Revenue Services 2026 Withholding Tables.
 
-            [UsState.MD] = new()
-            {
-                StandardDeductionSingle = 2_550m,
-                StandardDeductionMarried = 5_100m,
-                AllowanceAmount = 3_200m,
-                BracketsSingle =
-                [
-                    B(0, 1_000m, 0.02m),
-                    B(1_000m, 2_000m, 0.03m),
-                    B(2_000m, 3_000m, 0.04m),
-                    B(3_000m, 100_000m, 0.0475m),
-                    B(100_000m, 125_000m, 0.05m),
-                    B(125_000m, 150_000m, 0.0525m),
-                    B(150_000m, 250_000m, 0.055m),
-                    B(250_000m, 500_000m, 0.0575m),
-                    B(500_000m, 1_000_000m, 0.0625m),
-                    B(1_000_000m, null, 0.065m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 1_000m, 0.02m),
-                    B(1_000m, 2_000m, 0.03m),
-                    B(2_000m, 3_000m, 0.04m),
-                    B(3_000m, 150_000m, 0.0475m),
-                    B(150_000m, 175_000m, 0.05m),
-                    B(175_000m, 225_000m, 0.0525m),
-                    B(225_000m, 300_000m, 0.055m),
-                    B(300_000m, 600_000m, 0.0575m),
-                    B(600_000m, 1_200_000m, 0.0625m),
-                    B(1_200_000m, null, 0.065m)
-                ]
-            },
+            // Maryland uses a dedicated calculator (MarylandWithholdingCalculator)
+            // — MW507 filing statuses (Single/Married/Head of Household), variable
+            // standard deduction (15% of wages, min $1,600/$3,200, max $2,550/$5,100),
+            // $3,200 per MW507 exemption, and ten graduated brackets (2%–6.5%) per the
+            // Comptroller of Maryland 2026 Employer Withholding Guide.
 
-            [UsState.MN] = new()
-            {
-                StandardDeductionSingle = 15_300m,
-                StandardDeductionMarried = 30_600m,
-                AllowanceAmount = 5_300m,
-                BracketsSingle =
-                [
-                    B(0, 33_310m, 0.0535m),
-                    B(33_310m, 109_430m, 0.068m),
-                    B(109_430m, 203_150m, 0.0785m),
-                    B(203_150m, null, 0.0985m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 48_700m, 0.0535m),
-                    B(48_700m, 193_480m, 0.068m),
-                    B(193_480m, 337_930m, 0.0785m),
-                    B(337_930m, null, 0.0985m)
-                ]
-            },
+            // Minnesota uses a dedicated calculator (MinnesotaWithholdingCalculator)
+            // — W-4MN filing statuses (Single/Married/Head of Household),
+            // $15,300/$30,600/$23,000 standard deduction, $5,300 per W-4MN allowance,
+            // and four graduated brackets (5.35%/6.80%/7.85%/9.85%) per the Minnesota
+            // Department of Revenue 2026 Withholding Tax Instructions and Tables (Pub. 89).
 
-            [UsState.MO] = new()
-            {
-                StandardDeductionSingle = 15_750m,
-                StandardDeductionMarried = 31_500m,
-                BracketsSingle =
-                [
-                    B(0, 1_313m, 0m),
-                    B(1_313m, 2_626m, 0.02m),
-                    B(2_626m, 3_939m, 0.025m),
-                    B(3_939m, 5_252m, 0.03m),
-                    B(5_252m, 6_565m, 0.035m),
-                    B(6_565m, 7_878m, 0.04m),
-                    B(7_878m, 9_191m, 0.045m),
-                    B(9_191m, null, 0.047m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 1_313m, 0m),
-                    B(1_313m, 2_626m, 0.02m),
-                    B(2_626m, 3_939m, 0.025m),
-                    B(3_939m, 5_252m, 0.03m),
-                    B(5_252m, 6_565m, 0.035m),
-                    B(6_565m, 7_878m, 0.04m),
-                    B(7_878m, 9_191m, 0.045m),
-                    B(9_191m, null, 0.047m)
-                ]
-            },
+            // Missouri uses a dedicated calculator (MissouriWithholdingCalculator)
+            // — MO W-4 filing statuses (Single/Married/Head of Household),
+            // $15,750/$31,500/$23,625 standard deduction (mirrors federal),
+            // $2,100 per MO W-4 allowance, and eight graduated brackets
+            // (0%–4.7%) per the Missouri DOR 2026 Employer's Withholding Tax Guide.
 
             [UsState.MT] = new()
             {

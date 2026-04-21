@@ -375,12 +375,29 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // standard deduction, $2,250 per K-4 allowance, two graduated
         // brackets 5.20%/5.58%).
         //
+        // Louisiana is also absent: it uses the dedicated
+        // LouisianaWithholdingCalculator (L-4 filing statuses, $4,500/$9,000
+        // personal exemption, $1,000 per-dependent deduction, and three
+        // graduated brackets 1.85%/3.50%/4.25% per R-1306).
+        //
+        // Maine is also absent: it uses the dedicated
+        // MaineWithholdingCalculator (W-4ME filing status, $15,300/$30,600
+        // standard deduction, $5,300 allowance, three graduated brackets).
+        //
+        // Maryland is also absent: it uses the dedicated
+        // MarylandWithholdingCalculator (MW507 filing statuses, variable
+        // standard deduction 15% of wages with min/max, $3,200 per exemption,
+        // ten graduated brackets 2%–6.5%).
+        //
+        // Massachusetts is also absent: it uses the dedicated
+        // MassachusettsWithholdingCalculator (M-4 filing statuses, personal/
+        // dependent/blind/age exemptions, flat 5% with 4% surtax above $1M).
+        //
         // Michigan is also absent: it uses the dedicated
         // MichiganWithholdingCalculator (flat 4.25% with MI-W4 exemptions).
         UsState[] expectedStates =
         [
             UsState.KY,
-            UsState.LA, UsState.MA, UsState.MD, UsState.ME,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
             UsState.ND, UsState.NE, UsState.NJ, UsState.NM, UsState.NY,
             UsState.OH, UsState.OR, UsState.RI, UsState.SC, UsState.UT,
@@ -411,8 +428,20 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.KS),
             "KS should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
 
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.LA),
+            "LA should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MD),
+            "MD should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.ME),
+            "ME should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MI),
             "MI should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MA),
+            "MA should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────
