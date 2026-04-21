@@ -26,6 +26,7 @@ using PaycheckCalc.Core.Tax.Iowa;
 using PaycheckCalc.Core.Tax.Kansas;
 using PaycheckCalc.Core.Tax.Louisiana;
 using PaycheckCalc.Core.Tax.Maine;
+using PaycheckCalc.Core.Tax.Maryland;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
@@ -181,6 +182,12 @@ public static class MauiProgram
             // brackets (5.80%/6.75%/7.15%) per Maine Revenue Services 2026
             // Withholding Tables
             registry.Register(new MaineWithholdingCalculator());
+
+            // Maryland — MW507 filing statuses (Single/Married/Head of Household),
+            // variable standard deduction (15% of wages, min $1,600/$3,200,
+            // max $2,550/$5,100), $3,200 per exemption, and ten graduated brackets
+            // (2%–6.5%) per the Comptroller of Maryland 2026 Employer Withholding Guide
+            registry.Register(new MarylandWithholdingCalculator());
 
             // Michigan — flat 4.25% with MI-W4 personal/dependent exemptions
             // ($5,900 per exemption, 2026 Form 446 Withholding Guide)
