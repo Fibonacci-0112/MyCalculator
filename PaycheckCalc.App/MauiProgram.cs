@@ -35,6 +35,7 @@ using PaycheckCalc.Core.Tax.Minnesota;
 using PaycheckCalc.Core.Tax.Montana;
 using PaycheckCalc.Core.Tax.Nebraska;
 using PaycheckCalc.Core.Tax.NewJersey;
+using PaycheckCalc.Core.Tax.NewMexico;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -243,6 +244,12 @@ public static class MauiProgram
             // Table A (single) brackets for Status A and C, and Table B
             // (married/HoH/surviving) brackets for Status B, D, and E per the 2026 NJ-WT
             registry.Register(new NewJerseyWithholdingCalculator());
+
+            // New Mexico — RPD-41272 filing statuses (Single/Married/Head of Household),
+            // $15,750/$31,500/$23,625 standard deduction (mirrors federal),
+            // $4,000 per RPD-41272 exemption, and five graduated brackets
+            // (1.7%/3.2%/4.7%/4.9%/5.9%) per NM FYI-104 and NMSA §7-2-7
+            registry.Register(new NewMexicoWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

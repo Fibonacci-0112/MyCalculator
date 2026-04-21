@@ -1,12 +1,12 @@
 # New Mexico (NM)
 
-New Mexico state income tax withholding is currently computed by the generic
-annualized percentage-method engine (`PercentageMethodWithholdingAdapter`
-+ `PercentageMethodStateTaxCalculator`) using the `UsState.NM` entry in
-`PaycheckCalc.Core/Tax/State/StateTaxConfigs2026.cs`.
+New Mexico state income tax withholding is computed by the dedicated
+`NewMexicoWithholdingCalculator`, which implements the annualized
+percentage-method formula described in the NM Taxation and Revenue
+Department FYI-104 and Form RPD-41272 (New Mexico Employee's Withholding
+Exemption Certificate).
 
-This folder exists as a placeholder so that any future New Mexico-specific
-logic that cannot be expressed through `PercentageMethodConfig` (for
-example, table-driven withholding, unique allowances, or a bespoke
-`IStateWithholdingCalculator` implementation) can be added here alongside
-the other state modules under `PaycheckCalc.Core/Tax/`.
+The calculator supports three filing statuses (Single, Married, and Head of
+Household), the $4,000 per-exemption deduction from RPD-41272, and five
+graduated brackets (1.7%/3.2%/4.7%/4.9%/5.9%) with filing-status–specific
+thresholds per NMSA §7-2-7 as amended by NM SB 145 (2023, effective 2024).
