@@ -214,7 +214,7 @@ public class KentuckyWithholdingCalculatorTest
             Year: 2026);
         var values = new StateInputValues { ["Allowances"] = 100 };
 
-        var result = calc.Calculate(context, new StateInputValues { ["Allowances"] = 100 });
+        var result = calc.Calculate(context, values);
 
         Assert.Equal(500m, result.TaxableWages);
         Assert.Equal(0m, result.Withholding);
