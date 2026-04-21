@@ -31,7 +31,6 @@ This repository is a cross-platform .NET MAUI paycheck calculator with a strict 
 ## State-tax extension rules
 
 - New states or major state changes should fit the plugin model behind `IStateWithholdingCalculator`.
-- If a state can use the generic annualized percentage-method engine, prefer `PercentageMethodWithholdingAdapter` with a `StateTaxConfigs2026` entry instead of creating a one-off calculator.
 - If a state truly has unique inputs or formulas, add a dedicated module under `PaycheckCalc.Core/Tax/<StateName>` and expose a schema through the calculator.
 - When adding or changing state input fields, make sure the schema, validation, UI field resolution, and tests all stay aligned.
 - Keep supported-state coverage complete for all 50 states plus DC.
