@@ -32,6 +32,7 @@ using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
 using PaycheckCalc.Core.Tax.Local.Pennsylvania;
+using PaycheckCalc.Core.Tax.Massachusetts;
 using PaycheckCalc.Core.Tax.Michigan;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
@@ -188,6 +189,10 @@ public static class MauiProgram
             // max $2,550/$5,100), $3,200 per exemption, and ten graduated brackets
             // (2%–6.5%) per the Comptroller of Maryland 2026 Employer Withholding Guide
             registry.Register(new MarylandWithholdingCalculator());
+
+            // Massachusetts — M-4 filing statuses (Single/Married/Head of Household),
+            // personal/dependent/blind/age exemptions, flat 5% with 4% surtax above $1M
+            registry.Register(new MassachusettsWithholdingCalculator());
 
             // Michigan — flat 4.25% with MI-W4 personal/dependent exemptions
             // ($5,900 per exemption, 2026 Form 446 Withholding Guide)
