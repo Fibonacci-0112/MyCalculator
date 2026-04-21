@@ -25,6 +25,7 @@ using PaycheckCalc.Core.Tax.Indiana;
 using PaycheckCalc.Core.Tax.Iowa;
 using PaycheckCalc.Core.Tax.Kansas;
 using PaycheckCalc.Core.Tax.Louisiana;
+using PaycheckCalc.Core.Tax.Maine;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
@@ -174,6 +175,12 @@ public static class MauiProgram
             // $4,500/$9,000 personal exemption, $1,000 per-dependent deduction,
             // and three graduated brackets (1.85%/3.50%/4.25%) per R-1306
             registry.Register(new LouisianaWithholdingCalculator());
+
+            // Maine — W-4ME filing statuses (Single/Married), $15,300/$30,600
+            // standard deduction, $5,300 per W-4ME allowance, and three graduated
+            // brackets (5.80%/6.75%/7.15%) per Maine Revenue Services 2026
+            // Withholding Tables
+            registry.Register(new MaineWithholdingCalculator());
 
             // Michigan — flat 4.25% with MI-W4 personal/dependent exemptions
             // ($5,900 per exemption, 2026 Form 446 Withholding Guide)

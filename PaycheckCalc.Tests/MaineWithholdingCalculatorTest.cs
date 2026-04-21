@@ -1,4 +1,5 @@
 using PaycheckCalc.Core.Models;
+using PaycheckCalc.Core.Tax.Maine;
 using PaycheckCalc.Core.Tax.State;
 using Xunit;
 
@@ -6,8 +7,7 @@ namespace PaycheckCalc.Tests;
 
 /// <summary>
 /// Regression tests for Maine (ME) state income tax withholding.
-/// Maine uses the generic <see cref="PercentageMethodWithholdingAdapter"/> backed
-/// by the <see cref="StateTaxConfigs2026"/> entry for <see cref="UsState.ME"/>.
+/// Maine uses the dedicated <see cref="MaineWithholdingCalculator"/>.
 ///
 /// Expected dollar amounts are hand-computed from Maine Revenue Services'
 /// annualized percentage-method formula (2026 Withholding Tables):
@@ -29,7 +29,7 @@ public class MaineWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsMaine()
     {
-        var calc = CreateCalculator();
+        var calc = new MaineWithholdingCalculator();
         Assert.Equal(UsState.ME, calc.State);
     }
 
@@ -38,7 +38,7 @@ public class MaineWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc = CreateCalculator();
+        var calc = new MaineWithholdingCalculator();
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -50,7 +50,7 @@ public class MaineWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsSingleMarried()
     {
-        var calc = CreateCalculator();
+        var calc = new MaineWithholdingCalculator();
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -228,12 +228,6 @@ public class MaineWithholdingCalculatorTest
 
     // ── Helper ───────────────────────────────────────────────────────
 
-    private static PercentageMethodWithholdingAdapter CreateCalculator()
-    {
-        var config = StateTaxConfigs2026.Configs[UsState.ME];
-        return new PercentageMethodWithholdingAdapter(UsState.ME, config);
-    }
-
     private static StateWithholdingResult Calculate(
         decimal GrossWages,
         PayFrequency PayPeriod,
@@ -242,7 +236,7 @@ public class MaineWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = CreateCalculator();
+        var calc = new MaineWithholdingCalculator();
         var context = new CommonWithholdingContext(
             UsState.ME,
             GrossWages: GrossWages,
@@ -258,3 +252,4 @@ public class MaineWithholdingCalculatorTest
         return calc.Calculate(context, values);
     }
 }
+

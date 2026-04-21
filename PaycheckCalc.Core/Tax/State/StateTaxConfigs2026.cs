@@ -120,24 +120,10 @@ public static class StateTaxConfigs2026
             // personal exemption, $1,000 per-dependent deduction, and three graduated
             // brackets (1.85%/3.50%/4.25%) per Louisiana R-1306.
 
-            [UsState.ME] = new()
-            {
-                StandardDeductionSingle = 15_300m,
-                StandardDeductionMarried = 30_600m,
-                AllowanceAmount = 5_300m,
-                BracketsSingle =
-                [
-                    B(0, 27_400m, 0.058m),
-                    B(27_400m, 64_850m, 0.0675m),
-                    B(64_850m, null, 0.0715m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 54_850m, 0.058m),
-                    B(54_850m, 129_750m, 0.0675m),
-                    B(129_750m, null, 0.0715m)
-                ]
-            },
+            // Maine uses a dedicated calculator (MaineWithholdingCalculator)
+            // — W-4ME filing statuses (Single/Married), $15,300/$30,600 standard
+            // deduction, $5,300 per W-4ME allowance, and three graduated brackets
+            // (5.80%/6.75%/7.15%) per Maine Revenue Services 2026 Withholding Tables.
 
             [UsState.MD] = new()
             {
