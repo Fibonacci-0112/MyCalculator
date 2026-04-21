@@ -27,6 +27,7 @@ using PaycheckCalc.Core.Tax.Kansas;
 using PaycheckCalc.Core.Tax.Louisiana;
 using PaycheckCalc.Core.Tax.Maine;
 using PaycheckCalc.Core.Tax.Maryland;
+using PaycheckCalc.Core.Tax.Missouri;
 using PaycheckCalc.Core.Tax.Mississippi;
 using PaycheckCalc.Core.Tax.Minnesota;
 using PaycheckCalc.Core.Tax.Local.Maryland;
@@ -210,6 +211,12 @@ public static class MauiProgram
             // ($6,000/$12,000/$9,500), $1,500 per dependent, and two brackets
             // (0% on $0–$10,000, 4% over $10,000) per MS Pub 89-105 and HB 1 (2023)
             registry.Register(new MississippiWithholdingCalculator());
+
+            // Missouri — MO W-4 filing statuses (Single/Married/Head of Household),
+            // $15,750/$31,500/$23,625 standard deduction (mirrors federal),
+            // $2,100 per MO W-4 allowance, and eight graduated brackets (0%–4.7%)
+            // per the Missouri DOR 2026 Employer's Withholding Tax Guide
+            registry.Register(new MissouriWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
