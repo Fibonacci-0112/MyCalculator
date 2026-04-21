@@ -27,6 +27,7 @@ using PaycheckCalc.Core.Tax.Kansas;
 using PaycheckCalc.Core.Tax.Louisiana;
 using PaycheckCalc.Core.Tax.Maine;
 using PaycheckCalc.Core.Tax.Maryland;
+using PaycheckCalc.Core.Tax.Minnesota;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
@@ -197,6 +198,12 @@ public static class MauiProgram
             // Michigan — flat 4.25% with MI-W4 personal/dependent exemptions
             // ($5,900 per exemption, 2026 Form 446 Withholding Guide)
             registry.Register(new MichiganWithholdingCalculator());
+
+            // Minnesota — W-4MN filing statuses (Single/Married/Head of Household),
+            // $15,300/$30,600/$23,000 standard deduction, $5,300 per W-4MN allowance,
+            // and four graduated brackets (5.35%/6.80%/7.85%/9.85%) per the Minnesota
+            // Department of Revenue 2026 Withholding Tax Instructions and Tables (Pub. 89)
+            registry.Register(new MinnesotaWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

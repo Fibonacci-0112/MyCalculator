@@ -128,26 +128,11 @@ public static class StateTaxConfigs2026
             // $3,200 per MW507 exemption, and ten graduated brackets (2%–6.5%) per the
             // Comptroller of Maryland 2026 Employer Withholding Guide.
 
-            [UsState.MN] = new()
-            {
-                StandardDeductionSingle = 15_300m,
-                StandardDeductionMarried = 30_600m,
-                AllowanceAmount = 5_300m,
-                BracketsSingle =
-                [
-                    B(0, 33_310m, 0.0535m),
-                    B(33_310m, 109_430m, 0.068m),
-                    B(109_430m, 203_150m, 0.0785m),
-                    B(203_150m, null, 0.0985m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 48_700m, 0.0535m),
-                    B(48_700m, 193_480m, 0.068m),
-                    B(193_480m, 337_930m, 0.0785m),
-                    B(337_930m, null, 0.0985m)
-                ]
-            },
+            // Minnesota uses a dedicated calculator (MinnesotaWithholdingCalculator)
+            // — W-4MN filing statuses (Single/Married/Head of Household),
+            // $15,300/$30,600/$23,000 standard deduction, $5,300 per W-4MN allowance,
+            // and four graduated brackets (5.35%/6.80%/7.85%/9.85%) per the Minnesota
+            // Department of Revenue 2026 Withholding Tax Instructions and Tables (Pub. 89).
 
             [UsState.MO] = new()
             {
