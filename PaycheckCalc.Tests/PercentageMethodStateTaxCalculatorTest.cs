@@ -100,38 +100,8 @@ public class PercentageMethodWithholdingAdapterExtendedTest
             "CA should not be in generic StateTaxConfigs2026 — it uses CaliforniaPercentageCalculator.");
     }
 
-    [Fact]
-    public void NewYork_GraduatedBrackets_Married()
-    {
-        var calc = CreateCalculator(UsState.NY);
-
-        var context = new CommonWithholdingContext(
-            UsState.NY,
-            GrossWages: 4000m,
-            PayPeriod: PayFrequency.Biweekly,
-            Year: 2026);
-        var values = new StateInputValues
-        {
-            ["FilingStatus"] = "Married",
-            ["Allowances"] = 0,
-            ["AdditionalWithholding"] = 0m
-        };
-
-        var result = calc.Calculate(context, values);
-
-        // annual = 4000 * 26 = 104,000
-        // std ded married = 16,050
-        // taxable = 104000 - 16050 = 87,950
-        // Married brackets:
-        // 0-17150 @ 4% = 686.00
-        // 17150-23600 @ 4.5% = 290.25
-        // 23600-27900 @ 5.25% = 225.75
-        // 27900-43000 @ 5.9% = 890.90
-        // 43000-87950 @ 6.09% = 2737.455
-        // total = 686.00 + 290.25 + 225.75 + 890.90 + 2737.455 = 4830.355
-        // per period = 4830.355 / 26 = 185.7828... rounds to 185.78
-        Assert.Equal(185.78m, result.Withholding);
-    }
+    // New York now uses a dedicated calculator (NewYorkWithholdingCalculator).
+    // See NewYorkWithholdingCalculatorTest for regression tests.
 
     [Fact]
     public void Ohio_ZeroBracket_LowIncome()
@@ -307,7 +277,6 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
     [Theory]
     [InlineData(UsState.UT)]
-    [InlineData(UsState.NY)]
     [InlineData(UsState.VA)]
     [InlineData(UsState.OH)]
     public void State_ReturnsCorrectState(UsState state)
@@ -395,11 +364,17 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         //
         // Michigan is also absent: it uses the dedicated
         // MichiganWithholdingCalculator (flat 4.25% with MI-W4 exemptions).
+        //
+        // New York is also absent: it uses the dedicated
+        // NewYorkWithholdingCalculator (IT-2104 filing statuses Single/Married/
+        // Head of Household, $8,000/$16,050/$11,000 standard deduction,
+        // $1,000 per IT-2104 allowance, ten graduated brackets 4%–10.9%
+        // per NYS Publication NYS-50-T-NYS (2026)).
         UsState[] expectedStates =
         [
             UsState.KY,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
-            UsState.ND, UsState.NE, UsState.NJ, UsState.NY,
+            UsState.ND, UsState.NE, UsState.NJ,
             UsState.OH, UsState.OR, UsState.RI, UsState.SC, UsState.UT,
             UsState.VA, UsState.VT, UsState.WI, UsState.WV
         ];
@@ -445,6 +420,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.NM),
             "NM should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.NY),
+            "NY should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────

@@ -36,6 +36,7 @@ using PaycheckCalc.Core.Tax.Montana;
 using PaycheckCalc.Core.Tax.Nebraska;
 using PaycheckCalc.Core.Tax.NewJersey;
 using PaycheckCalc.Core.Tax.NewMexico;
+using PaycheckCalc.Core.Tax.NewYork;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -250,6 +251,11 @@ public static class MauiProgram
             // $4,000 per RPD-41272 exemption, and five graduated brackets
             // (1.7%/3.2%/4.7%/4.9%/5.9%) per NM FYI-104 and NMSA §7-2-7
             registry.Register(new NewMexicoWithholdingCalculator());
+
+            // New York — IT-2104 filing statuses (Single/Married/Head of Household),
+            // $8,000/$16,050/$11,000 standard deduction, $1,000 per IT-2104 allowance,
+            // and ten graduated brackets (4%–10.9%) per NYS Publication NYS-50-T-NYS (2026)
+            registry.Register(new NewYorkWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

@@ -159,37 +159,10 @@ public static class StateTaxConfigs2026
             // (1.7%/3.2%/4.7%/4.9%/5.9%) with filing-status–specific thresholds
             // per the NM Taxation and Revenue FYI-104 and NMSA §7-2-7 (SB 145, 2023).
 
-            [UsState.NY] = new()
-            {
-                StandardDeductionSingle = 8_000m,
-                StandardDeductionMarried = 16_050m,
-                BracketsSingle =
-                [
-                    B(0, 8_500m, 0.04m),
-                    B(8_500m, 11_700m, 0.045m),
-                    B(11_700m, 13_900m, 0.0525m),
-                    B(13_900m, 21_400m, 0.059m),
-                    B(21_400m, 80_650m, 0.0609m),
-                    B(80_650m, 215_400m, 0.0641m),
-                    B(215_400m, 1_077_550m, 0.0685m),
-                    B(1_077_550m, 5_000_000m, 0.0965m),
-                    B(5_000_000m, 25_000_000m, 0.103m),
-                    B(25_000_000m, null, 0.109m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 17_150m, 0.04m),
-                    B(17_150m, 23_600m, 0.045m),
-                    B(23_600m, 27_900m, 0.0525m),
-                    B(27_900m, 43_000m, 0.059m),
-                    B(43_000m, 161_550m, 0.0609m),
-                    B(161_550m, 323_200m, 0.0641m),
-                    B(323_200m, 2_155_350m, 0.0685m),
-                    B(2_155_350m, 5_000_000m, 0.0965m),
-                    B(5_000_000m, 25_000_000m, 0.103m),
-                    B(25_000_000m, null, 0.109m)
-                ]
-            },
+            // New York uses a dedicated calculator (NewYorkWithholdingCalculator)
+            // — IT-2104 filing statuses (Single/Married/Head of Household),
+            // $8,000/$16,050/$11,000 standard deduction, $1,000 per IT-2104 allowance,
+            // and ten graduated brackets (4%–10.9%) per NYS Publication NYS-50-T-NYS (2026).
 
             [UsState.ND] = new()
             {
