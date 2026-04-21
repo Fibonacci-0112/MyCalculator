@@ -1,6 +1,6 @@
 # PaycheckCalc
 
-A cross-platform paycheck calculator that computes net pay, tax withholdings, and deductions for all 50 US states plus DC using 2026 tax tables. The solution ships with two front-ends — a **.NET MAUI** app (Android & Windows) and a **Blazor Server** web head — both backed by a shared UI-agnostic core library. It also includes self-employment (Schedule SE + QBI) and annual Form 1040 tax estimation modules.
+A cross-platform paycheck calculator that computes net pay, tax withholdings, and deductions for all 50 US states plus DC using 2026 tax tables. The solution ships with three front-ends — a **.NET MAUI** app (Android & Windows), a **Blazor Server** web head, and an **Angular + ASP.NET Core Web API** web head — all backed by a shared UI-agnostic core library. It also includes self-employment (Schedule SE + QBI) and annual Form 1040 tax estimation modules.
 
 ## Features
 
@@ -52,6 +52,12 @@ PaycheckCalc.slnx
 │   ├── Services/              # CalculatorSessionState (shared per-circuit state)
 │   ├── wwwroot/               # Static assets; tax JSON is content-linked from Core/Data at build
 │   └── Program.cs             # Web host, DI, and tax-data loading
+├── PaycheckCalc.Api/          # ASP.NET Core Web API (net11.0) backend for the Angular head
+│   ├── Controllers/           # PaycheckController, ReferenceController
+│   ├── Dtos/                  # JSON request/response DTOs mirroring Core models
+│   ├── Mapping/               # DTO ↔ PaycheckCalc.Core domain mapping
+│   └── Program.cs             # Web host, DI, CORS, and tax-data loading (mirrors Blazor head)
+├── PaycheckCalc.Angular/      # Angular single-page front end consuming PaycheckCalc.Api
 ├── PaycheckCalc.Core/         # Business logic (no UI dependencies)
 │   ├── Models/                # PaycheckInput/Result, Enums, Deduction, AnnualProjection,
 │   │                          #   CalculationScenario, SavedPaycheck, SelfEmploymentInput,
@@ -94,8 +100,8 @@ PaycheckCalc.slnx
 
 | Component | Technology |
 |---|---|
-| **Frameworks** | .NET 11 Preview — MAUI (PaycheckCalc.App) and Blazor Web App / Server rendering (PaycheckCalc.Blazor) |
-| **Target Platforms** | Android, Windows 10+ (MAUI); modern browsers via server-rendered Blazor |
+| **Frameworks** | .NET 11 Preview — MAUI (PaycheckCalc.App), Blazor Web App / Server rendering (PaycheckCalc.Blazor), and ASP.NET Core Web API (PaycheckCalc.Api); Angular 19 (PaycheckCalc.Angular) |
+| **Target Platforms** | Android, Windows 10+ (MAUI); modern browsers via server-rendered Blazor or the Angular SPA |
 | **UI Pattern** | MVVM with [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) on MAUI; Razor components on Blazor |
 | **Test Framework** | xUnit 2.9.3 |
 | **PDF Export** | [QuestPDF](https://www.questpdf.com/) 2025.12.4 |
@@ -141,6 +147,46 @@ dotnet run --project PaycheckCalc.Blazor
 ```
 
 The web app loads tax JSON at startup from its build output (linked from `PaycheckCalc.Core/Data/`) and uses an interactive Server rendering mode with a per-circuit `CalculatorSessionState` shared between the inputs and results pages.
+
+### Run the Angular Web App (ASP.NET Core API backend)
+
+The Angular head is a thin SPA that talks to a dedicated ASP.NET Core Web API
+(`PaycheckCalc.Api`). The API reuses `PaycheckCalc.Core` for all payroll math,
+so the Angular client never contains any tax logic of its own.
+
+1. Start the API (serves on `http://localhost:5200` in Development):
+
+   ```bash
+   dotnet run --project PaycheckCalc.Api
+   ```
+
+2. In a second terminal, install Angular dependencies and start the dev server
+   (serves on `http://localhost:4200`):
+
+   ```bash
+   cd PaycheckCalc.Angular
+   npm install
+   npm start
+   ```
+
+3. Open `http://localhost:4200` in a browser. The SPA fetches the list of
+   supported states, pay frequencies, and the per-state input schema from the
+   API, then posts a `PaycheckInput` to `POST /api/paycheck/calculate` and
+   renders the returned `PaycheckResult`.
+
+CORS for the Angular dev origin is configured in `PaycheckCalc.Api/appsettings.json`
+under the `Cors:AllowedOrigins` key.
+
+## Web API reference (PaycheckCalc.Api)
+
+| Endpoint | Description |
+|---|---|
+| `GET  /api/reference/states` | USPS two-letter codes for all supported states |
+| `GET  /api/reference/pay-frequencies` | Supported pay frequencies |
+| `GET  /api/reference/federal-filing-statuses` | Supported W-4 filing statuses |
+| `GET  /api/reference/deduction-options` | Deduction types and amount types |
+| `GET  /api/reference/states/{state}/schema` | Dynamic input schema (`StateFieldDefinition[]`) for the given state |
+| `POST /api/paycheck/calculate` | Runs `PayCalculator.Calculate` and returns a full `PaycheckResult` |
 
 ## How It Works
 
