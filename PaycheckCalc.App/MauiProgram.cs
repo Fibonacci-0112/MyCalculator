@@ -37,6 +37,7 @@ using PaycheckCalc.Core.Tax.Nebraska;
 using PaycheckCalc.Core.Tax.NewJersey;
 using PaycheckCalc.Core.Tax.NewMexico;
 using PaycheckCalc.Core.Tax.NewYork;
+using PaycheckCalc.Core.Tax.NorthCarolina;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -256,6 +257,11 @@ public static class MauiProgram
             // $8,000/$16,050/$11,000 standard deduction, $1,000 per IT-2104 allowance,
             // and ten graduated brackets (4%–10.9%) per NYS Publication NYS-50-T-NYS (2026)
             registry.Register(new NewYorkWithholdingCalculator());
+
+            // North Carolina — NC-4 filing statuses (Single/Married/Head of Household),
+            // $12,750/$25,500/$19,125 standard deduction, $2,500 per NC-4 allowance,
+            // and a flat 4.5% rate per NC DOR Publication NC-30 (2026)
+            registry.Register(new NorthCarolinaWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

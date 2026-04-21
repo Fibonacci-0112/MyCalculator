@@ -27,6 +27,7 @@ using PaycheckCalc.Core.Tax.Montana;
 using PaycheckCalc.Core.Tax.Nebraska;
 using PaycheckCalc.Core.Tax.NewJersey;
 using PaycheckCalc.Core.Tax.NewMexico;
+using PaycheckCalc.Core.Tax.NorthCarolina;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.State;
@@ -221,10 +222,12 @@ public class PercentageMethodWithholdingAdapterTest
         Assert.Equal(232.50m, result.Withholding);
     }
 
+    // North Carolina now uses a dedicated calculator (NorthCarolinaWithholdingCalculator).
+    // See NorthCarolinaWithholdingCalculatorTest for regression tests.
     [Fact]
-    public void NorthCarolina_Married_MatchesLegacyCalculator()
+    public void NorthCarolina_Married_DedicatedCalculator()
     {
-        var adapter = CreateAdapter(UsState.NC);
+        var calc = new NorthCarolinaWithholdingCalculator();
         var context = new CommonWithholdingContext(UsState.NC, 6000m, PayFrequency.Monthly, 2026);
         var values = new StateInputValues
         {
@@ -233,9 +236,11 @@ public class PercentageMethodWithholdingAdapterTest
             ["AdditionalWithholding"] = 0m
         };
 
-        var result = adapter.Calculate(context, values);
+        var result = calc.Calculate(context, values);
 
-        // Same as legacy test: 174.38
+        // annual = 6000 * 12 = 72,000; std ded married = 25,500
+        // taxable = 72,000 - 25,500 = 46,500; tax = 46,500 * 4.5% = 2,092.50
+        // per period = 2,092.50 / 12 = 174.375 → 174.38
         Assert.Equal(174.38m, result.Withholding);
     }
 
