@@ -23,6 +23,7 @@ using PaycheckCalc.Core.Tax.Michigan;
 using PaycheckCalc.Core.Tax.Missouri;
 using PaycheckCalc.Core.Tax.Mississippi;
 using PaycheckCalc.Core.Tax.Minnesota;
+using PaycheckCalc.Core.Tax.Montana;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.State;
@@ -770,6 +771,8 @@ public class FullRegistryIntegrationTest
         registry.Register(new MississippiWithholdingCalculator());
 
         registry.Register(new MissouriWithholdingCalculator());
+
+        registry.Register(new MontanaWithholdingCalculator());
 
         UsState[] noTaxStates = [UsState.AK, UsState.FL, UsState.NV, UsState.NH, UsState.SD, UsState.TN, UsState.TX, UsState.WA, UsState.WY];
         foreach (var state in noTaxStates)
