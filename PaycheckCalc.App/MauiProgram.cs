@@ -33,6 +33,7 @@ using PaycheckCalc.Core.Tax.Missouri;
 using PaycheckCalc.Core.Tax.Mississippi;
 using PaycheckCalc.Core.Tax.Minnesota;
 using PaycheckCalc.Core.Tax.Montana;
+using PaycheckCalc.Core.Tax.Nebraska;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -230,6 +231,12 @@ public static class MauiProgram
             // and two brackets (4.7% on $0–$23,800, 5.9% over $23,800) per the
             // Montana DOR 2026 Withholding Tax Guide
             registry.Register(new MontanaWithholdingCalculator());
+
+            // Nebraska — W-4N filing statuses (Single/Married/Head of Household),
+            // standard deductions $8,600/$17,200/$12,900, $171 per-allowance credit
+            // (applied to computed tax), and four graduated brackets (2.46%/3.51%/5.01%/5.2%)
+            // with filing-status–specific thresholds per the Nebraska DOR 2026 Circular EN
+            registry.Register(new NebraskaWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
