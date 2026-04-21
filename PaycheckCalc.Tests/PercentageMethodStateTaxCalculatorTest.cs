@@ -389,12 +389,15 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // standard deduction 15% of wages with min/max, $3,200 per exemption,
         // ten graduated brackets 2%–6.5%).
         //
+        // Massachusetts is also absent: it uses the dedicated
+        // MassachusettsWithholdingCalculator (M-4 filing statuses, personal/
+        // dependent/blind/age exemptions, flat 5% with 4% surtax above $1M).
+        //
         // Michigan is also absent: it uses the dedicated
         // MichiganWithholdingCalculator (flat 4.25% with MI-W4 exemptions).
         UsState[] expectedStates =
         [
             UsState.KY,
-            UsState.MA,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
             UsState.ND, UsState.NE, UsState.NJ, UsState.NM, UsState.NY,
             UsState.OH, UsState.OR, UsState.RI, UsState.SC, UsState.UT,
@@ -436,6 +439,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MI),
             "MI should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MA),
+            "MA should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────

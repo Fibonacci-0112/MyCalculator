@@ -17,6 +17,7 @@ using PaycheckCalc.Core.Tax.Kansas;
 using PaycheckCalc.Core.Tax.Louisiana;
 using PaycheckCalc.Core.Tax.Maine;
 using PaycheckCalc.Core.Tax.Maryland;
+using PaycheckCalc.Core.Tax.Massachusetts;
 using PaycheckCalc.Core.Tax.Michigan;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
@@ -754,6 +755,8 @@ public class FullRegistryIntegrationTest
         registry.Register(new MaineWithholdingCalculator());
 
         registry.Register(new MarylandWithholdingCalculator());
+
+        registry.Register(new MassachusettsWithholdingCalculator());
 
         registry.Register(new MichiganWithholdingCalculator());
 

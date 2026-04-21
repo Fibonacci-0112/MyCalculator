@@ -51,14 +51,11 @@ public static class StateTaxConfigs2026
                 BracketsMarried = [B(0, null, 0.04m)]
             },
 
-            [UsState.MA] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                AllowanceAmount = 4_400m,
-                BracketsSingle = [B(0, null, 0.05m)],
-                BracketsMarried = [B(0, null, 0.05m)]
-            },
+            // Massachusetts uses a dedicated calculator (MassachusettsWithholdingCalculator)
+            // — M-4 filing statuses (Single/Married/Head of Household), personal
+            // exemptions ($4,400/$8,800/$6,800), $1,000 per dependent, $2,200 per
+            // blind exemption, $700 per age-65+ exemption, flat 5% rate with a 4%
+            // surtax on annual taxable income above $1,000,000.
 
             // Michigan uses a dedicated calculator (MichiganWithholdingCalculator)
             // — flat 4.25% with MI-W4 exemptions at $5,900 per exemption per the
