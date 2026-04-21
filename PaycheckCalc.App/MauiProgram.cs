@@ -18,6 +18,7 @@ using PaycheckCalc.Core.Tax.Connecticut;
 using PaycheckCalc.Core.Tax.Delaware;
 using PaycheckCalc.Core.Tax.DistrictOfColumbia;
 using PaycheckCalc.Core.Tax.Georgia;
+using PaycheckCalc.Core.Tax.Hawaii;
 using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Local;
@@ -138,6 +139,11 @@ public static class MauiProgram
             // standard deduction, and additional allowances (HB 111 / 2026
             // Employer's Tax Guide)
             registry.Register(new GeorgiaWithholdingCalculator());
+
+            // Hawaii — Booklet A percentage method with HW-4 filing-status
+            // standard deduction ($2,200 / $4,400) and $1,144 per HW-4
+            // allowance; 2026 graduated brackets (1.4%–11.0%)
+            registry.Register(new HawaiiWithholdingCalculator());
 
             // Idaho — flat 5.3% with ID W-4 filing-status standard deduction
             // and $3,300 per pre-2020 allowance (Idaho HB 521 / EPB00006)

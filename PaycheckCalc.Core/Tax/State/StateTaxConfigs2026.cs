@@ -113,41 +113,10 @@ public static class StateTaxConfigs2026
 
             // Delaware uses a dedicated calculator (DelawareWithholdingCalculator)
 
-            [UsState.HI] = new()
-            {
-                StandardDeductionSingle = 2_200m,
-                StandardDeductionMarried = 4_400m,
-                BracketsSingle =
-                [
-                    B(0, 2_400m, 0.014m),
-                    B(2_400m, 4_800m, 0.032m),
-                    B(4_800m, 9_600m, 0.055m),
-                    B(9_600m, 14_400m, 0.064m),
-                    B(14_400m, 19_200m, 0.068m),
-                    B(19_200m, 24_000m, 0.072m),
-                    B(24_000m, 36_000m, 0.076m),
-                    B(36_000m, 48_000m, 0.079m),
-                    B(48_000m, 150_000m, 0.0825m),
-                    B(150_000m, 175_000m, 0.09m),
-                    B(175_000m, 300_000m, 0.10m),
-                    B(300_000m, null, 0.11m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 4_800m, 0.014m),
-                    B(4_800m, 9_600m, 0.032m),
-                    B(9_600m, 19_200m, 0.055m),
-                    B(19_200m, 28_800m, 0.064m),
-                    B(28_800m, 38_400m, 0.068m),
-                    B(38_400m, 48_000m, 0.072m),
-                    B(48_000m, 72_000m, 0.076m),
-                    B(72_000m, 96_000m, 0.079m),
-                    B(96_000m, 300_000m, 0.0825m),
-                    B(300_000m, 350_000m, 0.09m),
-                    B(350_000m, 400_000m, 0.10m),
-                    B(400_000m, null, 0.11m)
-                ]
-            },
+            // Hawaii uses a dedicated calculator (HawaiiWithholdingCalculator)
+            // — Booklet A percentage method with filing-status standard
+            // deduction ($2,200 / $4,400), $1,144 per HW-4 allowance, and
+            // the 2026 annual graduated brackets (1.4%–11.0%).
 
             [UsState.KS] = new()
             {
