@@ -34,14 +34,10 @@ public static class StateTaxConfigs2026
 
             // Illinois uses a dedicated calculator (IllinoisWithholdingCalculator)
 
-            [UsState.IN] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                AllowanceAmount = 1_000m,
-                BracketsSingle = [B(0, null, 0.0305m)],
-                BracketsMarried = [B(0, null, 0.0305m)]
-            },
+            // Indiana uses a dedicated calculator (IndianaWithholdingCalculator)
+            // — flat 3.05% with WH-4 personal/age/blind exemptions ($1,000 each)
+            // and a separate additional dependent exemption ($3,000 each per
+            // Indiana Departmental Notice #1, 2023+).
 
             [UsState.IA] = new()
             {

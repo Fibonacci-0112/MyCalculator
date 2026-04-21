@@ -21,6 +21,7 @@ using PaycheckCalc.Core.Tax.Georgia;
 using PaycheckCalc.Core.Tax.Hawaii;
 using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
+using PaycheckCalc.Core.Tax.Indiana;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
@@ -151,6 +152,11 @@ public static class MauiProgram
 
             // Illinois — flat 4.95% with IL-W-4 basic and additional allowances
             registry.Register(new IllinoisWithholdingCalculator());
+
+            // Indiana — flat 3.05% with WH-4 personal/age/blind exemptions
+            // ($1,000 each) and additional dependent exemption ($3,000 each,
+            // Indiana Departmental Notice #1 for tax years 2023+)
+            registry.Register(new IndianaWithholdingCalculator());
 
             // Michigan — flat 4.25% with MI-W4 personal/dependent exemptions
             // ($5,900 per exemption, 2026 Form 446 Withholding Guide)
