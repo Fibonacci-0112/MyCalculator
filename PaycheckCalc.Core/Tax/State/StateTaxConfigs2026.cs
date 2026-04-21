@@ -28,13 +28,9 @@ public static class StateTaxConfigs2026
             // standard deductions, $4,000 dependent allowance, and $3,000
             // additional allowance per HB 111 and the 2026 Employer's Tax Guide.
 
-            [UsState.ID] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                BracketsSingle = [B(0, null, 0.058m)],
-                BracketsMarried = [B(0, null, 0.058m)]
-            },
+            // Idaho uses a dedicated calculator (IdahoWithholdingCalculator)
+            // — flat 5.3% (HB 521, 2024) with filing-status standard
+            // deduction ($16,100 / $32,200) and $3,300 per ID W-4 allowance.
 
             // Illinois uses a dedicated calculator (IllinoisWithholdingCalculator)
 
