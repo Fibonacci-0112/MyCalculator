@@ -137,21 +137,12 @@ public static class StateTaxConfigs2026
             // $2,100 per MO W-4 allowance, and eight graduated brackets
             // (0%–4.7%) per the Missouri DOR 2026 Employer's Withholding Tax Guide.
 
-            [UsState.MT] = new()
-            {
-                StandardDeductionSingle = 5_310m,
-                StandardDeductionMarried = 10_620m,
-                BracketsSingle =
-                [
-                    B(0, 23_800m, 0.047m),
-                    B(23_800m, null, 0.059m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 23_800m, 0.047m),
-                    B(23_800m, null, 0.059m)
-                ]
-            },
+            // Montana uses a dedicated calculator (MontanaWithholdingCalculator)
+            // — MW-4 filing statuses (Single/Married/Head of Household), variable
+            // standard deduction (20% of wages, min $4,370/$8,740, max $5,310/$10,620
+            // for Single/Married), $3,040 per MW-4 exemption, and two brackets
+            // (4.7% on $0–$23,800, 5.9% over $23,800) per the Montana DOR 2026
+            // Withholding Tax Guide.
 
             [UsState.NE] = new()
             {

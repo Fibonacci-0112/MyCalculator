@@ -30,6 +30,7 @@ using PaycheckCalc.Core.Tax.Maryland;
 using PaycheckCalc.Core.Tax.Missouri;
 using PaycheckCalc.Core.Tax.Mississippi;
 using PaycheckCalc.Core.Tax.Minnesota;
+using PaycheckCalc.Core.Tax.Montana;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -217,6 +218,13 @@ public static class MauiProgram
             // $2,100 per MO W-4 allowance, and eight graduated brackets (0%–4.7%)
             // per the Missouri DOR 2026 Employer's Withholding Tax Guide
             registry.Register(new MissouriWithholdingCalculator());
+
+            // Montana — MW-4 filing statuses (Single/Married/Head of Household),
+            // variable standard deduction (20% of wages, min $4,370/$8,740,
+            // max $5,310/$10,620 for Single/Married), $3,040 per MW-4 exemption,
+            // and two brackets (4.7% on $0–$23,800, 5.9% over $23,800) per the
+            // Montana DOR 2026 Withholding Tax Guide
+            registry.Register(new MontanaWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
