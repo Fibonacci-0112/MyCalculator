@@ -22,6 +22,7 @@ using PaycheckCalc.Core.Tax.Hawaii;
 using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Indiana;
+using PaycheckCalc.Core.Tax.Iowa;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
@@ -157,6 +158,10 @@ public static class MauiProgram
             // ($1,000 each) and additional dependent exemption ($3,000 each,
             // Indiana Departmental Notice #1 for tax years 2023+)
             registry.Register(new IndianaWithholdingCalculator());
+
+            // Iowa — flat 3.65% with pre-tax deductions and optional extra
+            // withholding (IA W-4 Line 6)
+            registry.Register(new IowaWithholdingCalculator());
 
             // Michigan — flat 4.25% with MI-W4 personal/dependent exemptions
             // ($5,900 per exemption, 2026 Form 446 Withholding Guide)

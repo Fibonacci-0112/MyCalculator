@@ -12,6 +12,7 @@ using PaycheckCalc.Core.Tax.Hawaii;
 using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Indiana;
+using PaycheckCalc.Core.Tax.Iowa;
 using PaycheckCalc.Core.Tax.Michigan;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
@@ -157,7 +158,7 @@ public class PercentageMethodWithholdingAdapterTest
     [Fact]
     public void Schema_HasFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc = CreateAdapter(UsState.IA);
+        var calc = CreateAdapter(UsState.UT);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -172,7 +173,7 @@ public class PercentageMethodWithholdingAdapterTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = CreateAdapter(UsState.IA);
+        var calc = CreateAdapter(UsState.UT);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Invalid" });
         Assert.Single(errors);
     }
@@ -180,19 +181,19 @@ public class PercentageMethodWithholdingAdapterTest
     [Fact]
     public void Validate_ValidFilingStatus_ReturnsNoErrors()
     {
-        var calc = CreateAdapter(UsState.IA);
+        var calc = CreateAdapter(UsState.UT);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Single" });
         Assert.Empty(errors);
     }
 
     [Fact]
-    public void Iowa_FlatRate_MatchesLegacyCalculator()
+    public void Utah_FlatRate_MatchesLegacyCalculator()
     {
-        // Iowa is a flat 3.65% state with no standard deduction or
+        // Utah is a flat 4.65% state with no standard deduction or
         // allowance in StateTaxConfigs2026, making it a clean fixture
         // for verifying the generic percentage-method adapter.
-        var adapter = CreateAdapter(UsState.IA);
-        var context = new CommonWithholdingContext(UsState.IA, 5000m, PayFrequency.Biweekly, 2026);
+        var adapter = CreateAdapter(UsState.UT);
+        var context = new CommonWithholdingContext(UsState.UT, 5000m, PayFrequency.Biweekly, 2026);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -202,9 +203,9 @@ public class PercentageMethodWithholdingAdapterTest
 
         var result = adapter.Calculate(context, values);
 
-        // 5000 * 26 = 130,000 * 3.65% = 4,745 / 26 = 182.50
+        // 5000 * 26 = 130,000 * 4.65% = 6,045 / 26 = 232.50
         Assert.Equal(5000m, result.TaxableWages);
-        Assert.Equal(182.50m, result.Withholding);
+        Assert.Equal(232.50m, result.Withholding);
     }
 
     [Fact]
@@ -228,8 +229,8 @@ public class PercentageMethodWithholdingAdapterTest
     [Fact]
     public void AdditionalWithholding_IsAdded()
     {
-        var adapter = CreateAdapter(UsState.IA);
-        var context = new CommonWithholdingContext(UsState.IA, 5000m, PayFrequency.Biweekly, 2026);
+        var adapter = CreateAdapter(UsState.UT);
+        var context = new CommonWithholdingContext(UsState.UT, 5000m, PayFrequency.Biweekly, 2026);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -239,15 +240,15 @@ public class PercentageMethodWithholdingAdapterTest
 
         var result = adapter.Calculate(context, values);
 
-        // 182.50 base + 50 extra = 232.50
-        Assert.Equal(232.50m, result.Withholding);
+        // 232.50 base + 50 extra = 282.50
+        Assert.Equal(282.50m, result.Withholding);
     }
 
     [Fact]
     public void PreTaxDeductions_ReduceTaxableWages()
     {
-        var adapter = CreateAdapter(UsState.IA);
-        var context = new CommonWithholdingContext(UsState.IA, 5000m, PayFrequency.Biweekly, 2026,
+        var adapter = CreateAdapter(UsState.UT);
+        var context = new CommonWithholdingContext(UsState.UT, 5000m, PayFrequency.Biweekly, 2026,
             PreTaxDeductionsReducingStateWages: 1000m);
         var values = new StateInputValues
         {
@@ -259,9 +260,9 @@ public class PercentageMethodWithholdingAdapterTest
         var result = adapter.Calculate(context, values);
 
         // Taxable wages = 5000 - 1000 = 4000.
-        // 4000 * 26 = 104,000 * 3.65% = 3,796 / 26 = 146.00
+        // 4000 * 26 = 104,000 * 4.65% = 4,836 / 26 = 186.00
         Assert.Equal(4000m, result.TaxableWages);
-        Assert.Equal(146.00m, result.Withholding);
+        Assert.Equal(186.00m, result.Withholding);
     }
 
     [Fact]
@@ -739,6 +740,10 @@ public class FullRegistryIntegrationTest
         registry.Register(new HawaiiWithholdingCalculator());
 
         registry.Register(new IdahoWithholdingCalculator());
+
+        registry.Register(new IowaWithholdingCalculator());
+
+        registry.Register(new MichiganWithholdingCalculator());
 
         UsState[] noTaxStates = [UsState.AK, UsState.FL, UsState.NV, UsState.NH, UsState.SD, UsState.TN, UsState.TX, UsState.WA, UsState.WY];
         foreach (var state in noTaxStates)
