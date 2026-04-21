@@ -131,33 +131,11 @@ public static class StateTaxConfigs2026
             // and four graduated brackets (5.35%/6.80%/7.85%/9.85%) per the Minnesota
             // Department of Revenue 2026 Withholding Tax Instructions and Tables (Pub. 89).
 
-            [UsState.MO] = new()
-            {
-                StandardDeductionSingle = 15_750m,
-                StandardDeductionMarried = 31_500m,
-                BracketsSingle =
-                [
-                    B(0, 1_313m, 0m),
-                    B(1_313m, 2_626m, 0.02m),
-                    B(2_626m, 3_939m, 0.025m),
-                    B(3_939m, 5_252m, 0.03m),
-                    B(5_252m, 6_565m, 0.035m),
-                    B(6_565m, 7_878m, 0.04m),
-                    B(7_878m, 9_191m, 0.045m),
-                    B(9_191m, null, 0.047m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 1_313m, 0m),
-                    B(1_313m, 2_626m, 0.02m),
-                    B(2_626m, 3_939m, 0.025m),
-                    B(3_939m, 5_252m, 0.03m),
-                    B(5_252m, 6_565m, 0.035m),
-                    B(6_565m, 7_878m, 0.04m),
-                    B(7_878m, 9_191m, 0.045m),
-                    B(9_191m, null, 0.047m)
-                ]
-            },
+            // Missouri uses a dedicated calculator (MissouriWithholdingCalculator)
+            // — MO W-4 filing statuses (Single/Married/Head of Household),
+            // $15,750/$31,500/$23,625 standard deduction (mirrors federal),
+            // $2,100 per MO W-4 allowance, and eight graduated brackets
+            // (0%–4.7%) per the Missouri DOR 2026 Employer's Withholding Tax Guide.
 
             [UsState.MT] = new()
             {
