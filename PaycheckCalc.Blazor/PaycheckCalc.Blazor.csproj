@@ -20,7 +20,6 @@
   <!--
     Link Core's JSON tax data tables into wwwroot/data/ so the server process
     can read them from a stable, framework-agnostic relative path at startup.
-    This mirrors the pattern used by PaycheckCalc.Web.
   -->
   <ItemGroup>
     <Content Include="..\PaycheckCalc.Core\Data\us_irs_15t_2026_percentage_automated.json"
