@@ -23,6 +23,7 @@ using PaycheckCalc.Core.Tax.Kansas;
 using PaycheckCalc.Core.Tax.Louisiana;
 using PaycheckCalc.Core.Tax.Maine;
 using PaycheckCalc.Core.Tax.Maryland;
+using PaycheckCalc.Core.Tax.Minnesota;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
@@ -103,6 +104,7 @@ stateRegistry.Register(new MaineWithholdingCalculator());
 stateRegistry.Register(new MarylandWithholdingCalculator());
 stateRegistry.Register(new MassachusettsWithholdingCalculator());
 stateRegistry.Register(new MichiganWithholdingCalculator());
+stateRegistry.Register(new MinnesotaWithholdingCalculator());
 stateRegistry.Register(new OklahomaWithholdingCalculator(okCalc));
 stateRegistry.Register(new PennsylvaniaWithholdingCalculator());
 
