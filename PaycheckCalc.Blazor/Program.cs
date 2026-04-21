@@ -18,6 +18,7 @@ using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
 using PaycheckCalc.Core.Tax.Local.Pennsylvania;
+using PaycheckCalc.Core.Tax.Michigan;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.SelfEmployment;
@@ -79,6 +80,7 @@ stateRegistry.Register(ctCalc);
 stateRegistry.Register(new DelawareWithholdingCalculator());
 stateRegistry.Register(new GeorgiaWithholdingCalculator());
 stateRegistry.Register(new IllinoisWithholdingCalculator());
+stateRegistry.Register(new MichiganWithholdingCalculator());
 stateRegistry.Register(new OklahomaWithholdingCalculator(okCalc));
 stateRegistry.Register(new PennsylvaniaWithholdingCalculator());
 

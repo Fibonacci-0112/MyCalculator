@@ -76,14 +76,9 @@ public static class StateTaxConfigs2026
                 BracketsMarried = [B(0, null, 0.05m)]
             },
 
-            [UsState.MI] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                AllowanceAmount = 5_400m,
-                BracketsSingle = [B(0, null, 0.0405m)],
-                BracketsMarried = [B(0, null, 0.0405m)]
-            },
+            // Michigan uses a dedicated calculator (MichiganWithholdingCalculator)
+            // — flat 4.25% with MI-W4 exemptions at $5,900 per exemption per the
+            // 2026 Form 446 Withholding Guide.
 
             [UsState.MS] = new()
             {
