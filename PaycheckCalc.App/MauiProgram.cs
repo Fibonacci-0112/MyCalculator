@@ -24,6 +24,7 @@ using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Indiana;
 using PaycheckCalc.Core.Tax.Iowa;
 using PaycheckCalc.Core.Tax.Kansas;
+using PaycheckCalc.Core.Tax.Kentucky;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
@@ -168,6 +169,10 @@ public static class MauiProgram
             // ($3,605 / $8,240), $2,250 per K-4 allowance, and two graduated
             // brackets (5.20% up to $23,000/$46,000, then 5.58%)
             registry.Register(new KansasWithholdingCalculator());
+
+            // Kentucky — flat 4.0% with $3,160 standard deduction and $10
+            // K-4 allowance credit per the 2026 Form 42A003 withholding formula
+            registry.Register(new KentuckyWithholdingCalculator());
 
             // Michigan — flat 4.25% with MI-W4 personal/dependent exemptions
             // ($5,900 per exemption, 2026 Form 446 Withholding Guide)

@@ -14,6 +14,7 @@ using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Indiana;
 using PaycheckCalc.Core.Tax.Iowa;
 using PaycheckCalc.Core.Tax.Kansas;
+using PaycheckCalc.Core.Tax.Kentucky;
 using PaycheckCalc.Core.Tax.Michigan;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
@@ -745,6 +746,8 @@ public class FullRegistryIntegrationTest
         registry.Register(new IowaWithholdingCalculator());
 
         registry.Register(new KansasWithholdingCalculator());
+
+        registry.Register(new KentuckyWithholdingCalculator());
 
         registry.Register(new MichiganWithholdingCalculator());
 
