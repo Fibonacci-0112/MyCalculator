@@ -125,38 +125,11 @@ public static class StateTaxConfigs2026
             // deduction, $5,300 per W-4ME allowance, and three graduated brackets
             // (5.80%/6.75%/7.15%) per Maine Revenue Services 2026 Withholding Tables.
 
-            [UsState.MD] = new()
-            {
-                StandardDeductionSingle = 2_550m,
-                StandardDeductionMarried = 5_100m,
-                AllowanceAmount = 3_200m,
-                BracketsSingle =
-                [
-                    B(0, 1_000m, 0.02m),
-                    B(1_000m, 2_000m, 0.03m),
-                    B(2_000m, 3_000m, 0.04m),
-                    B(3_000m, 100_000m, 0.0475m),
-                    B(100_000m, 125_000m, 0.05m),
-                    B(125_000m, 150_000m, 0.0525m),
-                    B(150_000m, 250_000m, 0.055m),
-                    B(250_000m, 500_000m, 0.0575m),
-                    B(500_000m, 1_000_000m, 0.0625m),
-                    B(1_000_000m, null, 0.065m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 1_000m, 0.02m),
-                    B(1_000m, 2_000m, 0.03m),
-                    B(2_000m, 3_000m, 0.04m),
-                    B(3_000m, 150_000m, 0.0475m),
-                    B(150_000m, 175_000m, 0.05m),
-                    B(175_000m, 225_000m, 0.0525m),
-                    B(225_000m, 300_000m, 0.055m),
-                    B(300_000m, 600_000m, 0.0575m),
-                    B(600_000m, 1_200_000m, 0.0625m),
-                    B(1_200_000m, null, 0.065m)
-                ]
-            },
+            // Maryland uses a dedicated calculator (MarylandWithholdingCalculator)
+            // — MW507 filing statuses (Single/Married/Head of Household), variable
+            // standard deduction (15% of wages, min $1,600/$3,200, max $2,550/$5,100),
+            // $3,200 per MW507 exemption, and ten graduated brackets (2%–6.5%) per the
+            // Comptroller of Maryland 2026 Employer Withholding Guide.
 
             [UsState.MN] = new()
             {
