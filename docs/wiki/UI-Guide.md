@@ -1,21 +1,37 @@
 # UI Guide
 
-PaycheckCalc uses .NET MAUI with a flyout navigation pattern. This page describes the app's pages, input forms, and features.
+PaycheckCalc ships with two front-ends. The MAUI app uses a flyout navigation pattern; the Blazor Server head exposes a streamlined two-page flow. This page describes the pages, input forms, and features.
 
 ---
 
-## Navigation
+## Navigation (MAUI)
 
-The app uses **Shell Flyout** navigation with six main sections:
+The MAUI app uses **Shell Flyout** navigation. The flyout exposes the following items:
 
 | Flyout Item | Route | Page |
 |---|---|---|
-| Inputs | `//Inputs` | `InputsPage` — Multi-tab input form |
-| Results | `//Results` | `ResultsPage` — Per-period and annual results |
-| Compare | `//Compare` | `ComparePage` — Side-by-side comparison |
-| Saved Paychecks | `//Saved` | `SavedPaychecksPage` — Manage saved entries |
+| Inputs | `//Inputs` | `InputsPage` — multi-tab input form |
+| Results | `//Results` | `ResultsPage` — per-period and annual results |
+| Compare | `//Compare` | `ComparePage` — side-by-side comparison |
+| Saved Paychecks | `//Saved` | `SavedPaychecksPage` — manage saved entries |
 | Self-Employment | `//SelfEmployment` | `SelfEmploymentPage` — SE tax input form |
 | SE Results | `//SEResults` | `SelfEmploymentResultsPage` — SE tax results |
+| Annual Projection | `//AnnualProjection` | `AnnualProjectionPage` — Phase 8 annual inputs |
+| Jobs & YTD | `//JobsAndYtd` | `JobsAndYtdPage` — W-2 jobs and year-to-date |
+| Other Income & Adjustments | `//OtherIncomeAdjustments` | `OtherIncomeAdjustmentsPage` — Schedule 1 adjustments, other income |
+| Credits | `//Credits` | `CreditsPage` — CTC, education, saver's credit inputs |
+| Quarterly Estimates | `//QuarterlyEstimates` | `QuarterlyEstimatesPage` — Form 1040-ES |
+| What-If | `//WhatIf` | `WhatIfPage` — withholding-suggestion and scenario analysis |
+| Annual Results | `//AnnualResults` | `AnnualTaxResultsPage` — full Form 1040 estimate |
+
+The Annual Projection / Jobs & YTD / Other Income / Credits / Quarterly Estimates / What-If pages all share the singleton `AnnualTaxSession` as their source of truth, and a final Form 1040 estimate is produced on the Annual Results page.
+
+## Navigation (Blazor Server)
+
+The Blazor head currently exposes two Razor pages backed by a scoped `CalculatorSessionState`:
+
+- **Inputs** — captures `PaycheckInput` (pay & hours, federal W-4, state, and deductions).
+- **Results** — renders the `PaycheckResult` for the most recently submitted inputs in the current circuit.
 
 ---
 
@@ -36,7 +52,7 @@ The Inputs page is a tabbed form with four sub-pages:
 
 ### Federal W-4 Tab (`FederalPage`)
 
-- **Filing Status** — Picker: Single or Married.
+- **Filing Status** — Picker: Single / Married Filing Separately, Married Filing Jointly, or Head of Household (see `FederalFilingStatus`).
 - **Step 2 Checkbox** — Toggle (two jobs / spouse works).
 - **Step 3 Credits** — Decimal (child/dependent tax credits).
 - **Step 4(a) Other Income** — Decimal.
@@ -83,6 +99,7 @@ Displays the per-paycheck breakdown:
 - Social Security
 - Medicare
 - Additional Medicare
+- Local Withholding + Local Head Tax (when a locality is selected)
 - Post-Tax Deductions
 - **Net Pay**
 
@@ -105,11 +122,10 @@ Displays annualized projections:
 
 ## Compare Page
 
-The Compare page enables side-by-side comparison of two calculations:
+The Compare page supports two layouts:
 
-1. On the Results page, tap **Save to Compare** to snapshot the current calculation.
-2. Change inputs and recalculate.
-3. Navigate to the Compare page to see both scenarios side-by-side with differences highlighted.
+- **Saved-vs-current (default)** — Tap **Save to Compare** on the Results page to snapshot the current calculation, change inputs and recalculate, then open Compare to see both scenarios side-by-side with differences highlighted.
+- **Multi-scenario** — When one or more entries are pushed from the Saved Paychecks page into the singleton `ComparisonSession`, Compare renders all of them side-by-side instead of the legacy 1-vs-1 view.
 
 ---
 
@@ -121,6 +137,7 @@ Manage previously saved paycheck calculations:
 - **Load** — Restores saved inputs back into the calculator (via `PaycheckInputRestorer`).
 - **Rename** — Update the display name of a saved entry.
 - **Delete** — Remove a saved entry.
+- **Compare** — Push one or more selected entries into `ComparisonSession` for the multi-scenario Compare layout.
 
 When a saved paycheck is loaded, re-saving from the Results page overwrites the existing entry (tracked via `LoadedPaycheckId`).
 
@@ -140,6 +157,22 @@ Three-tab input form:
 Two-tab results display:
 - **Tax Breakdown** — Full itemized breakdown from Schedule C through net tax.
 - **Quarterly Estimates** — Suggested quarterly payment and over/under analysis.
+
+---
+
+## Annual (Phase 8) Pages
+
+The annual Form 1040 flow is split across several flyout pages, all sharing a singleton `AnnualTaxSession` that backs the `AnnualTaxInputMapper` → `TaxYearProfile` conversion:
+
+- **Annual Projection** — High-level filing status, anticipated annual wages, and withholdings.
+- **Jobs & YTD** — One or more W-2 jobs (optionally per-spouse via `W2JobInput.Holder` for MFJ) and year-to-date Social Security / Medicare wages.
+- **Other Income & Adjustments** — Schedule 1 income lines and adjustments.
+- **Credits** — Child Tax Credit, education credits (Form 8863), saver's credit (Form 8880), and other credit inputs.
+- **Quarterly Estimates** — Form 1040-ES quarterly estimate calculator.
+- **What-If** — Scenario exploration including the withholding-suggestion calculator that rounds per-period suggestions to cents.
+- **Annual Results** — Year-end Form 1040 estimate combining withholding, credits, NIIT, and balance due / refund.
+
+Saved annual scenarios are persisted through `IAnnualScenarioRepository` → `JsonAnnualScenarioRepository` (`saved_annual_scenarios.json`).
 
 ---
 

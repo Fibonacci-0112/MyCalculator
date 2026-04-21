@@ -52,7 +52,7 @@ FICA is calculated on `Gross Pay − Pre-Tax Deductions`. Year-to-date (YTD) Soc
 7. The result is **de-annualized** back to the pay period.
 
 Supported W-4 inputs:
-- Filing status (Single/Married)
+- Filing status (`FederalFilingStatus`: `SingleOrMarriedSeparately`, `MarriedFilingJointly`, `HeadOfHousehold` — Single and MFS are folded into a single enum value to match Pub 15-T withholding tables)
 - Step 2 checkbox (two jobs / spouse works)
 - Step 3 credits (child/dependent tax credits)
 - Step 4(a) other income
@@ -78,21 +78,29 @@ The calculator returns a `StateWithholdingResult` with:
 
 See [State Tax Coverage](State-Tax-Coverage.md) for details on each state's implementation.
 
-### Step 6: Net Pay
+### Step 6: Local (Sub-State) Withholding
+
+If the input includes a home/work locality, `PayCalculator` delegates to a `LocalCalculatorRegistry` to invoke the registered `ILocalWithholdingCalculator` for the matching `LocalityId`. Calculators produce `LocalWithholdingResult` values that are surfaced on `PaycheckResult` as:
+
+- `LocalWithholding` — local income tax withheld for the period
+- `LocalHeadTax` — flat per-pay-period head taxes (e.g., PA LST)
+- `LocalityLabel`, `LocalTaxableWages`, `LocalBreakdown` — itemized metadata for UI/exports
+
+Local taxes are **additive**: they reduce net pay but do **not** reduce federal or state taxable wages.
+
+### Step 7: Net Pay
 
 ```
 Net Pay = Gross Pay − Pre-Tax Deductions − Post-Tax Deductions − Federal Tax
           − State Tax − State Disability Insurance − Social Security − Medicare
-          − Additional Medicare
+          − Additional Medicare − Local Withholding − Local Head Tax
 ```
 
 ---
 
 ## Rounding
 
-All monetary values are rounded to two decimal places using `MidpointRounding.AwayFromZero` (round half up). This is applied at the final result level via the `RoundMoney()` helper.
-
-Some state calculators apply additional internal rounding rules (e.g., Oklahoma uses whole-dollar rounding for intermediate values).
+`PayCalculator` rounds gross pay, taxes, and deductions individually using `MidpointRounding.AwayFromZero` (round half away from zero). **Net pay is computed from the unrounded components and then rounded** so that the displayed net equals `gross − taxes − deductions` to the cent. Some state calculators apply additional internal rounding rules (e.g., Oklahoma uses whole-dollar rounding for intermediate values).
 
 ---
 

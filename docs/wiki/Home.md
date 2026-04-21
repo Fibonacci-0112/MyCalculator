@@ -1,8 +1,8 @@
 # PaycheckCalc Wiki
 
-Welcome to the **PaycheckCalc** wiki — the documentation home for the cross-platform .NET MAUI paycheck calculator.
+Welcome to the **PaycheckCalc** wiki — the documentation home for the cross-platform paycheck calculator.
 
-PaycheckCalc computes net pay, tax withholdings, and deductions for all 50 US states plus DC using 2026 tax tables. It also includes a self-employment tax estimation module.
+PaycheckCalc computes net pay, tax withholdings, and deductions for all 50 US states plus DC using 2026 tax tables. The solution ships with two front-ends — a **.NET MAUI** app (Android & Windows) and a **Blazor Server** web head — both backed by the shared `PaycheckCalc.Core` library. It also includes a self-employment tax estimation module and an annual Form 1040 / 1040-ES engine.
 
 ---
 
@@ -37,6 +37,7 @@ PaycheckCalc computes net pay, tax withholdings, and deductions for all 50 US st
 | UML Class Diagram | [`docs/class-diagram.md`](../class-diagram.md) |
 | Core Library | [`PaycheckCalc.Core/`](../../PaycheckCalc.Core/) |
 | MAUI App | [`PaycheckCalc.App/`](../../PaycheckCalc.App/) |
+| Blazor Server App | [`PaycheckCalc.Blazor/`](../../PaycheckCalc.Blazor/) |
 | Test Suite | [`PaycheckCalc.Tests/`](../../PaycheckCalc.Tests/) |
 
 ---
@@ -45,9 +46,9 @@ PaycheckCalc computes net pay, tax withholdings, and deductions for all 50 US st
 
 | Component | Technology |
 |---|---|
-| Framework | .NET 11 Preview / .NET MAUI |
-| Target Platforms | Android, Windows 10+ |
-| UI Pattern | MVVM with CommunityToolkit.Mvvm |
+| Frameworks | .NET 11 Preview — MAUI (App) and Blazor Web App / Server rendering (Blazor) |
+| Target Platforms | Android, Windows 10+ (MAUI); modern browsers via server-rendered Blazor |
+| UI Pattern | MVVM with CommunityToolkit.Mvvm (MAUI); Razor components (Blazor) |
 | Test Framework | xUnit 2.9.3 |
 | PDF Export | QuestPDF 2025.12.4 |
-| Tax Data | JSON-based IRS 15-T and state tax bracket tables (2026) |
+| Tax Data | JSON-based IRS 15-T, Federal 1040, and state / local tax bracket tables (2026) |
