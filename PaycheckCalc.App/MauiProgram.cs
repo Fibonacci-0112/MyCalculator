@@ -23,6 +23,7 @@ using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Indiana;
 using PaycheckCalc.Core.Tax.Iowa;
+using PaycheckCalc.Core.Tax.Kansas;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
@@ -162,6 +163,11 @@ public static class MauiProgram
             // Iowa — flat 3.65% with pre-tax deductions and optional extra
             // withholding (IA W-4 Line 6)
             registry.Register(new IowaWithholdingCalculator());
+
+            // Kansas — K-4 filing status (Single/Married), standard deduction
+            // ($3,605 / $8,240), $2,250 per K-4 allowance, and two graduated
+            // brackets (5.20% up to $23,000/$46,000, then 5.58%)
+            registry.Register(new KansasWithholdingCalculator());
 
             // Michigan — flat 4.25% with MI-W4 personal/dependent exemptions
             // ($5,900 per exemption, 2026 Form 446 Withholding Guide)
