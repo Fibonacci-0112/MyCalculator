@@ -349,9 +349,13 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // Arizona is intentionally absent: it uses the dedicated
         // ArizonaWithholdingCalculator (Form A-4 percentage election)
         // rather than the generic annualized percentage method.
+        //
+        // District of Columbia is also absent: it uses the dedicated
+        // DistrictOfColumbiaWithholdingCalculator (D-4 annualized
+        // percentage method).
         UsState[] expectedStates =
         [
-            UsState.DC, UsState.HI, UsState.IA,
+            UsState.HI, UsState.IA,
             UsState.ID, UsState.IN, UsState.KS, UsState.KY,
             UsState.LA, UsState.MA, UsState.MD, UsState.ME,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
@@ -365,6 +369,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.AZ),
             "AZ should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.DC),
+            "DC should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────

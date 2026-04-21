@@ -18,7 +18,7 @@ These states have no individual income tax and are implemented through `NoIncome
 |---|---|---|
 | PA | 3.07% | `PennsylvaniaWithholdingCalculator` |
 
-### Custom Formula States (10 states)
+### Custom Formula States (11 states)
 
 These states have unique calculation rules that require dedicated calculator implementations.
 
@@ -29,17 +29,18 @@ These states have unique calculation rules that require dedicated calculator imp
 | CA | `CaliforniaWithholdingCalculator` | Method B (EDD DE 44), State Disability Insurance (SDI) at 1.2% (JSON-backed) |
 | CO | `ColoradoWithholdingCalculator` | Flat 4.4% with DR 0004 Table 1 allowance + Family & Medical Leave Insurance (FMLI) (JSON-backed) |
 | CT | `ConnecticutWithholdingCalculator` | TPG-211 table-driven withholding + Paid Family & Medical Leave Insurance (PFMLI) (JSON-backed) |
+| DC | `DistrictOfColumbiaWithholdingCalculator` | D-4 with 4 filing statuses, $1,675 per-allowance exemption, 7 graduated brackets (top rate 10.75% over $1M) |
 | DE | `DelawareWithholdingCalculator` | DE W-4 with 4 filing statuses, $110 personal credit per allowance, 7 graduated brackets (top rate 6.6% over $60k) |
 | GA | `GeorgiaWithholdingCalculator` | Flat 5.19% (HB 111), Form G-4 filing statuses A/B/C/D, $12,000/$24,000 standard deduction, $4,000 dependent and $3,000 additional allowances |
 | IL | `IllinoisWithholdingCalculator` | Flat 4.95% with IL-W-4 basic allowances ($2,925/yr each) and additional allowances ($1,000/yr each) |
 | OK | `OklahomaWithholdingCalculator` | OW-2 percentage method with whole-dollar rounding (JSON-backed) |
 | PA | `PennsylvaniaWithholdingCalculator` | Flat 3.07% |
 
-### Annualized Percentage Method States (32 states)
+### Annualized Percentage Method States (31 states)
 
 These states use `PercentageMethodWithholdingAdapter` with state-specific configurations defined in `StateTaxConfigs2026`:
 
-**AZ, DC, HI, IA, ID, IN, KS, KY, LA, MA, MD, ME, MI, MN, MO, MS, MT, NC, ND, NE, NJ, NM, NY, OH, OR, RI, SC, UT, VA, VT, WI, WV**
+**AZ, HI, IA, ID, IN, KS, KY, LA, MA, MD, ME, MI, MN, MO, MS, MT, NC, ND, NE, NJ, NM, NY, OH, OR, RI, SC, UT, VA, VT, WI, WV**
 
 Each configuration specifies:
 - Standard deduction amounts (per filing status)
