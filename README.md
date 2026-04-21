@@ -59,12 +59,6 @@ PaycheckCalc.slnx
 │       ├── Illinois/          # Illinois flat-rate + IL-W-4 allowance calculator
 │       ├── Oklahoma/          # Oklahoma OW-2 percentage calculator
 │       └── Pennsylvania/      # Pennsylvania flat-rate calculator
-├── PaycheckCalc.Web/          # Blazor WebAssembly frontend (browser / GitHub Pages)
-│   ├── Pages/                 # Home.razor, Calculator.razor (PayCalculator integration)
-│   ├── Layouts/               # MainLayout.razor
-│   ├── Storage/               # LocalStoragePaycheckRepository (browser localStorage)
-│   ├── wwwroot/               # index.html (base href=/MyCalculator/), 404.html, app.css, download.js
-│   └── Program.cs             # Async DI bootstrap (pre-loads JSON via HttpClient)
 ├── PaycheckCalc.Tests/        # xUnit test suite
 └── docs/                      # Class diagrams and documentation
 ```
@@ -75,7 +69,6 @@ PaycheckCalc.slnx
 |---|---|
 | **Framework** | .NET 11 Preview / .NET MAUI |
 | **Target Platforms** | Android, Windows 10+ |
-| **Web Framework** | Blazor WebAssembly (net9.0) |
 | **UI Pattern** | MVVM with [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) |
 | **Test Framework** | xUnit 2.9.3 |
 | **PDF Export** | [QuestPDF](https://www.questpdf.com/) 2025.12.4 |
@@ -111,26 +104,6 @@ dotnet run --project PaycheckCalc.App
 ```
 
 > **Note:** The MAUI app requires the `maui` workload and a supported target platform (Android emulator/device or Windows).
-
-### Run the Web App
-
-```bash
-dotnet run --project PaycheckCalc.Web
-```
-
-> **Note:** Requires the .NET 9 SDK and the `wasm-tools` workload:
-> ```bash
-> cd PaycheckCalc.Web && dotnet workload install wasm-tools
-> ```
-
-## Deployment
-
-The web app is automatically built and deployed to **GitHub Pages** on every push to `main`
-that touches `PaycheckCalc.Web/**`, `PaycheckCalc.Core/**`, `global.json`, or the workflow itself.
-
-**Live URL:** [https://fibonacci-0112.github.io/MyCalculator/](https://fibonacci-0112.github.io/MyCalculator/)
-
-Workflow: [`.github/workflows/deploy-web.yml`](.github/workflows/deploy-web.yml)
 
 ## How It Works
 
