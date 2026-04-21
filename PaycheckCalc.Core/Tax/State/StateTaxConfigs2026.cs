@@ -105,32 +105,11 @@ public static class StateTaxConfigs2026
 
             // Connecticut — handled by ConnecticutWithholdingCalculator (TPG-211 table-driven)
 
-            [UsState.DC] = new()
-            {
-                StandardDeductionSingle = 15_000m,
-                StandardDeductionMarried = 30_000m,
-                AllowanceAmount = 1_675m,
-                BracketsSingle =
-                [
-                    B(0, 10_000m, 0.04m),
-                    B(10_000m, 40_000m, 0.06m),
-                    B(40_000m, 60_000m, 0.065m),
-                    B(60_000m, 250_000m, 0.085m),
-                    B(250_000m, 500_000m, 0.0925m),
-                    B(500_000m, 1_000_000m, 0.0975m),
-                    B(1_000_000m, null, 0.1075m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 10_000m, 0.04m),
-                    B(10_000m, 40_000m, 0.06m),
-                    B(40_000m, 60_000m, 0.065m),
-                    B(60_000m, 250_000m, 0.085m),
-                    B(250_000m, 500_000m, 0.0925m),
-                    B(500_000m, 1_000_000m, 0.0975m),
-                    B(1_000_000m, null, 0.1075m)
-                ]
-            },
+            // District of Columbia uses a dedicated calculator
+            // (DistrictOfColumbiaWithholdingCalculator) — D-4 annualized
+            // percentage method with filing-status standard deduction
+            // ($15,000 / $30,000), $1,675 per-allowance exemption, and the
+            // 2026 FR-230 graduated brackets (4%–10.75%).
 
             // Delaware uses a dedicated calculator (DelawareWithholdingCalculator)
 

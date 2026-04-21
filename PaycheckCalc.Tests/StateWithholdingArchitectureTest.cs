@@ -6,6 +6,7 @@ using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Colorado;
 using PaycheckCalc.Core.Tax.Connecticut;
 using PaycheckCalc.Core.Tax.Delaware;
+using PaycheckCalc.Core.Tax.DistrictOfColumbia;
 using PaycheckCalc.Core.Tax.Georgia;
 using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
@@ -726,6 +727,8 @@ public class FullRegistryIntegrationTest
         registry.Register(new ConnecticutWithholdingCalculator(ctJson));
 
         registry.Register(new DelawareWithholdingCalculator());
+
+        registry.Register(new DistrictOfColumbiaWithholdingCalculator());
 
         registry.Register(new GeorgiaWithholdingCalculator());
 

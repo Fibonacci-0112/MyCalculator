@@ -16,6 +16,7 @@ using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Colorado;
 using PaycheckCalc.Core.Tax.Connecticut;
 using PaycheckCalc.Core.Tax.Delaware;
+using PaycheckCalc.Core.Tax.DistrictOfColumbia;
 using PaycheckCalc.Core.Tax.Georgia;
 using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
@@ -127,6 +128,11 @@ public static class MauiProgram
 
             // Delaware — DE W-4, percentage method with personal credits
             registry.Register(new DelawareWithholdingCalculator());
+
+            // District of Columbia — D-4 annualized percentage method with
+            // filing-status standard deduction and $1,675 per-allowance
+            // exemption (FR-230 2026)
+            registry.Register(new DistrictOfColumbiaWithholdingCalculator());
 
             // Georgia — flat 5.19% with G-4 filing statuses, dependents,
             // standard deduction, and additional allowances (HB 111 / 2026
