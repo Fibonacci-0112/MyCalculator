@@ -375,12 +375,17 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // standard deduction, $2,250 per K-4 allowance, two graduated
         // brackets 5.20%/5.58%).
         //
+        // Louisiana is also absent: it uses the dedicated
+        // LouisianaWithholdingCalculator (L-4 filing statuses, $4,500/$9,000
+        // personal exemption, $1,000 per-dependent deduction, and three
+        // graduated brackets 1.85%/3.50%/4.25% per R-1306).
+        //
         // Michigan is also absent: it uses the dedicated
         // MichiganWithholdingCalculator (flat 4.25% with MI-W4 exemptions).
         UsState[] expectedStates =
         [
             UsState.KY,
-            UsState.LA, UsState.MA, UsState.MD, UsState.ME,
+            UsState.MA, UsState.MD, UsState.ME,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
             UsState.ND, UsState.NE, UsState.NJ, UsState.NM, UsState.NY,
             UsState.OH, UsState.OR, UsState.RI, UsState.SC, UsState.UT,
@@ -410,6 +415,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.KS),
             "KS should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.LA),
+            "LA should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MI),
             "MI should not be in StateTaxConfigs2026 — it has a dedicated calculator.");

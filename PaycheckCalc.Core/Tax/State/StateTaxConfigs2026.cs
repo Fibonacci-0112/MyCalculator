@@ -115,23 +115,10 @@ public static class StateTaxConfigs2026
             // deduction, $2,250 per K-4 allowance, and two brackets
             // (5.20% up to $23,000/$46,000, then 5.58%).
 
-            [UsState.LA] = new()
-            {
-                StandardDeductionSingle = 4_500m,
-                StandardDeductionMarried = 9_000m,
-                BracketsSingle =
-                [
-                    B(0, 12_500m, 0.0185m),
-                    B(12_500m, 50_000m, 0.035m),
-                    B(50_000m, null, 0.0425m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 25_000m, 0.0185m),
-                    B(25_000m, 100_000m, 0.035m),
-                    B(100_000m, null, 0.0425m)
-                ]
-            },
+            // Louisiana uses a dedicated calculator (LouisianaWithholdingCalculator)
+            // — L-4 filing statuses (Single/Married/Head of Household), $4,500/$9,000
+            // personal exemption, $1,000 per-dependent deduction, and three graduated
+            // brackets (1.85%/3.50%/4.25%) per Louisiana R-1306.
 
             [UsState.ME] = new()
             {
