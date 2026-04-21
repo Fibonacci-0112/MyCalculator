@@ -63,13 +63,10 @@ public static class StateTaxConfigs2026
             // ($6,000/$12,000/$9,500), $1,500 per dependent (Line 6), and two brackets
             // (0% on $0–$10,000, 4% over $10,000) per MS Pub 89-105 and HB 1 (2023).
 
-            [UsState.NC] = new()
-            {
-                StandardDeductionSingle = 12_750m,
-                StandardDeductionMarried = 25_500m,
-                BracketsSingle = [B(0, null, 0.045m)],
-                BracketsMarried = [B(0, null, 0.045m)]
-            },
+            // North Carolina uses a dedicated calculator (NorthCarolinaWithholdingCalculator)
+            // — NC-4 filing statuses (Single/Married/Head of Household),
+            // $12,750/$25,500/$19,125 standard deduction, $2,500 per NC-4 allowance,
+            // and a flat 4.5% rate per NC DOR Publication NC-30 (2026).
 
             [UsState.UT] = new()
             {

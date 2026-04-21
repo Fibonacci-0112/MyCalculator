@@ -32,32 +32,8 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
     // Illinois uses a dedicated calculator (IllinoisWithholdingCalculator)
 
-    [Fact]
-    public void NorthCarolina_FlatRate_WithStandardDeduction_Married()
-    {
-        var calc = CreateCalculator(UsState.NC);
-
-        var context = new CommonWithholdingContext(
-            UsState.NC,
-            GrossWages: 6000m,
-            PayPeriod: PayFrequency.Monthly,
-            Year: 2026);
-        var values = new StateInputValues
-        {
-            ["FilingStatus"] = "Married",
-            ["Allowances"] = 0,
-            ["AdditionalWithholding"] = 0m
-        };
-
-        var result = calc.Calculate(context, values);
-
-        // annual = 6000 * 12 = 72,000
-        // std ded married = 25,500
-        // taxable = 72000 - 25500 = 46,500
-        // tax = 46500 * 0.045 = 2092.50
-        // per period = 2092.50 / 12 = 174.375 rounds to 174.38
-        Assert.Equal(174.38m, result.Withholding);
-    }
+    // North Carolina now uses a dedicated calculator (NorthCarolinaWithholdingCalculator).
+    // See NorthCarolinaWithholdingCalculatorTest for regression tests.
 
     // ── Graduated-bracket state tests ────────────────────────────────
 
@@ -365,6 +341,11 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // Michigan is also absent: it uses the dedicated
         // MichiganWithholdingCalculator (flat 4.25% with MI-W4 exemptions).
         //
+        // North Carolina is also absent: it uses the dedicated
+        // NorthCarolinaWithholdingCalculator (NC-4 filing statuses Single/Married/
+        // Head of Household, $12,750/$25,500/$19,125 standard deduction,
+        // $2,500 per NC-4 allowance, flat 4.5% per NC DOR Publication NC-30 (2026)).
+        //
         // New York is also absent: it uses the dedicated
         // NewYorkWithholdingCalculator (IT-2104 filing statuses Single/Married/
         // Head of Household, $8,000/$16,050/$11,000 standard deduction,
@@ -373,7 +354,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         UsState[] expectedStates =
         [
             UsState.KY,
-            UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
+            UsState.MN, UsState.MO, UsState.MS, UsState.MT,
             UsState.ND, UsState.NE, UsState.NJ,
             UsState.OH, UsState.OR, UsState.RI, UsState.SC, UsState.UT,
             UsState.VA, UsState.VT, UsState.WI, UsState.WV
@@ -423,6 +404,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.NY),
             "NY should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.NC),
+            "NC should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────
