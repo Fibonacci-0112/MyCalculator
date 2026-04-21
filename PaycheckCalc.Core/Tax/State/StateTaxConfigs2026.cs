@@ -140,26 +140,11 @@ public static class StateTaxConfigs2026
             // (4.7% on $0–$23,800, 5.9% over $23,800) per the Montana DOR 2026
             // Withholding Tax Guide.
 
-            [UsState.NE] = new()
-            {
-                StandardDeductionSingle = 8_600m,
-                StandardDeductionMarried = 17_200m,
-                AllowanceCreditAmount = 171m,
-                BracketsSingle =
-                [
-                    B(0, 4_030m, 0.0246m),
-                    B(4_030m, 24_120m, 0.0351m),
-                    B(24_120m, 38_870m, 0.0501m),
-                    B(38_870m, null, 0.052m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 8_040m, 0.0246m),
-                    B(8_040m, 48_250m, 0.0351m),
-                    B(48_250m, 77_730m, 0.0501m),
-                    B(77_730m, null, 0.052m)
-                ]
-            },
+            // Nebraska uses a dedicated calculator (NebraskaWithholdingCalculator)
+            // — W-4N filing statuses (Single/Married/Head of Household), standard
+            // deductions $8,600/$17,200/$12,900, $171 per-allowance credit (applied
+            // to computed tax), and four graduated brackets (2.46%/3.51%/5.01%/5.2%)
+            // with filing-status–specific thresholds per the Nebraska DOR 2026 Circular EN.
 
             [UsState.NJ] = new()
             {
