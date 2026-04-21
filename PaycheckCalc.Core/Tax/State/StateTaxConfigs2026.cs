@@ -43,13 +43,9 @@ public static class StateTaxConfigs2026
             // — flat 3.65% with no standard deduction / allowance per the
             // Iowa Department of Revenue 2026 withholding formula.
 
-            [UsState.KY] = new()
-            {
-                StandardDeductionSingle = 3_160m,
-                StandardDeductionMarried = 3_160m,
-                BracketsSingle = [B(0, null, 0.04m)],
-                BracketsMarried = [B(0, null, 0.04m)]
-            },
+            // Kentucky uses a dedicated calculator (KentuckyWithholdingCalculator)
+            // — flat 4.0% with $3,160 standard deduction and $10 K-4 allowance
+            // credit per the 2026 Form 42A003 withholding formula.
 
             // Massachusetts uses a dedicated calculator (MassachusettsWithholdingCalculator)
             // — M-4 filing statuses (Single/Married/Head of Household), personal

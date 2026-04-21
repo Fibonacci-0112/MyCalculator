@@ -24,6 +24,8 @@ using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Indiana;
 using PaycheckCalc.Core.Tax.Iowa;
 using PaycheckCalc.Core.Tax.Kansas;
+using PaycheckCalc.Core.Tax.Kentucky;
+using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Louisiana;
 using PaycheckCalc.Core.Tax.Maine;
 using PaycheckCalc.Core.Tax.Maryland;
@@ -175,6 +177,9 @@ public static class MauiProgram
             // brackets (5.20% up to $23,000/$46,000, then 5.58%)
             registry.Register(new KansasWithholdingCalculator());
 
+            // Kentucky — flat 4.0% with $3,160 standard deduction and $10
+            // K-4 allowance credit per the 2026 Form 42A003 withholding formula
+            registry.Register(new KentuckyWithholdingCalculator());
             // Louisiana — L-4 filing statuses (Single/Married/Head of Household),
             // $4,500/$9,000 personal exemption, $1,000 per-dependent deduction,
             // and three graduated brackets (1.85%/3.50%/4.25%) per R-1306
