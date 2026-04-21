@@ -1,6 +1,6 @@
-# NewHampshire (NH)
+# New Hampshire (NH)
 
-NewHampshire does not levy a state individual income tax, so withholding for this
+New Hampshire does not levy a state individual income tax, so withholding for this
 state is currently handled by the generic
 `NoIncomeTaxWithholdingAdapter` registered in
 `PaycheckCalc.App/MauiProgram.cs`. No state-specific calculator lives in
