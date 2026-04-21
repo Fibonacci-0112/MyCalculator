@@ -353,9 +353,13 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // District of Columbia is also absent: it uses the dedicated
         // DistrictOfColumbiaWithholdingCalculator (D-4 annualized
         // percentage method).
+        //
+        // Hawaii is also absent: it uses the dedicated
+        // HawaiiWithholdingCalculator (Booklet A percentage method with
+        // HW-4 allowances).
         UsState[] expectedStates =
         [
-            UsState.HI, UsState.IA,
+            UsState.IA,
             UsState.ID, UsState.IN, UsState.KS, UsState.KY,
             UsState.LA, UsState.MA, UsState.MD, UsState.ME,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
@@ -372,6 +376,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.DC),
             "DC should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.HI),
+            "HI should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────

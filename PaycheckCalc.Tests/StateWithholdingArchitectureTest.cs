@@ -8,6 +8,7 @@ using PaycheckCalc.Core.Tax.Connecticut;
 using PaycheckCalc.Core.Tax.Delaware;
 using PaycheckCalc.Core.Tax.DistrictOfColumbia;
 using PaycheckCalc.Core.Tax.Georgia;
+using PaycheckCalc.Core.Tax.Hawaii;
 using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Michigan;
@@ -731,6 +732,8 @@ public class FullRegistryIntegrationTest
         registry.Register(new DistrictOfColumbiaWithholdingCalculator());
 
         registry.Register(new GeorgiaWithholdingCalculator());
+
+        registry.Register(new HawaiiWithholdingCalculator());
 
         registry.Register(new IdahoWithholdingCalculator());
 
