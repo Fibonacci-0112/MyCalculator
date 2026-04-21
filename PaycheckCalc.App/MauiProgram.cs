@@ -24,6 +24,7 @@ using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Indiana;
 using PaycheckCalc.Core.Tax.Iowa;
 using PaycheckCalc.Core.Tax.Kansas;
+using PaycheckCalc.Core.Tax.Louisiana;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
@@ -168,6 +169,11 @@ public static class MauiProgram
             // ($3,605 / $8,240), $2,250 per K-4 allowance, and two graduated
             // brackets (5.20% up to $23,000/$46,000, then 5.58%)
             registry.Register(new KansasWithholdingCalculator());
+
+            // Louisiana — L-4 filing statuses (Single/Married/Head of Household),
+            // $4,500/$9,000 personal exemption, $1,000 per-dependent deduction,
+            // and three graduated brackets (1.85%/3.50%/4.25%) per R-1306
+            registry.Register(new LouisianaWithholdingCalculator());
 
             // Michigan — flat 4.25% with MI-W4 personal/dependent exemptions
             // ($5,900 per exemption, 2026 Form 446 Withholding Guide)
