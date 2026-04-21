@@ -18,7 +18,7 @@ These states have no individual income tax and are implemented through `NoIncome
 |---|---|---|
 | PA | 3.07% | `PennsylvaniaWithholdingCalculator` |
 
-### Custom Formula States (9 states)
+### Custom Formula States (10 states)
 
 These states have unique calculation rules that require dedicated calculator implementations.
 
@@ -30,15 +30,16 @@ These states have unique calculation rules that require dedicated calculator imp
 | CO | `ColoradoWithholdingCalculator` | Flat 4.4% with DR 0004 Table 1 allowance + Family & Medical Leave Insurance (FMLI) (JSON-backed) |
 | CT | `ConnecticutWithholdingCalculator` | TPG-211 table-driven withholding + Paid Family & Medical Leave Insurance (PFMLI) (JSON-backed) |
 | DE | `DelawareWithholdingCalculator` | DE W-4 with 4 filing statuses, $110 personal credit per allowance, 7 graduated brackets (top rate 6.6% over $60k) |
+| GA | `GeorgiaWithholdingCalculator` | Flat 5.19% (HB 111), Form G-4 filing statuses A/B/C/D, $12,000/$24,000 standard deduction, $4,000 dependent and $3,000 additional allowances |
 | IL | `IllinoisWithholdingCalculator` | Flat 4.95% with IL-W-4 basic allowances ($2,925/yr each) and additional allowances ($1,000/yr each) |
 | OK | `OklahomaWithholdingCalculator` | OW-2 percentage method with whole-dollar rounding (JSON-backed) |
 | PA | `PennsylvaniaWithholdingCalculator` | Flat 3.07% |
 
-### Annualized Percentage Method States (34 states)
+### Annualized Percentage Method States (32 states)
 
 These states use `PercentageMethodWithholdingAdapter` with state-specific configurations defined in `StateTaxConfigs2026`:
 
-**AZ, DC, GA, HI, IA, ID, IN, KS, KY, LA, MA, MD, ME, MI, MN, MO, MS, MT, NC, ND, NE, NJ, NM, NY, OH, OR, RI, SC, UT, VA, VT, WI, WV**
+**AZ, DC, HI, IA, ID, IN, KS, KY, LA, MA, MD, ME, MI, MN, MO, MS, MT, NC, ND, NE, NJ, NM, NY, OH, OR, RI, SC, UT, VA, VT, WI, WV**
 
 Each configuration specifies:
 - Standard deduction amounts (per filing status)
@@ -60,6 +61,23 @@ Some states levy additional payroll taxes beyond income tax:
 | CT | Paid Family & Medical Leave Insurance (PFMLI) | 0.5% | "Family Leave Insurance (FLI)" |
 
 These amounts flow through `StateWithholdingResult.DisabilityInsurance` and appear as separate line items on the results screen, chart, and exports.
+
+---
+
+## Local (Sub-State) Tax Coverage
+
+PaycheckCalc models local / sub-state payroll taxes behind an `ILocalWithholdingCalculator` plugin model, with calculators registered in a `LocalCalculatorRegistry` keyed by locality code. `PayCalculator` consumes the local registry after state withholding.
+
+| Jurisdiction | Calculator | JSON Data |
+|---|---|---|
+| Pennsylvania Act 32 EIT | `PaEitCalculator` | `pa_eit_2026.json` |
+| Pennsylvania LST | `PaLstCalculator` | (flat head tax, no table) |
+| New York City | `NycWithholdingCalculator` | `nyc_withholding_2026.json` |
+| Ohio (RITA) | `OhRitaCalculator` | `oh_rita_2026.json` |
+| Ohio (CCA) | `OhCcaCalculator` | `oh_cca_2026.json` |
+| Maryland county surtax | `MdCountyCalculator` | `md_county_surtax_2026.json` |
+
+Local taxes are **additive**: they subtract from net pay but do **not** reduce federal or state taxable wages. `PaycheckResult` exposes `LocalWithholding`, `LocalHeadTax` (e.g., PA LST), `LocalityLabel`, `LocalTaxableWages`, and `LocalBreakdown` for itemized display.
 
 ---
 
@@ -109,8 +127,8 @@ If the state has unique inputs, formulas, or additional taxes:
 
 1. Create a new folder: `PaycheckCalc.Core/Tax/<StateName>/`.
 2. Implement `IStateWithholdingCalculator` with custom `GetInputSchema()`, `Validate()`, and `Calculate()`.
-3. If the calculator needs JSON data, add the file to `PaycheckCalc.Core/Data/` and register it as a MAUI app package asset.
-4. Register the calculator in `MauiProgram.cs` within the `StateCalculatorRegistry` setup.
+3. If the calculator needs JSON data, add the file to `PaycheckCalc.Core/Data/` and register it as an asset in both `PaycheckCalc.App` (as a `MauiAsset`) and `PaycheckCalc.Blazor` (as a linked `Content` item under `wwwroot/data/`).
+4. Register the calculator in `MauiProgram.cs` and `PaycheckCalc.Blazor/Program.cs` within the `StateCalculatorRegistry` setup.
 5. Add regression tests in `PaycheckCalc.Tests/`.
 
 ### Testing a New State
