@@ -39,13 +39,9 @@ public static class StateTaxConfigs2026
             // and a separate additional dependent exemption ($3,000 each per
             // Indiana Departmental Notice #1, 2023+).
 
-            [UsState.IA] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                BracketsSingle = [B(0, null, 0.0365m)],
-                BracketsMarried = [B(0, null, 0.0365m)]
-            },
+            // Iowa uses a dedicated calculator (IowaWithholdingCalculator)
+            // — flat 3.65% with no standard deduction / allowance per the
+            // Iowa Department of Revenue 2026 withholding formula.
 
             [UsState.KY] = new()
             {

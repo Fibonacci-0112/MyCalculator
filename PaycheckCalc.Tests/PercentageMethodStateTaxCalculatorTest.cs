@@ -7,12 +7,12 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     // ── Flat-rate state tests ────────────────────────────────────────
 
     [Fact]
-    public void Iowa_FlatRate_AppliedToGrossWages()
+    public void Utah_FlatRate_AppliedToGrossWages()
     {
-        var calc = CreateCalculator(UsState.IA);
+        var calc = CreateCalculator(UsState.UT);
 
         var context = new CommonWithholdingContext(
-            UsState.IA,
+            UsState.UT,
             GrossWages: 5000m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026);
@@ -25,9 +25,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         var result = calc.Calculate(context, values);
 
-        // 5000 * 26 = 130,000 annual, no std ded, 130000 * 3.65% = 4,745 annual, / 26 = 182.50
+        // 5000 * 26 = 130,000 annual, no std ded, 130000 * 4.65% = 6,045 annual, / 26 = 232.50
         Assert.Equal(5000m, result.TaxableWages);
-        Assert.Equal(182.50m, result.Withholding);
+        Assert.Equal(232.50m, result.Withholding);
     }
 
     // Illinois uses a dedicated calculator (IllinoisWithholdingCalculator)
@@ -228,10 +228,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void AdditionalWithholding_IsAdded()
     {
-        var calc = CreateCalculator(UsState.IA);
+        var calc = CreateCalculator(UsState.UT);
 
         var context = new CommonWithholdingContext(
-            UsState.IA,
+            UsState.UT,
             GrossWages: 5000m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026);
@@ -244,8 +244,8 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         var result = calc.Calculate(context, values);
 
-        // base = 182.50 + 50 = 232.50
-        Assert.Equal(232.50m, result.Withholding);
+        // base = 232.50 + 50 = 282.50
+        Assert.Equal(282.50m, result.Withholding);
     }
 
     // ── Pre-tax deductions test ──────────────────────────────────────
@@ -253,10 +253,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void PreTaxDeductions_ReduceTaxableWages()
     {
-        var calc = CreateCalculator(UsState.IA);
+        var calc = CreateCalculator(UsState.UT);
 
         var context = new CommonWithholdingContext(
-            UsState.IA,
+            UsState.UT,
             GrossWages: 5000m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026,
@@ -272,10 +272,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         // taxable wages = 5000 - 1000 = 4000
         // annual = 4000 * 26 = 104,000
-        // 104000 * 3.65% = 3,796
-        // per period = 3,796 / 26 = 146.00
+        // 104000 * 4.65% = 4,836
+        // per period = 4,836 / 26 = 186.00
         Assert.Equal(4000m, result.TaxableWages);
-        Assert.Equal(146.00m, result.Withholding);
+        Assert.Equal(186.00m, result.Withholding);
     }
 
     // ── Zero wages edge case ─────────────────────────────────────────
@@ -283,10 +283,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void ZeroGrossWages_ReturnsZeroWithholding()
     {
-        var calc = CreateCalculator(UsState.IA);
+        var calc = CreateCalculator(UsState.UT);
 
         var context = new CommonWithholdingContext(
-            UsState.IA,
+            UsState.UT,
             GrossWages: 0m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026);
@@ -306,7 +306,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     // ── State property test ──────────────────────────────────────────
 
     [Theory]
-    [InlineData(UsState.IA)]
+    [InlineData(UsState.UT)]
     [InlineData(UsState.NY)]
     [InlineData(UsState.VA)]
     [InlineData(UsState.OH)]
@@ -358,13 +358,23 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // HawaiiWithholdingCalculator (Booklet A percentage method with
         // HW-4 allowances).
         //
+        // Idaho is also absent: it uses the dedicated
+        // IdahoWithholdingCalculator (flat 5.3% with ID W-4 filing-status
+        // standard deduction and per-allowance amount).
+        //
         // Indiana is also absent: it uses the dedicated
         // IndianaWithholdingCalculator (flat 3.05% with WH-4 personal
         // and additional dependent exemptions).
+        //
+        // Iowa is also absent: it uses the dedicated
+        // IowaWithholdingCalculator (flat 3.65% with optional extra
+        // withholding per IA W-4 Line 6).
+        //
+        // Michigan is also absent: it uses the dedicated
+        // MichiganWithholdingCalculator (flat 4.25% with MI-W4 exemptions).
         UsState[] expectedStates =
         [
-            UsState.IA,
-            UsState.ID, UsState.KS, UsState.KY,
+            UsState.KS, UsState.KY,
             UsState.LA, UsState.MA, UsState.MD, UsState.ME,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
             UsState.ND, UsState.NE, UsState.NJ, UsState.NM, UsState.NY,
@@ -384,8 +394,17 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.HI),
             "HI should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
 
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.IA),
+            "IA should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.ID),
+            "ID should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.IN),
             "IN should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MI),
+            "MI should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────
