@@ -78,16 +78,17 @@ public class MichiganWithholdingCalculatorTest
     // Percentage Formula Method: rate 4.25%, $5,900 per MI-W4 exemption.
 
     [Fact]
-    public void Form446_WeeklyExample_900Wages_OneExemption_Is33_93()
+    public void Form446_WeeklyExample_900Wages_OneExemption_Is33_43()
     {
-        // Published worked example: weekly gross $900, 1 exemption.
-        // Weekly exemption = $5,900 / 52 = $113.46 (per guide).
-        // Taxable = 900 − 113.46 = 786.54.
-        // Withholding = 786.54 × 0.0425 = $33.43 per Form 446 formula.
-        // Note: the published example rounds the intermediate $113.46 then
-        // multiplies — we follow the same cents rounding and expect $33.43
-        // from exact arithmetic: 900 − (5900/52) = 786.5384615...
-        // × 0.0425 = 33.4278846... → rounds to $33.43.
+        // 2026 Michigan Form 446 Percentage Formula Method worked example:
+        // weekly gross $900, 1 MI-W4 exemption.
+        //   Weekly exemption = 5900 / 52 = 113.4615384...
+        //   Taxable         = 900 − 113.4615384... = 786.5384615...
+        //   Withholding     = 786.5384615... × 0.0425 = 33.4278846...
+        //                    → rounds to $33.43.
+        // (This calculator uses exact arithmetic on the annual exemption
+        // rather than rounding the per-period exemption to cents first,
+        // which matches the mathematical form of the Form 446 formula.)
         var calc = new MichiganWithholdingCalculator();
 
         var context = new CommonWithholdingContext(
