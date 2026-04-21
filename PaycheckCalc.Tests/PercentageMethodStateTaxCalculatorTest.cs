@@ -399,7 +399,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         [
             UsState.KY,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
-            UsState.ND, UsState.NE, UsState.NJ, UsState.NM, UsState.NY,
+            UsState.ND, UsState.NE, UsState.NJ, UsState.NY,
             UsState.OH, UsState.OR, UsState.RI, UsState.SC, UsState.UT,
             UsState.VA, UsState.VT, UsState.WI, UsState.WV
         ];
@@ -442,6 +442,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MA),
             "MA should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.NM),
+            "NM should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────

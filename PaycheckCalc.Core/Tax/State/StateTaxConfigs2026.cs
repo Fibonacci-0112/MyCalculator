@@ -152,27 +152,12 @@ public static class StateTaxConfigs2026
             // (married/HoH/surviving) brackets for Status B, D, and E, per the 2026
             // NJ-WT Employer's Guide.
 
-            [UsState.NM] = new()
-            {
-                StandardDeductionSingle = 15_750m,
-                StandardDeductionMarried = 31_500m,
-                BracketsSingle =
-                [
-                    B(0, 5_500m, 0.017m),
-                    B(5_500m, 11_000m, 0.032m),
-                    B(11_000m, 16_000m, 0.047m),
-                    B(16_000m, 210_000m, 0.049m),
-                    B(210_000m, null, 0.059m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 8_000m, 0.017m),
-                    B(8_000m, 16_000m, 0.032m),
-                    B(16_000m, 24_000m, 0.047m),
-                    B(24_000m, 315_000m, 0.049m),
-                    B(315_000m, null, 0.059m)
-                ]
-            },
+            // New Mexico uses a dedicated calculator (NewMexicoWithholdingCalculator)
+            // — RPD-41272 filing statuses (Single/Married/Head of Household),
+            // $15,750/$31,500/$23,625 standard deduction (mirrors federal),
+            // $4,000 per RPD-41272 exemption, and five graduated brackets
+            // (1.7%/3.2%/4.7%/4.9%/5.9%) with filing-status–specific thresholds
+            // per the NM Taxation and Revenue FYI-104 and NMSA §7-2-7 (SB 145, 2023).
 
             [UsState.NY] = new()
             {
