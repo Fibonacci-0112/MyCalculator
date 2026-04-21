@@ -27,8 +27,8 @@ using PaycheckCalc.Core.Tax.Kansas;
 using PaycheckCalc.Core.Tax.Louisiana;
 using PaycheckCalc.Core.Tax.Maine;
 using PaycheckCalc.Core.Tax.Maryland;
+using PaycheckCalc.Core.Tax.Mississippi;
 using PaycheckCalc.Core.Tax.Minnesota;
-using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -204,6 +204,12 @@ public static class MauiProgram
             // and four graduated brackets (5.35%/6.80%/7.85%/9.85%) per the Minnesota
             // Department of Revenue 2026 Withholding Tax Instructions and Tables (Pub. 89)
             registry.Register(new MinnesotaWithholdingCalculator());
+
+            // Mississippi — 89-350 filing statuses (Single/Married/Head of Household),
+            // standard deduction ($2,300/$4,600/$3,400), personal exemption
+            // ($6,000/$12,000/$9,500), $1,500 per dependent, and two brackets
+            // (0% on $0–$10,000, 4% over $10,000) per MS Pub 89-105 and HB 1 (2023)
+            registry.Register(new MississippiWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

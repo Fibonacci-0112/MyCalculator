@@ -61,14 +61,11 @@ public static class StateTaxConfigs2026
             // — flat 4.25% with MI-W4 exemptions at $5,900 per exemption per the
             // 2026 Form 446 Withholding Guide.
 
-            [UsState.MS] = new()
-            {
-                StandardDeductionSingle = 2_300m,
-                StandardDeductionMarried = 4_600m,
-                AllowanceAmount = 6_000m,
-                BracketsSingle = [B(0, null, 0.05m)],
-                BracketsMarried = [B(0, null, 0.05m)]
-            },
+            // Mississippi uses a dedicated calculator (MississippiWithholdingCalculator)
+            // — 89-350 filing statuses (Single/Married/Head of Household), filing-status
+            // standard deduction ($2,300/$4,600/$3,400), filing-status personal exemption
+            // ($6,000/$12,000/$9,500), $1,500 per dependent (Line 6), and two brackets
+            // (0% on $0–$10,000, 4% over $10,000) per MS Pub 89-105 and HB 1 (2023).
 
             [UsState.NC] = new()
             {
