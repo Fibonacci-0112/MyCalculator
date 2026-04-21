@@ -357,10 +357,14 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // Hawaii is also absent: it uses the dedicated
         // HawaiiWithholdingCalculator (Booklet A percentage method with
         // HW-4 allowances).
+        //
+        // Indiana is also absent: it uses the dedicated
+        // IndianaWithholdingCalculator (flat 3.05% with WH-4 personal
+        // and additional dependent exemptions).
         UsState[] expectedStates =
         [
             UsState.IA,
-            UsState.ID, UsState.IN, UsState.KS, UsState.KY,
+            UsState.ID, UsState.KS, UsState.KY,
             UsState.LA, UsState.MA, UsState.MD, UsState.ME,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT, UsState.NC,
             UsState.ND, UsState.NE, UsState.NJ, UsState.NM, UsState.NY,
@@ -379,6 +383,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.HI),
             "HI should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.IN),
+            "IN should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────

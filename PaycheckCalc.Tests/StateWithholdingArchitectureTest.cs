@@ -11,6 +11,7 @@ using PaycheckCalc.Core.Tax.Georgia;
 using PaycheckCalc.Core.Tax.Hawaii;
 using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
+using PaycheckCalc.Core.Tax.Indiana;
 using PaycheckCalc.Core.Tax.Michigan;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
@@ -718,6 +719,8 @@ public class FullRegistryIntegrationTest
         registry.Register(new PennsylvaniaWithholdingCalculator());
 
         registry.Register(new IllinoisWithholdingCalculator());
+
+        registry.Register(new IndianaWithholdingCalculator());
 
         var coDataPath = Path.Combine(AppContext.BaseDirectory, "co_dr0004_2026.json");
         var coJson = File.ReadAllText(coDataPath);
