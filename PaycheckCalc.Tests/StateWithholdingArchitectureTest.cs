@@ -6,6 +6,7 @@ using PaycheckCalc.Core.Tax.Colorado;
 using PaycheckCalc.Core.Tax.Connecticut;
 using PaycheckCalc.Core.Tax.Delaware;
 using PaycheckCalc.Core.Tax.Georgia;
+using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
@@ -717,6 +718,8 @@ public class FullRegistryIntegrationTest
         registry.Register(new DelawareWithholdingCalculator());
 
         registry.Register(new GeorgiaWithholdingCalculator());
+
+        registry.Register(new IdahoWithholdingCalculator());
 
         UsState[] noTaxStates = [UsState.AK, UsState.FL, UsState.NV, UsState.NH, UsState.SD, UsState.TN, UsState.TX, UsState.WA, UsState.WY];
         foreach (var state in noTaxStates)

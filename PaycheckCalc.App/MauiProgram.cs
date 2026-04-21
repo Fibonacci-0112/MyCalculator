@@ -16,6 +16,7 @@ using PaycheckCalc.Core.Tax.Colorado;
 using PaycheckCalc.Core.Tax.Connecticut;
 using PaycheckCalc.Core.Tax.Delaware;
 using PaycheckCalc.Core.Tax.Georgia;
+using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
@@ -126,6 +127,10 @@ public static class MauiProgram
             // standard deduction, and additional allowances (HB 111 / 2026
             // Employer's Tax Guide)
             registry.Register(new GeorgiaWithholdingCalculator());
+
+            // Idaho — flat 5.3% with ID W-4 filing-status standard deduction
+            // and $3,300 per pre-2020 allowance (Idaho HB 521 / EPB00006)
+            registry.Register(new IdahoWithholdingCalculator());
 
             // Illinois — flat 4.95% with IL-W-4 basic and additional allowances
             registry.Register(new IllinoisWithholdingCalculator());
