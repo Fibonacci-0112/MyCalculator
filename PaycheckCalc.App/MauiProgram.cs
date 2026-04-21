@@ -34,6 +34,7 @@ using PaycheckCalc.Core.Tax.Mississippi;
 using PaycheckCalc.Core.Tax.Minnesota;
 using PaycheckCalc.Core.Tax.Montana;
 using PaycheckCalc.Core.Tax.Nebraska;
+using PaycheckCalc.Core.Tax.NewJersey;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -237,6 +238,11 @@ public static class MauiProgram
             // (applied to computed tax), and four graduated brackets (2.46%/3.51%/5.01%/5.2%)
             // with filing-status–specific thresholds per the Nebraska DOR 2026 Circular EN
             registry.Register(new NebraskaWithholdingCalculator());
+
+            // New Jersey — NJ-W4 filing statuses A–E, $1,000 per-allowance deduction,
+            // Table A (single) brackets for Status A and C, and Table B
+            // (married/HoH/surviving) brackets for Status B, D, and E per the 2026 NJ-WT
+            registry.Register(new NewJerseyWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

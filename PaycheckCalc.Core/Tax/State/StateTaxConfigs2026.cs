@@ -146,33 +146,11 @@ public static class StateTaxConfigs2026
             // to computed tax), and four graduated brackets (2.46%/3.51%/5.01%/5.2%)
             // with filing-status–specific thresholds per the Nebraska DOR 2026 Circular EN.
 
-            [UsState.NJ] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                AllowanceAmount = 1_000m,
-                BracketsSingle =
-                [
-                    B(0, 20_000m, 0.014m),
-                    B(20_000m, 35_000m, 0.0175m),
-                    B(35_000m, 40_000m, 0.035m),
-                    B(40_000m, 75_000m, 0.0553m),
-                    B(75_000m, 500_000m, 0.0637m),
-                    B(500_000m, 1_000_000m, 0.0897m),
-                    B(1_000_000m, null, 0.1075m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 20_000m, 0.014m),
-                    B(20_000m, 50_000m, 0.0175m),
-                    B(50_000m, 70_000m, 0.0245m),
-                    B(70_000m, 80_000m, 0.035m),
-                    B(80_000m, 150_000m, 0.0553m),
-                    B(150_000m, 500_000m, 0.0637m),
-                    B(500_000m, 1_000_000m, 0.0897m),
-                    B(1_000_000m, null, 0.1075m)
-                ]
-            },
+            // New Jersey uses a dedicated calculator (NewJerseyWithholdingCalculator)
+            // — NJ-W4 filing statuses A–E, $1,000 per-allowance deduction, no standard
+            // deduction, Table A (single) brackets for Status A and C, and Table B
+            // (married/HoH/surviving) brackets for Status B, D, and E, per the 2026
+            // NJ-WT Employer's Guide.
 
             [UsState.NM] = new()
             {
