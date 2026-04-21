@@ -1,5 +1,6 @@
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Tax.Alabama;
+using PaycheckCalc.Core.Tax.Arizona;
 using PaycheckCalc.Core.Tax.Arkansas;
 using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Colorado;
@@ -8,6 +9,7 @@ using PaycheckCalc.Core.Tax.Delaware;
 using PaycheckCalc.Core.Tax.Georgia;
 using PaycheckCalc.Core.Tax.Idaho;
 using PaycheckCalc.Core.Tax.Illinois;
+using PaycheckCalc.Core.Tax.Michigan;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.State;
@@ -152,7 +154,7 @@ public class PercentageMethodWithholdingAdapterTest
     [Fact]
     public void Schema_HasFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc = CreateAdapter(UsState.AZ);
+        var calc = CreateAdapter(UsState.IA);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -167,7 +169,7 @@ public class PercentageMethodWithholdingAdapterTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = CreateAdapter(UsState.AZ);
+        var calc = CreateAdapter(UsState.IA);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Invalid" });
         Assert.Single(errors);
     }
@@ -175,16 +177,19 @@ public class PercentageMethodWithholdingAdapterTest
     [Fact]
     public void Validate_ValidFilingStatus_ReturnsNoErrors()
     {
-        var calc = CreateAdapter(UsState.AZ);
+        var calc = CreateAdapter(UsState.IA);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Single" });
         Assert.Empty(errors);
     }
 
     [Fact]
-    public void Arizona_FlatRate_MatchesLegacyCalculator()
+    public void Iowa_FlatRate_MatchesLegacyCalculator()
     {
-        var adapter = CreateAdapter(UsState.AZ);
-        var context = new CommonWithholdingContext(UsState.AZ, 5000m, PayFrequency.Biweekly, 2026);
+        // Iowa is a flat 3.65% state with no standard deduction or
+        // allowance in StateTaxConfigs2026, making it a clean fixture
+        // for verifying the generic percentage-method adapter.
+        var adapter = CreateAdapter(UsState.IA);
+        var context = new CommonWithholdingContext(UsState.IA, 5000m, PayFrequency.Biweekly, 2026);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -194,9 +199,9 @@ public class PercentageMethodWithholdingAdapterTest
 
         var result = adapter.Calculate(context, values);
 
-        // 5000 * 26 = 130,000 * 2.5% = 3250 / 26 = 125.00
+        // 5000 * 26 = 130,000 * 3.65% = 4,745 / 26 = 182.50
         Assert.Equal(5000m, result.TaxableWages);
-        Assert.Equal(125.00m, result.Withholding);
+        Assert.Equal(182.50m, result.Withholding);
     }
 
     [Fact]
@@ -220,8 +225,8 @@ public class PercentageMethodWithholdingAdapterTest
     [Fact]
     public void AdditionalWithholding_IsAdded()
     {
-        var adapter = CreateAdapter(UsState.AZ);
-        var context = new CommonWithholdingContext(UsState.AZ, 5000m, PayFrequency.Biweekly, 2026);
+        var adapter = CreateAdapter(UsState.IA);
+        var context = new CommonWithholdingContext(UsState.IA, 5000m, PayFrequency.Biweekly, 2026);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -231,14 +236,15 @@ public class PercentageMethodWithholdingAdapterTest
 
         var result = adapter.Calculate(context, values);
 
-        Assert.Equal(175.00m, result.Withholding);
+        // 182.50 base + 50 extra = 232.50
+        Assert.Equal(232.50m, result.Withholding);
     }
 
     [Fact]
     public void PreTaxDeductions_ReduceTaxableWages()
     {
-        var adapter = CreateAdapter(UsState.AZ);
-        var context = new CommonWithholdingContext(UsState.AZ, 5000m, PayFrequency.Biweekly, 2026,
+        var adapter = CreateAdapter(UsState.IA);
+        var context = new CommonWithholdingContext(UsState.IA, 5000m, PayFrequency.Biweekly, 2026,
             PreTaxDeductionsReducingStateWages: 1000m);
         var values = new StateInputValues
         {
@@ -249,8 +255,10 @@ public class PercentageMethodWithholdingAdapterTest
 
         var result = adapter.Calculate(context, values);
 
+        // Taxable wages = 5000 - 1000 = 4000.
+        // 4000 * 26 = 104,000 * 3.65% = 3,796 / 26 = 146.00
         Assert.Equal(4000m, result.TaxableWages);
-        Assert.Equal(100.00m, result.Withholding);
+        Assert.Equal(146.00m, result.Withholding);
     }
 
     [Fact]
@@ -690,6 +698,8 @@ public class FullRegistryIntegrationTest
         var registry = new StateCalculatorRegistry();
 
         registry.Register(new AlabamaWithholdingCalculator());
+
+        registry.Register(new ArizonaWithholdingCalculator());
 
         var arDataPath = Path.Combine(AppContext.BaseDirectory, "ar_withholding_2026.json");
         var arJson = File.ReadAllText(arDataPath);

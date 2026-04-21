@@ -3,6 +3,7 @@ using PaycheckCalc.Blazor.Services;
 using PaycheckCalc.Core.Pay;
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Tax.Alabama;
+using PaycheckCalc.Core.Tax.Arizona;
 using PaycheckCalc.Core.Tax.Arkansas;
 using PaycheckCalc.Core.Tax.California;
 using PaycheckCalc.Core.Tax.Colorado;
@@ -74,6 +75,7 @@ var stateRegistry = new StateCalculatorRegistry();
 
 // Dedicated state calculators
 stateRegistry.Register(new AlabamaWithholdingCalculator());
+stateRegistry.Register(new ArizonaWithholdingCalculator());
 stateRegistry.Register(new ArkansasWithholdingCalculator(arFormulaCalc));
 stateRegistry.Register(new CaliforniaWithholdingCalculator(caPercentCalc));
 stateRegistry.Register(coCalc);

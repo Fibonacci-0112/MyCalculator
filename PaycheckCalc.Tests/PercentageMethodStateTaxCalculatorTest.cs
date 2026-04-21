@@ -7,12 +7,12 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     // ── Flat-rate state tests ────────────────────────────────────────
 
     [Fact]
-    public void Arizona_FlatRate_AppliedToGrossWages()
+    public void Iowa_FlatRate_AppliedToGrossWages()
     {
-        var calc = CreateCalculator(UsState.AZ);
+        var calc = CreateCalculator(UsState.IA);
 
         var context = new CommonWithholdingContext(
-            UsState.AZ,
+            UsState.IA,
             GrossWages: 5000m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026);
@@ -25,9 +25,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         var result = calc.Calculate(context, values);
 
-        // 5000 * 26 = 130,000 annual, no std ded, 130000 * 2.5% = 3250 annual, / 26 = 125.00
+        // 5000 * 26 = 130,000 annual, no std ded, 130000 * 3.65% = 4,745 annual, / 26 = 182.50
         Assert.Equal(5000m, result.TaxableWages);
-        Assert.Equal(125.00m, result.Withholding);
+        Assert.Equal(182.50m, result.Withholding);
     }
 
     // Illinois uses a dedicated calculator (IllinoisWithholdingCalculator)
@@ -228,10 +228,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void AdditionalWithholding_IsAdded()
     {
-        var calc = CreateCalculator(UsState.AZ);
+        var calc = CreateCalculator(UsState.IA);
 
         var context = new CommonWithholdingContext(
-            UsState.AZ,
+            UsState.IA,
             GrossWages: 5000m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026);
@@ -244,8 +244,8 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         var result = calc.Calculate(context, values);
 
-        // base = 125.00 + 50 = 175.00
-        Assert.Equal(175.00m, result.Withholding);
+        // base = 182.50 + 50 = 232.50
+        Assert.Equal(232.50m, result.Withholding);
     }
 
     // ── Pre-tax deductions test ──────────────────────────────────────
@@ -253,10 +253,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void PreTaxDeductions_ReduceTaxableWages()
     {
-        var calc = CreateCalculator(UsState.AZ);
+        var calc = CreateCalculator(UsState.IA);
 
         var context = new CommonWithholdingContext(
-            UsState.AZ,
+            UsState.IA,
             GrossWages: 5000m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026,
@@ -272,10 +272,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         // taxable wages = 5000 - 1000 = 4000
         // annual = 4000 * 26 = 104,000
-        // 104000 * 2.5% = 2600
-        // per period = 2600 / 26 = 100.00
+        // 104000 * 3.65% = 3,796
+        // per period = 3,796 / 26 = 146.00
         Assert.Equal(4000m, result.TaxableWages);
-        Assert.Equal(100.00m, result.Withholding);
+        Assert.Equal(146.00m, result.Withholding);
     }
 
     // ── Zero wages edge case ─────────────────────────────────────────
@@ -283,10 +283,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void ZeroGrossWages_ReturnsZeroWithholding()
     {
-        var calc = CreateCalculator(UsState.AZ);
+        var calc = CreateCalculator(UsState.IA);
 
         var context = new CommonWithholdingContext(
-            UsState.AZ,
+            UsState.IA,
             GrossWages: 0m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026);
@@ -306,7 +306,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     // ── State property test ──────────────────────────────────────────
 
     [Theory]
-    [InlineData(UsState.AZ)]
+    [InlineData(UsState.IA)]
     [InlineData(UsState.NY)]
     [InlineData(UsState.VA)]
     [InlineData(UsState.OH)]
@@ -346,9 +346,11 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void AllExpectedStates_AreConfigured()
     {
+        // Arizona is intentionally absent: it uses the dedicated
+        // ArizonaWithholdingCalculator (Form A-4 percentage election)
+        // rather than the generic annualized percentage method.
         UsState[] expectedStates =
         [
-            UsState.AZ,
             UsState.DC, UsState.HI, UsState.IA,
             UsState.ID, UsState.IN, UsState.KS, UsState.KY,
             UsState.LA, UsState.MA, UsState.MD, UsState.ME,
@@ -360,6 +362,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         foreach (var state in expectedStates)
             Assert.True(StateTaxConfigs2026.Configs.ContainsKey(state), $"{state} should be configured");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.AZ),
+            "AZ should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────
