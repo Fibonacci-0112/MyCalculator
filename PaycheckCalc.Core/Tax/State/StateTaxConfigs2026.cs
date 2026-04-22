@@ -186,24 +186,11 @@ public static class StateTaxConfigs2026
             // exemption, and three graduated brackets (3.75%/4.75%/5.99%) per the RI
             // Division of Taxation 2026 Pub. T-174.
 
-            [UsState.SC] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                AllowanceAmount = 5_000m,
-                BracketsSingle =
-                [
-                    B(0, 3_640m, 0m),
-                    B(3_640m, 18_230m, 0.03m),
-                    B(18_230m, null, 0.06m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 3_640m, 0m),
-                    B(3_640m, 18_230m, 0.03m),
-                    B(18_230m, null, 0.06m)
-                ]
-            },
+            // South Carolina uses a dedicated calculator (SouthCarolinaWithholdingCalculator)
+            // — SC W-4 filing statuses (Single/Married/Head of Household), a variable
+            // standard deduction of 10% of annualized wages (maximum $7,500, only when
+            // at least one allowance is claimed), $5,000 per SC W-4 allowance, and three
+            // graduated brackets (0%/3%/6% at $0/$3,640/$18,230) per SCDOR Form WH-1603F.
 
             [UsState.VA] = new()
             {
