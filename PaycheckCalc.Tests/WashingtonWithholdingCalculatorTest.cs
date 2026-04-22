@@ -6,7 +6,7 @@ using Xunit;
 /// <summary>
 /// Washington has no state individual income tax, so income-tax withholding is always
 /// zero.  The WashingtonWithholdingCalculator adds a WA Cares Fund (Long-Term Care)
-/// deduction at 0.58 % of all gross wages.  Employees with an approved DSHS exemption
+/// deduction at 0.58% of all gross wages.  Employees with an approved DSHS exemption
 /// certificate may opt out via the WaCaresExempt field.
 /// </summary>
 public class WashingtonWithholdingCalculatorTest
@@ -96,7 +96,7 @@ public class WashingtonWithholdingCalculatorTest
     [Fact]
     public void WaCaresFund_Biweekly_5000Gross()
     {
-        // WA Cares Fund = 5,000 × 0.58 % = $29.00
+        // WA Cares Fund = 5,000 × 0.58% = $29.00
         var calc = CreateCalc();
 
         var context = new CommonWithholdingContext(
@@ -113,7 +113,7 @@ public class WashingtonWithholdingCalculatorTest
     [Fact]
     public void WaCaresFund_Weekly_3000Gross()
     {
-        // WA Cares Fund = 3,000 × 0.58 % = $17.40
+        // WA Cares Fund = 3,000 × 0.58% = $17.40
         var calc = CreateCalc();
 
         var context = new CommonWithholdingContext(
@@ -130,7 +130,7 @@ public class WashingtonWithholdingCalculatorTest
     [Fact]
     public void WaCaresFund_Monthly_12500Gross()
     {
-        // WA Cares Fund = 12,500 × 0.58 % = $72.50
+        // WA Cares Fund = 12,500 × 0.58% = $72.50
         var calc = CreateCalc();
 
         var context = new CommonWithholdingContext(
@@ -214,7 +214,7 @@ public class WashingtonWithholdingCalculatorTest
 
         var result = calc.Calculate(context, values);
 
-        // 5,000 × 0.58 % = $29.00
+        // 5,000 × 0.58% = $29.00
         Assert.Equal(29.00m, result.DisabilityInsurance);
     }
 
@@ -237,7 +237,7 @@ public class WashingtonWithholdingCalculatorTest
 
         var result = calc.Calculate(context, new StateInputValues());
 
-        // WA Cares = 6,000 × 0.58 % = $34.80  (gross, not 4,500)
+        // WA Cares = 6,000 × 0.58% = $34.80  (gross, not 4,500)
         Assert.Equal(34.80m, result.DisabilityInsurance);
     }
 

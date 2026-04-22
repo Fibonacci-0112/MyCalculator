@@ -36,7 +36,7 @@ These states have unique calculation rules that require dedicated calculator imp
 | ND | `NorthDakotaWithholdingCalculator` | Federal W-4 filing statuses (Single/Married/HoH), $15,750/$31,500/$23,625 std deduction (mirrors federal), three brackets (1.10%/2.04%/2.64%) |
 | OK | `OklahomaWithholdingCalculator` | OW-2 percentage method with whole-dollar rounding (JSON-backed) |
 | PA | `PennsylvaniaWithholdingCalculator` | Flat 3.07% |
-| WA | `WashingtonWithholdingCalculator` | No income tax; WA Cares Fund (Long-Term Care) at 0.58 % of gross wages, with optional exemption toggle |
+| WA | `WashingtonWithholdingCalculator` | No income tax; WA Cares Fund (Long-Term Care) at 0.58% of gross wages, with optional exemption toggle |
 
 ### Annualized Percentage Method States (30 states)
 
