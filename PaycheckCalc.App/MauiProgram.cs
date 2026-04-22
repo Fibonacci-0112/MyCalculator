@@ -49,6 +49,7 @@ using PaycheckCalc.Core.Tax.Virginia;
 using PaycheckCalc.Core.Tax.Washington;
 using PaycheckCalc.Core.Tax.WestVirginia;
 using PaycheckCalc.Core.Tax.Wisconsin;
+using PaycheckCalc.Core.Tax.Wyoming;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -344,8 +345,12 @@ public static class MauiProgram
             // Washington — no income tax; WA Cares Fund (Long-Term Care) at 0.58 %
             registry.Register(new WashingtonWithholdingCalculator());
 
+            // Wyoming — no state income tax and no employee-paid state payroll
+            // assessments (SUI is employer-funded under Wyo. Stat. § 27-3-501 et seq.)
+            registry.Register(new WyomingWithholdingCalculator());
+
             // States with no individual income tax
-            UsState[] noTaxStates = [UsState.AK, UsState.FL, UsState.NV, UsState.NH, UsState.SD, UsState.TN, UsState.TX, UsState.WY];
+            UsState[] noTaxStates = [UsState.AK, UsState.FL, UsState.NV, UsState.NH, UsState.SD, UsState.TN, UsState.TX];
             foreach (var state in noTaxStates)
                 registry.Register(new NoIncomeTaxWithholdingAdapter(state));
 
