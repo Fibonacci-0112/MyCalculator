@@ -167,21 +167,11 @@ public static class StateTaxConfigs2026
             // brackets (1.10%/2.04%/2.64%) with filing-status–specific thresholds per the
             // ND Office of State Tax Commissioner 2026 Employer's Withholding Guide.
 
-            [UsState.OH] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                BracketsSingle =
-                [
-                    B(0, 26_050m, 0m),
-                    B(26_050m, null, 0.0275m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 26_050m, 0m),
-                    B(26_050m, null, 0.0275m)
-                ]
-            },
+            // Ohio uses a dedicated calculator (OhioWithholdingCalculator)
+            // — IT-4 exemption allowance ($650 annualized per exemption, no filing
+            // status), and two brackets (0% on $0–$26,050, 2.75% over $26,050) per the
+            // Ohio Department of Taxation 2026 Employer Withholding Tax – Optional
+            // Computer Formula (HB 96, effective January 1, 2026).
 
             [UsState.OR] = new()
             {
