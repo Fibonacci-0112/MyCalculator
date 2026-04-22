@@ -6,11 +6,11 @@ PaycheckCalc supports all 50 US states plus the District of Columbia. This page 
 
 ## State Calculator Categories
 
-### No Income Tax (9 states)
+### No Income Tax (8 states)
 
 These states have no individual income tax and are implemented through `NoIncomeTaxWithholdingAdapter`, which returns zero withholding.
 
-**AK, FL, NV, NH, SD, TN, TX, WA, WY**
+**AK, FL, NV, NH, SD, TN, TX, WY**
 
 ### Flat Rate (1 state)
 
@@ -36,6 +36,7 @@ These states have unique calculation rules that require dedicated calculator imp
 | ND | `NorthDakotaWithholdingCalculator` | Federal W-4 filing statuses (Single/Married/HoH), $15,750/$31,500/$23,625 std deduction (mirrors federal), three brackets (1.10%/2.04%/2.64%) |
 | OK | `OklahomaWithholdingCalculator` | OW-2 percentage method with whole-dollar rounding (JSON-backed) |
 | PA | `PennsylvaniaWithholdingCalculator` | Flat 3.07% |
+| WA | `WashingtonWithholdingCalculator` | No income tax; WA Cares Fund (Long-Term Care) at 0.58% of gross wages, with optional exemption toggle |
 
 ### Annualized Percentage Method States (30 states)
 
@@ -61,6 +62,7 @@ Some states levy additional payroll taxes beyond income tax:
 | CA | State Disability Insurance (SDI) | 1.2% | "State Disability Insurance (SDI)" |
 | CO | Family & Medical Leave Insurance (FMLI) | 0.45% | "State Disability Insurance" |
 | CT | Paid Family & Medical Leave Insurance (PFMLI) | 0.5% | "Family Leave Insurance (FLI)" |
+| WA | WA Cares Fund (Long-Term Care Insurance) | 0.58% | "WA Cares Fund (Long-Term Care)" |
 
 These amounts flow through `StateWithholdingResult.DisabilityInsurance` and appear as separate line items on the results screen, chart, and exports.
 

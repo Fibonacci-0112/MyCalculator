@@ -41,6 +41,7 @@ using PaycheckCalc.Core.Tax.SouthCarolina;
 using PaycheckCalc.Core.Tax.Utah;
 using PaycheckCalc.Core.Tax.Vermont;
 using PaycheckCalc.Core.Tax.Virginia;
+using PaycheckCalc.Core.Tax.Washington;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
@@ -157,11 +158,14 @@ stateRegistry.Register(new VirginiaWithholdingCalculator());
 stateRegistry.Register(new OklahomaWithholdingCalculator(okCalc));
 stateRegistry.Register(new PennsylvaniaWithholdingCalculator());
 
+// Washington — no income tax; WA Cares Fund (Long-Term Care) at 0.58 %
+stateRegistry.Register(new WashingtonWithholdingCalculator());
+
 // No-income-tax states
 UsState[] noTaxStates =
 [
     UsState.AK, UsState.FL, UsState.NV, UsState.NH,
-    UsState.SD, UsState.TN, UsState.TX, UsState.WA, UsState.WY
+    UsState.SD, UsState.TN, UsState.TX, UsState.WY
 ];
 foreach (var state in noTaxStates)
     stateRegistry.Register(new NoIncomeTaxWithholdingAdapter(state));
