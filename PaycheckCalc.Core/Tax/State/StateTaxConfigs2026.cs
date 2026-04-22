@@ -203,6 +203,12 @@ public static class StateTaxConfigs2026
             // (2%/3%/5%/5.75% at $0/$3,000/$5,000/$17,000) per the Virginia
             // Department of Taxation Employer Withholding Instructions (Pub. 93045, 2026).
 
+            // West Virginia uses a dedicated calculator (WestVirginiaWithholdingCalculator)
+            // — IT-104 filing statuses (Single/Married), no state standard deduction,
+            // $2,000 per IT-104 personal exemption, and five graduated brackets
+            // (3%/4%/4.5%/6%/6.5% at $0/$10,000/$25,000/$40,000/$60,000)
+            // per the WV State Tax Dept. Form IT-104 and WV Code § 11-21-71 (2026).
+
             [UsState.WI] = new()
             {
                 StandardDeductionSingle = 12_760m,
@@ -220,29 +226,6 @@ public static class StateTaxConfigs2026
                     B(18_410m, 36_820m, 0.0465m),
                     B(36_820m, 405_550m, 0.053m),
                     B(405_550m, null, 0.0765m)
-                ]
-            },
-
-            [UsState.WV] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                AllowanceAmount = 2_000m,
-                BracketsSingle =
-                [
-                    B(0, 10_000m, 0.03m),
-                    B(10_000m, 25_000m, 0.04m),
-                    B(25_000m, 40_000m, 0.045m),
-                    B(40_000m, 60_000m, 0.06m),
-                    B(60_000m, null, 0.065m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 10_000m, 0.03m),
-                    B(10_000m, 25_000m, 0.04m),
-                    B(25_000m, 40_000m, 0.045m),
-                    B(40_000m, 60_000m, 0.06m),
-                    B(60_000m, null, 0.065m)
                 ]
             },
         };

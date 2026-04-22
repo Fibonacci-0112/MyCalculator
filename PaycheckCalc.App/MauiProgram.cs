@@ -47,6 +47,7 @@ using PaycheckCalc.Core.Tax.Utah;
 using PaycheckCalc.Core.Tax.Vermont;
 using PaycheckCalc.Core.Tax.Virginia;
 using PaycheckCalc.Core.Tax.Washington;
+using PaycheckCalc.Core.Tax.WestVirginia;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -319,6 +320,12 @@ public static class MauiProgram
             // (2%/3%/5%/5.75% at $0/$3,000/$5,000/$17,000) per the Virginia
             // Department of Taxation Employer Withholding Instructions (Pub. 93045, 2026)
             registry.Register(new VirginiaWithholdingCalculator());
+
+            // West Virginia — IT-104 filing statuses (Single/Married), no state standard
+            // deduction, $2,000 per IT-104 personal exemption, and five graduated brackets
+            // (3%/4%/4.5%/6%/6.5% at $0/$10,000/$25,000/$40,000/$60,000)
+            // per the WV State Tax Dept. Form IT-104 and WV Code § 11-21-71 (2026)
+            registry.Register(new WestVirginiaWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
