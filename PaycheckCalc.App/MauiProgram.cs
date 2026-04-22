@@ -38,6 +38,7 @@ using PaycheckCalc.Core.Tax.NewJersey;
 using PaycheckCalc.Core.Tax.NewMexico;
 using PaycheckCalc.Core.Tax.NewYork;
 using PaycheckCalc.Core.Tax.NorthCarolina;
+using PaycheckCalc.Core.Tax.NorthDakota;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -262,6 +263,12 @@ public static class MauiProgram
             // $12,750/$25,500/$19,125 standard deduction, $2,500 per NC-4 allowance,
             // and a flat 4.5% rate per NC DOR Publication NC-30 (2026)
             registry.Register(new NorthCarolinaWithholdingCalculator());
+
+            // North Dakota — federal W-4 filing statuses (Single/Married/Head of Household),
+            // $15,750/$31,500/$23,625 standard deduction (mirrors federal), and three graduated
+            // brackets (1.10%/2.04%/2.64%) per the ND Office of State Tax Commissioner 2026
+            // Employer's Withholding Guide
+            registry.Register(new NorthDakotaWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

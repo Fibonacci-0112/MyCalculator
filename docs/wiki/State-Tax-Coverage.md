@@ -18,7 +18,7 @@ These states have no individual income tax and are implemented through `NoIncome
 |---|---|---|
 | PA | 3.07% | `PennsylvaniaWithholdingCalculator` |
 
-### Custom Formula States (11 states)
+### Custom Formula States (12 states)
 
 These states have unique calculation rules that require dedicated calculator implementations.
 
@@ -33,14 +33,15 @@ These states have unique calculation rules that require dedicated calculator imp
 | DE | `DelawareWithholdingCalculator` | DE W-4 with 4 filing statuses, $110 personal credit per allowance, 7 graduated brackets (top rate 6.6% over $60k) |
 | GA | `GeorgiaWithholdingCalculator` | Flat 5.19% (HB 111), Form G-4 filing statuses A/B/C/D, $12,000/$24,000 standard deduction, $4,000 dependent and $3,000 additional allowances |
 | IL | `IllinoisWithholdingCalculator` | Flat 4.95% with IL-W-4 basic allowances ($2,925/yr each) and additional allowances ($1,000/yr each) |
+| ND | `NorthDakotaWithholdingCalculator` | Federal W-4 filing statuses (Single/Married/HoH), $15,750/$31,500/$23,625 std deduction (mirrors federal), three brackets (1.10%/2.04%/2.64%) |
 | OK | `OklahomaWithholdingCalculator` | OW-2 percentage method with whole-dollar rounding (JSON-backed) |
 | PA | `PennsylvaniaWithholdingCalculator` | Flat 3.07% |
 
-### Annualized Percentage Method States (31 states)
+### Annualized Percentage Method States (30 states)
 
 These states use `PercentageMethodWithholdingAdapter` with state-specific configurations defined in `StateTaxConfigs2026`:
 
-**AZ, HI, IA, ID, IN, KS, KY, LA, MA, MD, ME, MI, MN, MO, MS, MT, NC, ND, NE, NJ, NM, NY, OH, OR, RI, SC, UT, VA, VT, WI, WV**
+**AZ, HI, IA, ID, IN, KS, KY, LA, MA, MD, ME, MI, MN, MO, MS, MT, NC, NE, NJ, NM, NY, OH, OR, RI, SC, UT, VA, VT, WI, WV**
 
 Each configuration specifies:
 - Standard deduction amounts (per filing status)

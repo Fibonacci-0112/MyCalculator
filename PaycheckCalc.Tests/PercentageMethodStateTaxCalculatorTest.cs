@@ -351,11 +351,17 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // Head of Household, $8,000/$16,050/$11,000 standard deduction,
         // $1,000 per IT-2104 allowance, ten graduated brackets 4%–10.9%
         // per NYS Publication NYS-50-T-NYS (2026)).
+        //
+        // North Dakota is also absent: it uses the dedicated
+        // NorthDakotaWithholdingCalculator (federal W-4 filing statuses Single/Married/
+        // Head of Household, $15,750/$31,500/$23,625 standard deduction (mirrors federal),
+        // three graduated brackets 1.10%/2.04%/2.64% per the ND Office of State Tax
+        // Commissioner 2026 Employer's Withholding Guide).
         UsState[] expectedStates =
         [
             UsState.KY,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT,
-            UsState.ND, UsState.NE, UsState.NJ,
+            UsState.NE, UsState.NJ,
             UsState.OH, UsState.OR, UsState.RI, UsState.SC, UsState.UT,
             UsState.VA, UsState.VT, UsState.WI, UsState.WV
         ];
@@ -407,6 +413,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.NC),
             "NC should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.ND),
+            "ND should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────

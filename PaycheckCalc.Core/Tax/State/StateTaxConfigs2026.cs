@@ -161,23 +161,11 @@ public static class StateTaxConfigs2026
             // $8,000/$16,050/$11,000 standard deduction, $1,000 per IT-2104 allowance,
             // and ten graduated brackets (4%–10.9%) per NYS Publication NYS-50-T-NYS (2026).
 
-            [UsState.ND] = new()
-            {
-                StandardDeductionSingle = 15_750m,
-                StandardDeductionMarried = 31_500m,
-                BracketsSingle =
-                [
-                    B(0, 46_500m, 0.011m),
-                    B(46_500m, 113_750m, 0.0204m),
-                    B(113_750m, null, 0.0264m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 78_650m, 0.011m),
-                    B(78_650m, 197_550m, 0.0204m),
-                    B(197_550m, null, 0.0264m)
-                ]
-            },
+            // North Dakota uses a dedicated calculator (NorthDakotaWithholdingCalculator)
+            // — federal W-4 filing statuses (Single/Married/Head of Household), standard
+            // deductions $15,750/$31,500/$23,625 (mirrors federal), and three graduated
+            // brackets (1.10%/2.04%/2.64%) with filing-status–specific thresholds per the
+            // ND Office of State Tax Commissioner 2026 Employer's Withholding Guide.
 
             [UsState.OH] = new()
             {
