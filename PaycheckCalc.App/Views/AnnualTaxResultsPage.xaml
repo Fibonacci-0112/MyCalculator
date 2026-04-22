@@ -270,7 +270,7 @@
         <!-- Empty state -->
         <Label Grid.Row="1"
                IsVisible="{Binding HasResult, Converter={StaticResource InvertBoolConverter}}"
-               Text="Run a calculation from the Annual Tax page to see your federal and state summary here."
+               Text="Enter W-2 jobs, other income, adjustments, and credits on the Annual flyouts to see your federal and state Form 1040 summary here."
                TextColor="#78909C" FontSize="13"
                Padding="24"
                HorizontalTextAlignment="Center"

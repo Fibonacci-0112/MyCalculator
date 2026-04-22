@@ -56,10 +56,9 @@ public partial class AnnualTaxViewModel : ObservableObject
 
     /// <summary>
     /// Re-runs <see cref="Form1040Calculator"/> using the current session
-    /// state and navigates to the Annual Results flyout.
+    /// state and refreshes the bindable result surface. Does not navigate.
     /// </summary>
-    [RelayCommand]
-    private async Task CalculateAsync()
+    public void Recalculate()
     {
         var profile = AnnualTaxInputMapper.Map(Session);
         var domainResult = _calc.Calculate(profile);
@@ -67,6 +66,16 @@ public partial class AnnualTaxViewModel : ObservableObject
         OnPropertyChanged(nameof(ResultModel));
         OnPropertyChanged(nameof(HasResult));
         OnPropertyChanged(nameof(FilingStatusDisplay));
+    }
+
+    /// <summary>
+    /// Re-runs <see cref="Form1040Calculator"/> using the current session
+    /// state and navigates to the Annual Results flyout.
+    /// </summary>
+    [RelayCommand]
+    private async Task CalculateAsync()
+    {
+        Recalculate();
 
         if (Shell.Current is not null)
             await Shell.Current.GoToAsync("//AnnualResults");
