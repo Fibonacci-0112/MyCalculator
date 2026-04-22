@@ -173,25 +173,12 @@ public static class StateTaxConfigs2026
             // Ohio Department of Taxation 2026 Employer Withholding Tax – Optional
             // Computer Formula (HB 96, effective January 1, 2026).
 
-            [UsState.OR] = new()
-            {
-                StandardDeductionSingle = 2_835m,
-                StandardDeductionMarried = 5_670m,
-                BracketsSingle =
-                [
-                    B(0, 4_300m, 0.0475m),
-                    B(4_300m, 10_750m, 0.0675m),
-                    B(10_750m, 125_000m, 0.0875m),
-                    B(125_000m, null, 0.099m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 8_600m, 0.0475m),
-                    B(8_600m, 21_500m, 0.0675m),
-                    B(21_500m, 250_000m, 0.0875m),
-                    B(250_000m, null, 0.099m)
-                ]
-            },
+            // Oregon uses a dedicated calculator (OregonWithholdingCalculator)
+            // — OR-W-4 filing statuses (Single/Married/Head of Household),
+            // $2,835/$5,670/$2,835 standard deduction (HoH uses Single deduction),
+            // $219 per OR-W-4 allowance credit (applied to computed annual tax),
+            // and four graduated brackets (4.75%/6.75%/8.75%/9.9%) where HoH uses
+            // Married bracket thresholds per Oregon DOR Publication 150-206-436 (2026).
 
             [UsState.RI] = new()
             {
