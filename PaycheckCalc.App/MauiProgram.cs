@@ -40,6 +40,7 @@ using PaycheckCalc.Core.Tax.NewYork;
 using PaycheckCalc.Core.Tax.NorthCarolina;
 using PaycheckCalc.Core.Tax.NorthDakota;
 using PaycheckCalc.Core.Tax.Ohio;
+using PaycheckCalc.Core.Tax.Oregon;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -275,6 +276,13 @@ public static class MauiProgram
             // status), and two brackets (0% on $0–$26,050, 2.75% over $26,050) per the Ohio
             // Department of Taxation 2026 Employer Withholding Tax – Optional Computer Formula
             registry.Register(new OhioWithholdingCalculator());
+
+            // Oregon — OR-W-4 filing statuses (Single/Married/Head of Household),
+            // $2,835/$5,670/$2,835 standard deduction (HoH uses Single deduction),
+            // $219 per OR-W-4 allowance credit, and four graduated brackets
+            // (4.75%/6.75%/8.75%/9.9%) where HoH uses Married bracket thresholds
+            // per Oregon DOR Publication 150-206-436 (2026)
+            registry.Register(new OregonWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
