@@ -325,12 +325,17 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // standard deduction where HoH uses Single deduction, $219 per OR-W-4 allowance
         // credit, and four graduated brackets 4.75%/6.75%/8.75%/9.9% where HoH uses
         // Married bracket thresholds per Oregon DOR Publication 150-206-436 (2026)).
+        //
+        // Rhode Island is also absent: it uses the dedicated RhodeIslandWithholdingCalculator
+        // (RI W-4 filing statuses Single/Married/Head of Household, $10,550 standard
+        // deduction same for all filing statuses, $4,700 per RI W-4 exemption, and three
+        // graduated brackets 3.75%/4.75%/5.99% per the RI Division of Taxation 2026 Pub. T-174).
         UsState[] expectedStates =
         [
             UsState.KY,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT,
             UsState.NE, UsState.NJ,
-            UsState.RI, UsState.SC, UsState.UT,
+            UsState.SC, UsState.UT,
             UsState.VA, UsState.VT, UsState.WI, UsState.WV
         ];
 
@@ -387,6 +392,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.OR),
             "OR should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.RI),
+            "RI should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────

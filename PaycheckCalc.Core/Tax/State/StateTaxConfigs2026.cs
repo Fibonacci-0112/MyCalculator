@@ -180,24 +180,11 @@ public static class StateTaxConfigs2026
             // and four graduated brackets (4.75%/6.75%/8.75%/9.9%) where HoH uses
             // Married bracket thresholds per Oregon DOR Publication 150-206-436 (2026).
 
-            [UsState.RI] = new()
-            {
-                StandardDeductionSingle = 10_550m,
-                StandardDeductionMarried = 10_550m,
-                AllowanceAmount = 4_700m,
-                BracketsSingle =
-                [
-                    B(0, 77_450m, 0.0375m),
-                    B(77_450m, 176_050m, 0.0475m),
-                    B(176_050m, null, 0.0599m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 77_450m, 0.0375m),
-                    B(77_450m, 176_050m, 0.0475m),
-                    B(176_050m, null, 0.0599m)
-                ]
-            },
+            // Rhode Island uses a dedicated calculator (RhodeIslandWithholdingCalculator)
+            // — RI W-4 filing statuses (Single/Married/Head of Household), $10,550
+            // standard deduction (same for all filing statuses), $4,700 per RI W-4
+            // exemption, and three graduated brackets (3.75%/4.75%/5.99%) per the RI
+            // Division of Taxation 2026 Pub. T-174.
 
             [UsState.SC] = new()
             {
