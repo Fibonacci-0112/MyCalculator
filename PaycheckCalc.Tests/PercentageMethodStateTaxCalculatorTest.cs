@@ -330,12 +330,17 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // (RI W-4 filing statuses Single/Married/Head of Household, $10,550 standard
         // deduction same for all filing statuses, $4,700 per RI W-4 exemption, and three
         // graduated brackets 3.75%/4.75%/5.99% per the RI Division of Taxation 2026 Pub. T-174).
+        //
+        // South Carolina is also absent: it uses the dedicated SouthCarolinaWithholdingCalculator
+        // (SC W-4 filing statuses Single/Married/Head of Household, variable standard deduction
+        // 10% of annualized wages max $7,500 when allowances ≥ 1, $5,000 per SC W-4 allowance,
+        // and three graduated brackets 0%/3%/6% at $0/$3,640/$18,230 per SCDOR WH-1603F (2026)).
         UsState[] expectedStates =
         [
             UsState.KY,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT,
             UsState.NE, UsState.NJ,
-            UsState.SC, UsState.UT,
+            UsState.UT,
             UsState.VA, UsState.VT, UsState.WI, UsState.WV
         ];
 
@@ -395,6 +400,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.RI),
             "RI should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.SC),
+            "SC should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────
