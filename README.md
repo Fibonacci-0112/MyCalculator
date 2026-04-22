@@ -1,17 +1,16 @@
 # PaycheckCalc
 
-A cross-platform paycheck calculator that computes net pay, tax withholdings, and deductions for all 50 US states plus DC using 2026 tax tables. The solution ships with three front-ends — a **.NET MAUI** app (Android & Windows), a **Blazor Server** web head, and an **Angular + ASP.NET Core Web API** web head — all backed by a shared UI-agnostic core library. It also includes self-employment (Schedule SE + QBI) and annual Form 1040 tax estimation modules.
+A cross-platform paycheck calculator that computes net pay, tax withholdings, and deductions for all 50 US states plus DC using 2026 tax tables. The solution ships with two front-ends — a **.NET MAUI** app (Android & Windows) and a **Blazor Server** web head — both backed by a shared UI-agnostic core library. It also includes self-employment (Schedule SE + QBI) and annual Form 1040 tax estimation modules.
 
 ## Features
 
 - **Gross Pay Calculation** — Computes gross pay from hourly rate, regular hours, and overtime hours with a configurable overtime multiplier.
 - **Federal Income Tax** — Implements the IRS Publication 15-T (2026) percentage method for automated payroll systems, supporting all W-4 inputs (filing status, Step 2 checkbox, Step 3 credits, Step 4 adjustments).
 - **FICA Taxes** — Calculates Social Security (6.2%, capped at $184,500), Medicare (1.45%), and Additional Medicare (0.9% above $200,000).
-- **State Income Tax** — Covers all 50 states and DC with state-specific calculators:
-  - **9 no-income-tax states** — AK, FL, NV, NH, SD, TN, TX, WA, WY
-  - **Flat-rate state** — Pennsylvania (3.07%)
-  - **Custom formula states** — Alabama (graduated + dependents + federal deduction), Arkansas (DFA formula method), California (Method B, EDD DE 44 withholding tables + SDI), Colorado (flat 4.4% + DR 0004 Table 1 allowance + FMLI), Connecticut (TPG-211 table-driven withholding + PFMLI), Delaware (DE W-4, 7 graduated brackets + $110 personal credit), Georgia (flat 5.19% per HB 111 + G-4 allowances and dependent deductions), Illinois (flat 4.95% + IL-W-4 allowances), Oklahoma (OW-2)
-  - **Percentage method states** — 32 states using an annualized graduated bracket approach with state-specific standard deductions, allowances, and tax brackets
+- **State Income Tax** — Covers all 50 states and DC. Every state ships its own `IStateWithholdingCalculator` implementation under `PaycheckCalc.Core/Tax/<State>/`, registered centrally via `StateCalculatorRegistry`:
+  - **9 no-income-tax states** — AK, FL, NV, NH, SD, TN, TX, WA, WY. Most use the shared `NoIncomeTaxWithholdingAdapter`; WA has a dedicated calculator for the WA Cares Fund (0.58% LTC premium with opt-out), and WY has its own dedicated (empty-schema) calculator.
+  - **Flat-rate state** — Pennsylvania (3.07%).
+  - **All other states** — Each implements its own withholding rules (W-4 / state-specific certificate, standard deductions, allowances / exemptions, graduated brackets or flat rate, and state-specific credits). Examples include Alabama (graduated + dependents + federal deduction), Arkansas (DFA formula method), California (Method B, EDD DE 44 withholding tables + SDI), Colorado (flat 4.4% + DR 0004 Table 1 allowance + FMLI), Connecticut (TPG-211 table-driven withholding + PFMLI), Delaware (DE W-4, 7 graduated brackets + $110 personal credit), Georgia (flat 5.19% per HB 111 + G-4 allowances and dependent deductions), Illinois (flat 4.95% + IL-W-4 allowances), Ohio (IT-4 exemptions + two-bracket formula), Oklahoma (OW-2), Oregon (OR-W-4 with per-allowance tax credit), Utah (flat 4.5% with phase-out allowance credit), Virginia (VA-4), Wisconsin (WT-4), West Virginia (IT-104), and the remaining states that use an annualized graduated-bracket approach with state-specific deductions and allowances.
 - **Local / Sub-State Taxes** — Plugin-based local (city / county / school district) withholding with calculators for Pennsylvania Act 32 EIT + LST, New York City, Ohio RITA and CCA, and Maryland county surtax, all JSON-backed.
 - **State Disability / Family Leave Insurance** — California SDI and Connecticut PFMLI are computed alongside state withholding with dynamic labels on the results screen and exports.
 - **Pre-Tax & Post-Tax Deductions** — Supports configurable deductions that reduce taxable wages.
@@ -52,12 +51,6 @@ PaycheckCalc.slnx
 │   ├── Services/              # CalculatorSessionState (shared per-circuit state)
 │   ├── wwwroot/               # Static assets; tax JSON is content-linked from Core/Data at build
 │   └── Program.cs             # Web host, DI, and tax-data loading
-├── PaycheckCalc.Api/          # ASP.NET Core Web API (net11.0) backend for the Angular head
-│   ├── Controllers/           # PaycheckController, ReferenceController
-│   ├── Dtos/                  # JSON request/response DTOs mirroring Core models
-│   ├── Mapping/               # DTO ↔ PaycheckCalc.Core domain mapping
-│   └── Program.cs             # Web host, DI, CORS, and tax-data loading (mirrors Blazor head)
-├── PaycheckCalc.Angular/      # Angular single-page front end consuming PaycheckCalc.Api
 ├── PaycheckCalc.Core/         # Business logic (no UI dependencies)
 │   ├── Models/                # PaycheckInput/Result, Enums, Deduction, AnnualProjection,
 │   │                          #   CalculationScenario, SavedPaycheck, SelfEmploymentInput,
@@ -76,22 +69,15 @@ PaycheckCalc.slnx
 │       ├── Fica/              # Social Security & Medicare calculator
 │       ├── SelfEmployment/    # Schedule SE tax & Form 8995/8995-A QBI deduction
 │       ├── State/             # State tax interfaces, registry, generic percentage-method adapter,
-│       │                      #   and annual state-tax calculator
+│       │                      #   no-income-tax adapter, and annual state-tax calculator
 │       ├── Local/             # Local (city/county/school district) plugin model + registry
 │       │   ├── Maryland/      # County surtax (JSON-backed)
 │       │   ├── NewYork/       # NYC withholding (JSON-backed)
 │       │   ├── Ohio/          # RITA + CCA (JSON-backed)
 │       │   └── Pennsylvania/  # Act 32 EIT (JSON-backed) + LST flat head tax
-│       ├── Alabama/           # Alabama-specific formula calculator
-│       ├── Arkansas/          # Arkansas DFA formula calculator
-│       ├── California/        # California Method B calculator (+ SDI)
-│       ├── Colorado/          # Colorado flat-rate + DR 0004 calculator (+ FMLI)
-│       ├── Connecticut/       # Connecticut TPG-211 table-driven calculator (+ PFMLI)
-│       ├── Delaware/          # Delaware DE W-4 graduated calculator (+ personal credit)
-│       ├── Georgia/           # Georgia flat 5.19% + G-4 allowances (HB 111, 2026)
-│       ├── Illinois/          # Illinois flat-rate + IL-W-4 allowance calculator
-│       ├── Oklahoma/          # Oklahoma OW-2 percentage calculator
-│       └── Pennsylvania/      # Pennsylvania flat-rate calculator
+│       └── <State>/           # One folder per state (Alabama, Alaska, Arizona, … Wyoming)
+│                              #   each containing a dedicated IStateWithholdingCalculator
+│                              #   implementation for that state's withholding rules
 ├── PaycheckCalc.Tests/        # xUnit test suite
 └── docs/                      # Class diagrams and documentation
 ```
@@ -100,8 +86,8 @@ PaycheckCalc.slnx
 
 | Component | Technology |
 |---|---|
-| **Frameworks** | .NET 11 Preview — MAUI (PaycheckCalc.App), Blazor Web App / Server rendering (PaycheckCalc.Blazor), and ASP.NET Core Web API (PaycheckCalc.Api); Angular 19 (PaycheckCalc.Angular) |
-| **Target Platforms** | Android, Windows 10+ (MAUI); modern browsers via server-rendered Blazor or the Angular SPA |
+| **Frameworks** | .NET 11 — MAUI (PaycheckCalc.App) and Blazor Web App / Server rendering (PaycheckCalc.Blazor) |
+| **Target Platforms** | Android, Windows 10+ (MAUI); modern browsers via server-rendered Blazor |
 | **UI Pattern** | MVVM with [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) on MAUI; Razor components on Blazor |
 | **Test Framework** | xUnit 2.9.3 |
 | **PDF Export** | [QuestPDF](https://www.questpdf.com/) 2025.12.4 |
@@ -109,7 +95,7 @@ PaycheckCalc.slnx
 
 ## Prerequisites
 
-- [.NET 11 SDK](https://dotnet.microsoft.com/) (preview) — pinned in `global.json`
+- [.NET 11 SDK](https://dotnet.microsoft.com/) — the solution targets `net11.0` (see `global.json` for the pinned SDK version and preview/roll-forward settings)
 - .NET MAUI workload (only required for the MAUI App project):
   ```bash
   dotnet workload install maui
@@ -148,46 +134,6 @@ dotnet run --project PaycheckCalc.Blazor
 
 The web app loads tax JSON at startup from its build output (linked from `PaycheckCalc.Core/Data/`) and uses an interactive Server rendering mode with a per-circuit `CalculatorSessionState` shared between the inputs and results pages.
 
-### Run the Angular Web App (ASP.NET Core API backend)
-
-The Angular head is a thin SPA that talks to a dedicated ASP.NET Core Web API
-(`PaycheckCalc.Api`). The API reuses `PaycheckCalc.Core` for all payroll math,
-so the Angular client never contains any tax logic of its own.
-
-1. Start the API (serves on `http://localhost:5200` in Development):
-
-   ```bash
-   dotnet run --project PaycheckCalc.Api
-   ```
-
-2. In a second terminal, install Angular dependencies and start the dev server
-   (serves on `http://localhost:4200`):
-
-   ```bash
-   cd PaycheckCalc.Angular
-   npm install
-   npm start
-   ```
-
-3. Open `http://localhost:4200` in a browser. The SPA fetches the list of
-   supported states, pay frequencies, and the per-state input schema from the
-   API, then posts a `PaycheckInput` to `POST /api/paycheck/calculate` and
-   renders the returned `PaycheckResult`.
-
-CORS for the Angular dev origin is configured in `PaycheckCalc.Api/appsettings.json`
-under the `Cors:AllowedOrigins` key.
-
-## Web API reference (PaycheckCalc.Api)
-
-| Endpoint | Description |
-|---|---|
-| `GET  /api/reference/states` | USPS two-letter codes for all supported states |
-| `GET  /api/reference/pay-frequencies` | Supported pay frequencies |
-| `GET  /api/reference/federal-filing-statuses` | Supported W-4 filing statuses |
-| `GET  /api/reference/deduction-options` | Deduction types and amount types |
-| `GET  /api/reference/states/{state}/schema` | Dynamic input schema (`StateFieldDefinition[]`) for the given state |
-| `POST /api/paycheck/calculate` | Runs `PayCalculator.Calculate` and returns a full `PaycheckResult` |
-
 ## How It Works
 
 The **PayCalculator** orchestrates the full paycheck calculation pipeline:
@@ -204,14 +150,28 @@ Gross pay, taxes, and deductions are rounded individually to two decimal places 
 
 ## State Tax Coverage
 
-All 50 states and the District of Columbia are supported. The architecture uses a plugin-based registry where each state implements `IStateWithholdingCalculator`:
+All 50 states and the District of Columbia are supported. The architecture uses a plugin-based registry where each state implements `IStateWithholdingCalculator` and is registered centrally in `StateCalculatorRegistry` (see `MauiProgram.cs` / `PaycheckCalc.Blazor/Program.cs`). Every state has a dedicated calculator under `PaycheckCalc.Core/Tax/<State>/`; the shared `NoIncomeTaxWithholdingAdapter` is used only for the plain no-income-tax states, and the generic `PercentageMethodWithholdingAdapter` is retained for tests and potential future use but is not wired to any production state.
 
 | Category | States |
 |---|---|
-| **No Income Tax** | AK, FL, NV, NH, SD, TN, TX, WA, WY |
+| **No Income Tax** | AK, FL, NV, NH, SD, TN, TX (plus WA and WY, which have dedicated calculators — WA adds the WA Cares Fund 0.58% LTC premium with an opt-out toggle; WY has no state income tax and no employee-paid state payroll assessments) |
 | **Flat Rate** | PA (3.07%) |
-| **Custom Formula** | AL (graduated + dependents + federal deduction), AR (DFA formula method), CA (Method B, EDD DE 44 + SDI), CO (flat 4.4% + DR 0004 Table 1 allowance + FMLI), CT (TPG-211 table-driven + PFMLI), DE (DE W-4, 7 graduated brackets + $110 credit), GA (flat 5.19% + G-4 allowances, HB 111 / 2026 Employer's Tax Guide), IL (flat 4.95% + IL-W-4 allowances), OK (OW-2 percentage tables) |
-| **Annualized Percentage Method** | AZ, DC, HI, IA, ID, IN, KS, KY, LA, MA, MD, ME, MI, MN, MO, MS, MT, NC, ND, NE, NJ, NM, NY, OH, OR, RI, SC, UT, VA, VT, WI, WV |
+| **Dedicated state calculators with graduated / custom formulas** | AL, AR, AZ, CA (+ SDI), CO (+ FMLI), CT (+ PFMLI), DC, DE, GA, HI, IA, ID, IL, IN, KS, KY, LA, MA, MD, ME, MI, MN, MO, MS, MT, NC, ND, NE, NJ, NM, NY, OH, OK, OR, RI, SC, UT, VA, VT, WI, WV |
+
+Notable state-specific details:
+
+- **AL** — graduated brackets with dependent deductions and annualized federal-withholding deduction.
+- **AR** — Arkansas DFA formula method (JSON-backed tables).
+- **CA** — Method B (EDD DE 44 percentage tables) plus State Disability Insurance.
+- **CO** — flat 4.4% with DR 0004 Table 1 standard allowance and Family and Medical Leave Insurance premium.
+- **CT** — TPG-211 table-driven withholding plus Paid Family & Medical Leave insurance.
+- **DE** — DE W-4, 7 graduated brackets, $110 personal credit.
+- **GA** — flat 5.19% per HB 111, G-4 filing statuses with allowance and dependent deductions.
+- **IL** — flat 4.95% with IL-W-4 allowances.
+- **OH** — IT-4 exemption ($650 annualized per exemption) with the two-bracket (0% up to $26,050, 2.75% over) Optional Computer Formula.
+- **OK** — OW-2 percentage method (JSON-backed) with whole-dollar rounding.
+- **OR** — OR-W-4 with a per-allowance tax *credit* (not deduction) and four graduated brackets.
+- **UT** — flat 4.5% with phase-out allowance credit.
 
 ## Local (Sub-State) Tax Coverage
 
