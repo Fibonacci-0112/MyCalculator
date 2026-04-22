@@ -205,7 +205,7 @@ public class VirginiaWithholdingCalculatorTest
     // ── Head of Household filer (uses Married standard deduction $17,500) ──
 
     [Fact]
-    public void HeadOfHousehold_UsesMrriedStandardDeduction()
+    public void HeadOfHousehold_UsesMarriedStandardDeduction()
     {
         // HoH uses $17,500 standard deduction (same as Married)
         // annual = $8,000 × 12 = $96,000; std ded = $17,500; exemptions = 2 → taxable = $76,640
