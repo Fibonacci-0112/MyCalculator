@@ -63,7 +63,7 @@
                                                     CommandParameter="{Binding .}"
                                                     BackgroundColor="#D32F2F" TextColor="White" CornerRadius="6" Padding="10,4" />
                                         </Grid>
-                                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto"
+                                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
                                               ColumnSpacing="8" RowSpacing="6">
                                             <Label Grid.Row="0" Grid.Column="0" Text="Box 1 (Wages)" TextColor="#37474F" FontSize="13" />
                                             <Entry Grid.Row="0" Grid.Column="1" Text="{Binding WagesBox1}" Keyboard="Numeric"
@@ -88,6 +88,20 @@
                                             </Entry>
                                             <Label Grid.Row="3" Grid.Column="0" Text="Box 4 (SS Tax)" TextColor="#37474F" FontSize="13" />
                                             <Entry Grid.Row="3" Grid.Column="1" Text="{Binding SocialSecurityTaxBox4}" Keyboard="Numeric"
+                                                   BackgroundColor="White" TextColor="Black">
+                                                <Entry.Behaviors>
+                                                    <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                                </Entry.Behaviors>
+                                            </Entry>
+                                            <Label Grid.Row="4" Grid.Column="0" Text="Box 16 (State Wages)" TextColor="#37474F" FontSize="13" />
+                                            <Entry Grid.Row="4" Grid.Column="1" Text="{Binding StateWagesBox16}" Keyboard="Numeric"
+                                                   BackgroundColor="White" TextColor="Black">
+                                                <Entry.Behaviors>
+                                                    <behaviors:DecimalFormatBehavior IsCurrency="True" />
+                                                </Entry.Behaviors>
+                                            </Entry>
+                                            <Label Grid.Row="5" Grid.Column="0" Text="Box 17 (State WH)" TextColor="#37474F" FontSize="13" />
+                                            <Entry Grid.Row="5" Grid.Column="1" Text="{Binding StateWithholdingBox17}" Keyboard="Numeric"
                                                    BackgroundColor="White" TextColor="Black">
                                                 <Entry.Behaviors>
                                                     <behaviors:DecimalFormatBehavior IsCurrency="True" />
