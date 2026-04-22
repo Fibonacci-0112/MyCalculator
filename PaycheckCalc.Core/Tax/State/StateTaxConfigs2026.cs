@@ -9,9 +9,6 @@ namespace PaycheckCalc.Core.Tax.State;
 /// </summary>
 public static class StateTaxConfigs2026
 {
-    private static TaxBracket B(decimal floor, decimal? ceiling, decimal rate)
-        => new() { Floor = floor, Ceiling = ceiling, Rate = rate };
-
     public static IReadOnlyDictionary<UsState, PercentageMethodConfig> Configs { get; } =
         new Dictionary<UsState, PercentageMethodConfig>
         {
@@ -209,24 +206,10 @@ public static class StateTaxConfigs2026
             // (3%/4%/4.5%/6%/6.5% at $0/$10,000/$25,000/$40,000/$60,000)
             // per the WV State Tax Dept. Form IT-104 and WV Code § 11-21-71 (2026).
 
-            [UsState.WI] = new()
-            {
-                StandardDeductionSingle = 12_760m,
-                StandardDeductionMarried = 23_170m,
-                BracketsSingle =
-                [
-                    B(0, 13_810m, 0.0354m),
-                    B(13_810m, 27_630m, 0.0465m),
-                    B(27_630m, 304_170m, 0.053m),
-                    B(304_170m, null, 0.0765m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 18_410m, 0.0354m),
-                    B(18_410m, 36_820m, 0.0465m),
-                    B(36_820m, 405_550m, 0.053m),
-                    B(405_550m, null, 0.0765m)
-                ]
-            },
+            // Wisconsin uses a dedicated calculator (WisconsinWithholdingCalculator)
+            // — WT-4 filing statuses (Single/Married/Head of Household), standard
+            // deductions $12,760/$23,170/$16,840, $700 per WT-4 allowance, and four
+            // graduated brackets (3.54%/4.65%/5.30%/7.65%) where Single and Head of
+            // Household share bracket thresholds per WI DOR Publication W-166 (2026).
         };
 }

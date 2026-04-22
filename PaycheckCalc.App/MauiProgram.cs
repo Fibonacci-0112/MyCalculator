@@ -48,6 +48,7 @@ using PaycheckCalc.Core.Tax.Vermont;
 using PaycheckCalc.Core.Tax.Virginia;
 using PaycheckCalc.Core.Tax.Washington;
 using PaycheckCalc.Core.Tax.WestVirginia;
+using PaycheckCalc.Core.Tax.Wisconsin;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -326,6 +327,12 @@ public static class MauiProgram
             // (3%/4%/4.5%/6%/6.5% at $0/$10,000/$25,000/$40,000/$60,000)
             // per the WV State Tax Dept. Form IT-104 and WV Code § 11-21-71 (2026)
             registry.Register(new WestVirginiaWithholdingCalculator());
+
+            // Wisconsin — WT-4 filing statuses (Single/Married/Head of Household),
+            // $12,760/$23,170/$16,840 standard deduction, $700 per WT-4 allowance,
+            // and four graduated brackets (3.54%/4.65%/5.30%/7.65%) where Single
+            // and Head of Household share bracket thresholds per WI DOR Pub W-166 (2026)
+            registry.Register(new WisconsinWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
