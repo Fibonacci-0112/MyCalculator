@@ -44,6 +44,7 @@ using PaycheckCalc.Core.Tax.Oregon;
 using PaycheckCalc.Core.Tax.RhodeIsland;
 using PaycheckCalc.Core.Tax.SouthCarolina;
 using PaycheckCalc.Core.Tax.Utah;
+using PaycheckCalc.Core.Tax.Vermont;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -303,6 +304,12 @@ public static class MauiProgram
             // phase-out allowance credit ($450/$900 per allowance for Single/Married,
             // phased out at 1.3% of wages above $9,107/$18,213) per Utah Publication 14 (2026)
             registry.Register(new UtahWithholdingCalculator());
+
+            // Vermont — W-4VT filing statuses (Single/Married/Head of Household),
+            // no state standard deduction, $5,400 per W-4VT allowance, and four
+            // graduated brackets (3.35%/6.60%/7.60%/8.75%) per Vermont Department
+            // of Taxes BP-55 (2026 Income Tax Withholding Instructions, Tables, and Charts)
+            registry.Register(new VermontWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

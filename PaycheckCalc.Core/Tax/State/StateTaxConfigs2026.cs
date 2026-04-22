@@ -189,6 +189,13 @@ public static class StateTaxConfigs2026
             // at least one allowance is claimed), $5,000 per SC W-4 allowance, and three
             // graduated brackets (0%/3%/6% at $0/$3,640/$18,230) per SCDOR Form WH-1603F.
 
+            // Vermont uses a dedicated calculator (VermontWithholdingCalculator)
+            // — W-4VT filing statuses (Single/Married/Head of Household), no state
+            // standard deduction (allowances are the sole annualized offset), $5,400 per
+            // W-4VT allowance, and four graduated brackets (3.35%/6.60%/7.60%/8.75%)
+            // with filing-status–specific thresholds per the Vermont Department of Taxes
+            // BP-55 (2026 Income Tax Withholding Instructions, Tables, and Charts).
+
             [UsState.VA] = new()
             {
                 StandardDeductionSingle = 8_750m,
@@ -207,26 +214,6 @@ public static class StateTaxConfigs2026
                     B(3_000m, 5_000m, 0.03m),
                     B(5_000m, 17_000m, 0.05m),
                     B(17_000m, null, 0.0575m)
-                ]
-            },
-
-            [UsState.VT] = new()
-            {
-                StandardDeductionSingle = 15_750m,
-                StandardDeductionMarried = 31_500m,
-                BracketsSingle =
-                [
-                    B(0, 47_900m, 0.0335m),
-                    B(47_900m, 116_000m, 0.066m),
-                    B(116_000m, 242_000m, 0.076m),
-                    B(242_000m, null, 0.0875m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 79_950m, 0.0335m),
-                    B(79_950m, 193_300m, 0.066m),
-                    B(193_300m, 294_600m, 0.076m),
-                    B(294_600m, null, 0.0875m)
                 ]
             },
 
