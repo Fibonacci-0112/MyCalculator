@@ -45,6 +45,7 @@ using PaycheckCalc.Core.Tax.RhodeIsland;
 using PaycheckCalc.Core.Tax.SouthCarolina;
 using PaycheckCalc.Core.Tax.Utah;
 using PaycheckCalc.Core.Tax.Vermont;
+using PaycheckCalc.Core.Tax.Virginia;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -310,6 +311,13 @@ public static class MauiProgram
             // graduated brackets (3.35%/6.60%/7.60%/8.75%) per Vermont Department
             // of Taxes BP-55 (2026 Income Tax Withholding Instructions, Tables, and Charts)
             registry.Register(new VermontWithholdingCalculator());
+
+            // Virginia — VA-4 filing statuses (Single/Married/Head of Household),
+            // $8,750 standard deduction for Single and $17,500 for Married/HoH,
+            // $930 per VA-4 personal exemption, and four graduated brackets
+            // (2%/3%/5%/5.75% at $0/$3,000/$5,000/$17,000) per the Virginia
+            // Department of Taxation Employer Withholding Instructions (Pub. 93045, 2026)
+            registry.Register(new VirginiaWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();

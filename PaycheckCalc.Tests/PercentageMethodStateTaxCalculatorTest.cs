@@ -6,13 +6,25 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 {
     // ── Flat-rate state tests ────────────────────────────────────────
 
+    // Utah now uses a dedicated calculator (UtahWithholdingCalculator).
+    // See UtahWithholdingCalculatorTest for regression tests.
+
     [Fact]
-    public void Utah_FlatRate_AppliedToGrossWages()
+    public void Utah_UsesDedicatedCalculator_NotInGenericConfigs()
     {
-        var calc = CreateCalculator(UsState.UT);
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.UT),
+            "UT should not be in generic StateTaxConfigs2026 — it uses UtahWithholdingCalculator.");
+    }
+
+    // ── Graduated-bracket state tests ────────────────────────────────
+
+    [Fact]
+    public void Wisconsin_GraduatedBrackets_Single()
+    {
+        var calc = CreateCalculator(UsState.WI);
 
         var context = new CommonWithholdingContext(
-            UsState.UT,
+            UsState.WI,
             GrossWages: 5000m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026);
@@ -25,9 +37,15 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         var result = calc.Calculate(context, values);
 
-        // 5000 * 26 = 130,000 annual, no std ded, 130000 * 4.65% = 6,045 annual, / 26 = 232.50
+        // annual = 5000 * 26 = 130,000
+        // std ded (single) = 12,760 → taxable = 117,240
+        // 0–13,810 @ 3.54%       = 13,810 × 0.0354  = 488.874
+        // 13,810–27,630 @ 4.65%  = 13,820 × 0.0465  = 642.630
+        // 27,630–117,240 @ 5.30% = 89,610 × 0.053   = 4,749.330
+        // total = 5,880.834
+        // per period = 5,880.834 / 26 = 226.185923... → 226.19
         Assert.Equal(5000m, result.TaxableWages);
-        Assert.Equal(232.50m, result.Withholding);
+        Assert.Equal(226.19m, result.Withholding);
     }
 
     // Illinois uses a dedicated calculator (IllinoisWithholdingCalculator)
@@ -40,30 +58,11 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void Virginia_GraduatedBrackets_Single()
     {
-        var calc = CreateCalculator(UsState.VA);
-
-        var context = new CommonWithholdingContext(
-            UsState.VA,
-            GrossWages: 5000m,
-            PayPeriod: PayFrequency.Monthly,
-            Year: 2026);
-        var values = new StateInputValues
-        {
-            ["FilingStatus"] = "Single",
-            ["Allowances"] = 1,
-            ["AdditionalWithholding"] = 0m
-        };
-
-        var result = calc.Calculate(context, values);
-
-        // annual = 5000 * 12 = 60,000
-        // std ded single = 8,750
-        // allowance deduction = 1 * 930 = 930
-        // taxable = 60000 - 8750 - 930 = 50,320
-        // brackets: 0-3000@2% = 60, 3000-5000@3% = 60, 5000-17000@5% = 600, 17000-50320@5.75% = 1915.90
-        // total = 60 + 60 + 600 + 1915.90 = 2635.90
-        // per period = 2635.90 / 12 = 219.6583... rounds to 219.66
-        Assert.Equal(219.66m, result.Withholding);
+        // Virginia now uses a dedicated calculator (VirginiaWithholdingCalculator).
+        // See VirginiaWithholdingCalculatorTest for regression tests.
+        // This test verifies VA is no longer in the generic percentage method configs.
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.VA),
+            "VA should not be in generic StateTaxConfigs2026 — it uses VirginiaWithholdingCalculator.");
     }
 
     [Fact]
@@ -94,37 +93,12 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     // See DelawareWithholdingCalculatorTest for allowance credit coverage.
 
     [Fact]
-    public void Nebraska_AllowanceCredit_ReducesTax()
+    public void Nebraska_UsesDedicatedCalculator_NotInGenericConfigs()
     {
-        var calc = CreateCalculator(UsState.NE);
-
-        var context = new CommonWithholdingContext(
-            UsState.NE,
-            GrossWages: 4000m,
-            PayPeriod: PayFrequency.Monthly,
-            Year: 2026);
-        var values = new StateInputValues
-        {
-            ["FilingStatus"] = "Single",
-            ["Allowances"] = 2,
-            ["AdditionalWithholding"] = 0m
-        };
-
-        var result = calc.Calculate(context, values);
-
-        // Nebraska: AllowanceCreditAmount = $171, std ded single = $8,600
-        // annual = 4000 * 12 = 48,000
-        // taxable = 48,000 - 8,600 = 39,400
-        // NE brackets (single):
-        //   0-4,030 @ 2.46% = 99.138
-        //   4,030-24,120 @ 3.51% = 705.159
-        //   24,120-38,870 @ 5.01% = 738.975
-        //   38,870-39,400 @ 5.20% = 27.56
-        //   total = 1570.832
-        // credit = 2 * 171 = 342
-        // net tax = 1570.832 - 342 = 1228.832
-        // per period = 1228.832 / 12 = 102.4026..., rounds to 102.40
-        Assert.Equal(102.40m, result.Withholding);
+        // Nebraska now uses a dedicated calculator (NebraskaWithholdingCalculator).
+        // See NebraskaWithholdingCalculatorTest for allowance credit and bracket tests.
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.NE),
+            "NE should not be in generic StateTaxConfigs2026 — it uses NebraskaWithholdingCalculator.");
     }
 
     // ── Additional withholding test ──────────────────────────────────
@@ -132,10 +106,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void AdditionalWithholding_IsAdded()
     {
-        var calc = CreateCalculator(UsState.UT);
+        var calc = CreateCalculator(UsState.WI);
 
         var context = new CommonWithholdingContext(
-            UsState.UT,
+            UsState.WI,
             GrossWages: 5000m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026);
@@ -148,8 +122,8 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         var result = calc.Calculate(context, values);
 
-        // base = 232.50 + 50 = 282.50
-        Assert.Equal(282.50m, result.Withholding);
+        // base = 226.19 (from Wisconsin_GraduatedBrackets_Single) + 50 = 276.19
+        Assert.Equal(276.19m, result.Withholding);
     }
 
     // ── Pre-tax deductions test ──────────────────────────────────────
@@ -157,10 +131,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void PreTaxDeductions_ReduceTaxableWages()
     {
-        var calc = CreateCalculator(UsState.UT);
+        var calc = CreateCalculator(UsState.WI);
 
         var context = new CommonWithholdingContext(
-            UsState.UT,
+            UsState.WI,
             GrossWages: 5000m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026,
@@ -175,11 +149,13 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         var result = calc.Calculate(context, values);
 
         // taxable wages = 5000 - 1000 = 4000
-        // annual = 4000 * 26 = 104,000
-        // 104000 * 4.65% = 4,836
-        // per period = 4,836 / 26 = 186.00
+        // annual = 4000 * 26 = 104,000; std ded (single) = 12,760 → taxable = 91,240
+        // 0–13,810 @ 3.54%      = 488.874
+        // 13,810–27,630 @ 4.65% = 642.630
+        // 27,630–91,240 @ 5.30% = 63,610 × 0.053 = 3,371.330
+        // total = 4,502.834; per period = 4,502.834 / 26 = 173.185923... → 173.19
         Assert.Equal(4000m, result.TaxableWages);
-        Assert.Equal(186.00m, result.Withholding);
+        Assert.Equal(173.19m, result.Withholding);
     }
 
     // ── Zero wages edge case ─────────────────────────────────────────
@@ -187,10 +163,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Fact]
     public void ZeroGrossWages_ReturnsZeroWithholding()
     {
-        var calc = CreateCalculator(UsState.UT);
+        var calc = CreateCalculator(UsState.WI);
 
         var context = new CommonWithholdingContext(
-            UsState.UT,
+            UsState.WI,
             GrossWages: 0m,
             PayPeriod: PayFrequency.Biweekly,
             Year: 2026);
@@ -210,8 +186,8 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     // ── State property test ──────────────────────────────────────────
 
     [Theory]
-    [InlineData(UsState.UT)]
-    [InlineData(UsState.VA)]
+    [InlineData(UsState.WI)]
+    [InlineData(UsState.WV)]
     public void State_ReturnsCorrectState(UsState state)
     {
         var calc = CreateCalculator(state);
@@ -277,6 +253,10 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // standard deduction, $2,250 per K-4 allowance, two graduated
         // brackets 5.20%/5.58%).
         //
+        // Kentucky is also absent: it uses the dedicated
+        // KentuckyWithholdingCalculator (flat 4.0% with $3,160 standard
+        // deduction and $10 K-4 allowance credit).
+        //
         // Louisiana is also absent: it uses the dedicated
         // LouisianaWithholdingCalculator (L-4 filing statuses, $4,500/$9,000
         // personal exemption, $1,000 per-dependent deduction, and three
@@ -297,6 +277,33 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         //
         // Michigan is also absent: it uses the dedicated
         // MichiganWithholdingCalculator (flat 4.25% with MI-W4 exemptions).
+        //
+        // Minnesota is also absent: it uses the dedicated
+        // MinnesotaWithholdingCalculator (W-4MN filing statuses Single/Married/
+        // Head of Household, $15,300/$30,600/$23,000 standard deduction,
+        // $5,300 per W-4MN allowance, four graduated brackets 5.35%/6.80%/7.85%/9.85%).
+        //
+        // Mississippi is also absent: it uses the dedicated
+        // MississippiWithholdingCalculator (89-350 filing statuses Single/Married/HoH,
+        // filing-status standard deduction and personal exemption, two brackets
+        // 0%/$0–$10,000 and 4% over $10,000).
+        //
+        // Missouri is also absent: it uses the dedicated
+        // MissouriWithholdingCalculator (MO W-4 filing statuses Single/Married/HoH,
+        // $15,750/$31,500/$23,625 standard deduction, $2,100 allowance, eight brackets 0%–4.7%).
+        //
+        // Montana is also absent: it uses the dedicated
+        // MontanaWithholdingCalculator (MW-4 filing statuses, variable 20% standard
+        // deduction with min/max, $3,040 per exemption, two brackets 4.7%/5.9%).
+        //
+        // Nebraska is also absent: it uses the dedicated
+        // NebraskaWithholdingCalculator (W-4N filing statuses Single/Married/HoH,
+        // $8,600/$17,200/$12,900 standard deduction, $171 per-allowance credit,
+        // four brackets 2.46%/3.51%/5.01%/5.2%).
+        //
+        // New Jersey is also absent: it uses the dedicated
+        // NewJerseyWithholdingCalculator (NJ-W4 statuses A–E, $1,000 allowance
+        // deduction, Table A/B brackets).
         //
         // North Carolina is also absent: it uses the dedicated
         // NorthCarolinaWithholdingCalculator (NC-4 filing statuses Single/Married/
@@ -335,13 +342,22 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // (SC W-4 filing statuses Single/Married/Head of Household, variable standard deduction
         // 10% of annualized wages max $7,500 when allowances ≥ 1, $5,000 per SC W-4 allowance,
         // and three graduated brackets 0%/3%/6% at $0/$3,640/$18,230 per SCDOR WH-1603F (2026)).
+        //
+        // Utah is also absent: it uses the dedicated UtahWithholdingCalculator
+        // (federal W-4 statuses Single/Married, flat 4.5% with phase-out allowance credit).
+        //
+        // Vermont is also absent: it uses the dedicated VermontWithholdingCalculator
+        // (W-4VT filing statuses Single/Married/HoH, $5,400/allowance, four brackets
+        // 3.35%/6.60%/7.60%/8.75% per Vermont Department of Taxes BP-55 (2026)).
+        //
+        // Virginia is also absent: it uses the dedicated VirginiaWithholdingCalculator
+        // (VA-4 filing statuses Single/Married/HoH, $8,750/$17,500 standard deduction,
+        // $930/exemption, four brackets 2%/3%/5%/5.75% per VA Pub. 93045 (2026)).
+        //
+        // Only Wisconsin and West Virginia remain in the generic percentage-method configs.
         UsState[] expectedStates =
         [
-            UsState.KY,
-            UsState.MN, UsState.MO, UsState.MS, UsState.MT,
-            UsState.NE, UsState.NJ,
-            UsState.UT,
-            UsState.VA, UsState.VT, UsState.WI, UsState.WV
+            UsState.WI, UsState.WV
         ];
 
         foreach (var state in expectedStates)
@@ -368,6 +384,9 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.KS),
             "KS should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
 
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.KY),
+            "KY should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.LA),
             "LA should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
 
@@ -382,6 +401,27 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MA),
             "MA should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MI),
+            "MI should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MN),
+            "MN should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MO),
+            "MO should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MS),
+            "MS should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.MT),
+            "MT should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.NE),
+            "NE should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.NJ),
+            "NJ should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.NM),
             "NM should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
@@ -403,6 +443,15 @@ public class PercentageMethodWithholdingAdapterExtendedTest
 
         Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.SC),
             "SC should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.UT),
+            "UT should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.VA),
+            "VA should not be in StateTaxConfigs2026 — it uses VirginiaWithholdingCalculator.");
+
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.VT),
+            "VT should not be in StateTaxConfigs2026 — it has a dedicated calculator.");
     }
 
     // ── Helper ───────────────────────────────────────────────────────
