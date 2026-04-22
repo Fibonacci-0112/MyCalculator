@@ -31,6 +31,7 @@ using PaycheckCalc.Core.Tax.NorthCarolina;
 using PaycheckCalc.Core.Tax.Oklahoma;
 using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.Washington;
+using PaycheckCalc.Core.Tax.Wyoming;
 using PaycheckCalc.Core.Tax.State;
 using Xunit;
 
@@ -139,7 +140,6 @@ public class NoIncomeTaxWithholdingAdapterTest
     [InlineData(UsState.AK)]
     [InlineData(UsState.FL)]
     [InlineData(UsState.TX)]
-    [InlineData(UsState.WY)]
     public void ReturnsZeroWithholding(UsState state)
     {
         var calc = new NoIncomeTaxWithholdingAdapter(state);
@@ -791,7 +791,9 @@ public class FullRegistryIntegrationTest
 
         registry.Register(new WashingtonWithholdingCalculator());
 
-        UsState[] noTaxStates = [UsState.AK, UsState.FL, UsState.NV, UsState.NH, UsState.SD, UsState.TN, UsState.TX, UsState.WY];
+        registry.Register(new WyomingWithholdingCalculator());
+
+        UsState[] noTaxStates = [UsState.AK, UsState.FL, UsState.NV, UsState.NH, UsState.SD, UsState.TN, UsState.TX];
         foreach (var state in noTaxStates)
             registry.Register(new NoIncomeTaxWithholdingAdapter(state));
 
