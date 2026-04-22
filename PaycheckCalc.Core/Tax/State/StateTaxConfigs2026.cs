@@ -196,26 +196,12 @@ public static class StateTaxConfigs2026
             // with filing-status–specific thresholds per the Vermont Department of Taxes
             // BP-55 (2026 Income Tax Withholding Instructions, Tables, and Charts).
 
-            [UsState.VA] = new()
-            {
-                StandardDeductionSingle = 8_750m,
-                StandardDeductionMarried = 17_500m,
-                AllowanceAmount = 930m,
-                BracketsSingle =
-                [
-                    B(0, 3_000m, 0.02m),
-                    B(3_000m, 5_000m, 0.03m),
-                    B(5_000m, 17_000m, 0.05m),
-                    B(17_000m, null, 0.0575m)
-                ],
-                BracketsMarried =
-                [
-                    B(0, 3_000m, 0.02m),
-                    B(3_000m, 5_000m, 0.03m),
-                    B(5_000m, 17_000m, 0.05m),
-                    B(17_000m, null, 0.0575m)
-                ]
-            },
+            // Virginia uses a dedicated calculator (VirginiaWithholdingCalculator)
+            // — VA-4 filing statuses (Single/Married/Head of Household),
+            // $8,750 standard deduction for Single and $17,500 for Married/HoH,
+            // $930 per VA-4 personal exemption, and four graduated brackets
+            // (2%/3%/5%/5.75% at $0/$3,000/$5,000/$17,000) per the Virginia
+            // Department of Taxation Employer Withholding Instructions (Pub. 93045, 2026).
 
             [UsState.WI] = new()
             {
