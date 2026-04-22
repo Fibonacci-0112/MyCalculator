@@ -41,6 +41,7 @@ using PaycheckCalc.Core.Tax.NorthCarolina;
 using PaycheckCalc.Core.Tax.NorthDakota;
 using PaycheckCalc.Core.Tax.Ohio;
 using PaycheckCalc.Core.Tax.Oregon;
+using PaycheckCalc.Core.Tax.RhodeIsland;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -283,6 +284,12 @@ public static class MauiProgram
             // (4.75%/6.75%/8.75%/9.9%) where HoH uses Married bracket thresholds
             // per Oregon DOR Publication 150-206-436 (2026)
             registry.Register(new OregonWithholdingCalculator());
+
+            // Rhode Island — RI W-4 filing statuses (Single/Married/Head of Household),
+            // $10,550 standard deduction (same for all filing statuses),
+            // $4,700 per RI W-4 exemption, and three graduated brackets
+            // (3.75%/4.75%/5.99%) per the RI Division of Taxation 2026 Pub. T-174
+            registry.Register(new RhodeIslandWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
