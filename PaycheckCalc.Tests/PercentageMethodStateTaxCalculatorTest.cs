@@ -79,56 +79,14 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     // New York now uses a dedicated calculator (NewYorkWithholdingCalculator).
     // See NewYorkWithholdingCalculatorTest for regression tests.
 
-    [Fact]
-    public void Ohio_ZeroBracket_LowIncome()
-    {
-        var calc = CreateCalculator(UsState.OH);
-
-        var context = new CommonWithholdingContext(
-            UsState.OH,
-            GrossWages: 900m,
-            PayPeriod: PayFrequency.Biweekly,
-            Year: 2026);
-        var values = new StateInputValues
-        {
-            ["FilingStatus"] = "Single",
-            ["Allowances"] = 0,
-            ["AdditionalWithholding"] = 0m
-        };
-
-        var result = calc.Calculate(context, values);
-
-        // annual = 900 * 26 = 23,400
-        // no std ded, taxable = 23,400
-        // 0-26050 @ 0% = 0
-        // total tax = 0
-        Assert.Equal(0m, result.Withholding);
-    }
+    // Ohio now uses a dedicated calculator (OhioWithholdingCalculator).
+    // See OhioWithholdingCalculatorTest for regression tests.
 
     [Fact]
-    public void Ohio_AboveThreshold()
+    public void Ohio_UsesDedicatedCalculator_NotInGenericConfigs()
     {
-        var calc = CreateCalculator(UsState.OH);
-
-        var context = new CommonWithholdingContext(
-            UsState.OH,
-            GrossWages: 3000m,
-            PayPeriod: PayFrequency.Biweekly,
-            Year: 2026);
-        var values = new StateInputValues
-        {
-            ["FilingStatus"] = "Single",
-            ["Allowances"] = 0,
-            ["AdditionalWithholding"] = 0m
-        };
-
-        var result = calc.Calculate(context, values);
-
-        // annual = 3000 * 26 = 78,000
-        // 0-26050 @ 0% = 0
-        // 26050-78000 @ 2.75% = 51950 * 0.0275 = 1428.625
-        // per period = 1428.625 / 26 = 54.9471... rounds to 54.95
-        Assert.Equal(54.95m, result.Withholding);
+        Assert.False(StateTaxConfigs2026.Configs.ContainsKey(UsState.OH),
+            "OH should not be in generic StateTaxConfigs2026 — it uses OhioWithholdingCalculator.");
     }
 
     // ── Allowance credit tests ───────────────────────────────────────
@@ -254,7 +212,6 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     [Theory]
     [InlineData(UsState.UT)]
     [InlineData(UsState.VA)]
-    [InlineData(UsState.OH)]
     public void State_ReturnsCorrectState(UsState state)
     {
         var calc = CreateCalculator(state);
@@ -357,12 +314,17 @@ public class PercentageMethodWithholdingAdapterExtendedTest
         // Head of Household, $15,750/$31,500/$23,625 standard deduction (mirrors federal),
         // three graduated brackets 1.10%/2.04%/2.64% per the ND Office of State Tax
         // Commissioner 2026 Employer's Withholding Guide).
+        //
+        // Ohio is also absent: it uses the dedicated OhioWithholdingCalculator
+        // (IT-4 exemption allowance $650 annualized per exemption, no filing status,
+        // two brackets 0% on $0–$26,050 and 2.75% over $26,050 per the Ohio Department
+        // of Taxation 2026 Employer Withholding Tax – Optional Computer Formula).
         UsState[] expectedStates =
         [
             UsState.KY,
             UsState.MN, UsState.MO, UsState.MS, UsState.MT,
             UsState.NE, UsState.NJ,
-            UsState.OH, UsState.OR, UsState.RI, UsState.SC, UsState.UT,
+            UsState.OR, UsState.RI, UsState.SC, UsState.UT,
             UsState.VA, UsState.VT, UsState.WI, UsState.WV
         ];
 

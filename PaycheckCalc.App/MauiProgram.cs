@@ -39,6 +39,7 @@ using PaycheckCalc.Core.Tax.NewMexico;
 using PaycheckCalc.Core.Tax.NewYork;
 using PaycheckCalc.Core.Tax.NorthCarolina;
 using PaycheckCalc.Core.Tax.NorthDakota;
+using PaycheckCalc.Core.Tax.Ohio;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -269,6 +270,11 @@ public static class MauiProgram
             // brackets (1.10%/2.04%/2.64%) per the ND Office of State Tax Commissioner 2026
             // Employer's Withholding Guide
             registry.Register(new NorthDakotaWithholdingCalculator());
+
+            // Ohio — IT-4 exemption allowance ($650 annualized per exemption, no filing
+            // status), and two brackets (0% on $0–$26,050, 2.75% over $26,050) per the Ohio
+            // Department of Taxation 2026 Employer Withholding Tax – Optional Computer Formula
+            registry.Register(new OhioWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
