@@ -68,13 +68,10 @@ public static class StateTaxConfigs2026
             // $12,750/$25,500/$19,125 standard deduction, $2,500 per NC-4 allowance,
             // and a flat 4.5% rate per NC DOR Publication NC-30 (2026).
 
-            [UsState.UT] = new()
-            {
-                StandardDeductionSingle = 0m,
-                StandardDeductionMarried = 0m,
-                BracketsSingle = [B(0, null, 0.0465m)],
-                BracketsMarried = [B(0, null, 0.0465m)]
-            },
+            // Utah uses a dedicated calculator (UtahWithholdingCalculator)
+            // — federal W-4 filing statuses (Single/Married), flat 4.5% rate with a
+            // phase-out allowance credit ($450/$900 per allowance for Single/Married,
+            // phased out at 1.3% of wages above $9,107/$18,213) per Utah Publication 14 (2026).
 
             // ── Graduated-bracket states ─────────────────────────────────
 

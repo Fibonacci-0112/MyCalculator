@@ -38,6 +38,7 @@ using PaycheckCalc.Core.Tax.Ohio;
 using PaycheckCalc.Core.Tax.Oregon;
 using PaycheckCalc.Core.Tax.RhodeIsland;
 using PaycheckCalc.Core.Tax.SouthCarolina;
+using PaycheckCalc.Core.Tax.Utah;
 using PaycheckCalc.Core.Tax.Local;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
@@ -133,6 +134,11 @@ stateRegistry.Register(new OhioWithholdingCalculator());
 stateRegistry.Register(new OregonWithholdingCalculator());
 stateRegistry.Register(new RhodeIslandWithholdingCalculator());
 stateRegistry.Register(new SouthCarolinaWithholdingCalculator());
+
+// Utah — federal W-4 filing statuses (Single/Married), flat 4.5% rate,
+// phase-out allowance credit ($450/$900 per allowance for Single/Married,
+// phased out at 1.3% of wages above $9,107/$18,213) per Utah Publication 14 (2026)
+stateRegistry.Register(new UtahWithholdingCalculator());
 stateRegistry.Register(new OklahomaWithholdingCalculator(okCalc));
 stateRegistry.Register(new PennsylvaniaWithholdingCalculator());
 

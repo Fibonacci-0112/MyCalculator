@@ -43,6 +43,7 @@ using PaycheckCalc.Core.Tax.Ohio;
 using PaycheckCalc.Core.Tax.Oregon;
 using PaycheckCalc.Core.Tax.RhodeIsland;
 using PaycheckCalc.Core.Tax.SouthCarolina;
+using PaycheckCalc.Core.Tax.Utah;
 using PaycheckCalc.Core.Tax.Local.Maryland;
 using PaycheckCalc.Core.Tax.Local.NewYork;
 using PaycheckCalc.Core.Tax.Local.Ohio;
@@ -297,6 +298,11 @@ public static class MauiProgram
             // allowances ≥ 1), $5,000 per SC W-4 allowance, and three graduated brackets
             // (0%/3%/6% at $0/$3,640/$18,230) per SCDOR Form WH-1603F (2026)
             registry.Register(new SouthCarolinaWithholdingCalculator());
+
+            // Utah — federal W-4 filing statuses (Single/Married), flat 4.5% rate,
+            // phase-out allowance credit ($450/$900 per allowance for Single/Married,
+            // phased out at 1.3% of wages above $9,107/$18,213) per Utah Publication 14 (2026)
+            registry.Register(new UtahWithholdingCalculator());
 
             // Oklahoma — OW-2 percentage method
             var okCalc = sp.GetRequiredService<OklahomaOw2PercentageCalculator>();
