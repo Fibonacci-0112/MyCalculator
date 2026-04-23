@@ -4,7 +4,7 @@
              xmlns:behaviors="clr-namespace:PaycheckCalc.App.Behaviors"
              x:Class="PaycheckCalc.App.Views.InputsPage"
              Title="Inputs"
-             BackgroundColor="#F0F4FF">
+             BackgroundColor="#000099">
     <Grid RowDefinitions="Auto,*">
 
         <!-- Tab header row -->
