@@ -81,6 +81,13 @@ public sealed class AnnualTaxResult
     /// <summary>Form 1040 line 24 — total tax.</summary>
     public decimal TotalTax { get; init; }
 
+    // ── FICA taxes ──────────────────────────────────────────
+    /// <summary>Sum of W-2 Box 4 Social Security tax withheld across all jobs.</summary>
+    public decimal TotalW2SocialSecurityTax { get; init; }
+
+    /// <summary>Sum of W-2 Box 6 Medicare tax withheld across all jobs.</summary>
+    public decimal TotalW2MedicareTax { get; init; }
+
     // ── Payments (Form 1040 lines 25a/25c/26) ───────────────
     /// <summary>Sum of W-2 Box 2 federal income tax withheld.</summary>
     public decimal FederalWithholdingFromW2s { get; init; }
