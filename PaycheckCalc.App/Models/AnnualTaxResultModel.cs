@@ -38,6 +38,10 @@ public sealed class AnnualTaxResultModel
     public decimal OtherSchedule2Taxes { get; init; }
     public decimal TotalTax { get; init; }
 
+    // ── FICA taxes ───────────────────────────────────────────
+    public decimal TotalW2SocialSecurityTax { get; init; }
+    public decimal TotalW2MedicareTax { get; init; }
+
     // ── Payments ────────────────────────────────────────────
     public decimal FederalWithholdingFromW2s { get; init; }
     public decimal EstimatedTaxPayments { get; init; }
