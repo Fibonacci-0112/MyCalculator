@@ -70,6 +70,7 @@ public sealed class Form1040Calculator
         var w2SsWages = profile.W2Jobs.Sum(j => j.SocialSecurityWagesBox3);
         var w2SsTax = profile.W2Jobs.Sum(j => j.SocialSecurityTaxBox4);
         var w2MedicareWages = profile.W2Jobs.Sum(j => j.MedicareWagesBox5);
+        var w2MedicareTax = profile.W2Jobs.Sum(j => j.MedicareTaxBox6);
 
         // ── Step 2: Schedule C + SE tax (reuse existing pipeline) ──
         decimal scheduleCNetProfit = 0m;
@@ -267,6 +268,9 @@ public sealed class Form1040Calculator
             NetInvestmentIncomeTax = R(niit),
             OtherSchedule2Taxes = R(otherSch2),
             TotalTax = totalTax,
+
+            TotalW2SocialSecurityTax = R(w2SsTax),
+            TotalW2MedicareTax = R(w2MedicareTax),
 
             FederalWithholdingFromW2s = R(w2FedWH),
             EstimatedTaxPayments = R(estimatedPayments),
