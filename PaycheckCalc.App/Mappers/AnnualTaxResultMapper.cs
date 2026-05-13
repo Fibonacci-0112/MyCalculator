@@ -44,6 +44,9 @@ public static class AnnualTaxResultMapper
             OtherSchedule2Taxes = r.OtherSchedule2Taxes,
             TotalTax = r.TotalTax,
 
+            TotalW2SocialSecurityTax = r.TotalW2SocialSecurityTax,
+            TotalW2MedicareTax = r.TotalW2MedicareTax,
+
             FederalWithholdingFromW2s = r.FederalWithholdingFromW2s,
             EstimatedTaxPayments = r.EstimatedTaxPayments,
             ExcessSocialSecurityCredit = r.ExcessSocialSecurityCredit,
