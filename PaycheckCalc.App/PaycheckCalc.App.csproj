@@ -42,7 +42,7 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0-preview.4.26230.115" />
-	<PackageReference Include="Microsoft.Maui.Controls" Version="11.0.0-preview.4.26230.115" />
+	<PackageReference Include="Microsoft.Maui.Controls" Version="11.0.0-preview.4.26230.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,7 +53,4 @@
     <Folder Include="Resources\Images\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls" Version="11.0.0-preview.4.26230.115" />
-  </ItemGroup>
 </Project>
