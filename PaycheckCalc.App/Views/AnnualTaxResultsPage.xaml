@@ -153,6 +153,26 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- FICA taxes -->
+                <Border BackgroundColor="White" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" Padding="16">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="FICA Taxes (W-2)"
+                               FontSize="15" FontAttributes="Bold" TextColor="#1565C0" />
+                        <BoxView HeightRequest="1" Color="#E0E0E0" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Social Security Tax (Box 4)" TextColor="#37474F" FontSize="13" />
+                            <Label Grid.Column="1" Text="{Binding ResultModel.TotalW2SocialSecurityTax, StringFormat='${0:N2}'}"
+                                   TextColor="Black" FontSize="13" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Medicare Tax (Box 6)" TextColor="#37474F" FontSize="13" />
+                            <Label Grid.Column="1" Text="{Binding ResultModel.TotalW2MedicareTax, StringFormat='${0:N2}'}"
+                                   TextColor="Black" FontSize="13" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
                 <!-- Federal payments -->
                 <Border BackgroundColor="White" StrokeThickness="0"
                         StrokeShape="RoundRectangle 12" Padding="16">
