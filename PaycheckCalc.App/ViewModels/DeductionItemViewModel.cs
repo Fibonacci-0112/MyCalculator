@@ -18,6 +18,7 @@ public partial class DeductionItemViewModel : ObservableObject
     public partial DeductionAmountType AmountType { get; set; } = DeductionAmountType.Dollar;
 
     [ObservableProperty] public partial bool ReducesStateTaxableWages { get; set; } = true;
+    [ObservableProperty] public partial bool ReducesFicaWages { get; set; } = true;
 
     /// <summary>
     /// True when <see cref="AmountType"/> is <see cref="DeductionAmountType.Percentage"/>.
@@ -65,6 +66,7 @@ public partial class DeductionItemViewModel : ObservableObject
         Type = Type,
         Amount = Amount,
         AmountType = AmountType,
-        ReducesStateTaxableWages = ReducesStateTaxableWages
+        ReducesStateTaxableWages = ReducesStateTaxableWages,
+        ReducesFicaWages = ReducesFicaWages
     };
 }
