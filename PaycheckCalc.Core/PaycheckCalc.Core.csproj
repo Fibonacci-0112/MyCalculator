@@ -52,7 +52,7 @@
   <!-- net11.0-only packages (preview package, QuestPDF PDF rendering) -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0-preview.4.26230.115" />
-    <PackageReference Include="QuestPDF" Version="2026.2.4" />
+    <PackageReference Include="QuestPDF" Version="2026.5.0" />
   </ItemGroup>
 
   <!-- net9.0 (Web/WASM) build: exclude QuestPDF and the PDF exporters that depend on it -->
