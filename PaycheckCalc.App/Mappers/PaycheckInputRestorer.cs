@@ -41,7 +41,8 @@ public static class PaycheckInputRestorer
                 Name = d.Name,
                 Amount = d.Amount,
                 AmountType = d.AmountType,
-                ReducesStateTaxableWages = d.ReducesStateTaxableWages
+                ReducesStateTaxableWages = d.ReducesStateTaxableWages,
+                ReducesFicaWages = d.ReducesFicaWages
             };
             item.SelectedDeductionTypePickerItem = item.DeductionTypeItems
                 .FirstOrDefault(t => t.Value == d.Type);
