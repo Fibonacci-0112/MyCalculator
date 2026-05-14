@@ -13,17 +13,23 @@
        Shell.FlyoutBackgroundColor="#F0F4FF"
        FlyoutBehavior="Flyout">
 
-    <FlyoutItem Title="Inputs" Route="Inputs">
-        <ShellContent ContentTemplate="{DataTemplate views:InputsPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="Results" Route="Results">
-        <ShellContent ContentTemplate="{DataTemplate views:ResultsPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="Compare" Route="Compare">
-        <ShellContent ContentTemplate="{DataTemplate views:ComparePage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="Saved Paychecks" Route="Saved">
-        <ShellContent ContentTemplate="{DataTemplate views:SavedPaychecksPage}" />
+    <FlyoutItem Title="Paycheck Calculator" Route="Paycheck">
+        <Tab Title="Inputs">
+            <ShellContent Route="Inputs"
+                          ContentTemplate="{DataTemplate views:InputsPage}" />
+        </Tab>
+        <Tab Title="Results">
+            <ShellContent Route="Results"
+                          ContentTemplate="{DataTemplate views:ResultsPage}" />
+        </Tab>
+        <Tab Title="Compare">
+            <ShellContent Route="Compare"
+                          ContentTemplate="{DataTemplate views:ComparePage}" />
+        </Tab>
+        <Tab Title="Saved">
+            <ShellContent Route="Saved"
+                          ContentTemplate="{DataTemplate views:SavedPaychecksPage}" />
+        </Tab>
     </FlyoutItem>
     <FlyoutItem Title="Self-Employment" Route="SelfEmployment">
         <ShellContent ContentTemplate="{DataTemplate views:SelfEmploymentPage}" />
