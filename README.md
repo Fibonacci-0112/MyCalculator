@@ -190,15 +190,30 @@ Local taxes are additive: they subtract from net pay but do **not** reduce feder
 
 ## UI Overview
 
-The MAUI app uses flyout navigation with the following sections:
+The MAUI app groups its features under three flyout hubs. Each hub opens to a top tab strip containing its sub-pages, so end-of-year 1040 features stay hidden until the user explicitly opens the Annual Tax Planner.
+
+### Paycheck Calculator
 
 - **Inputs** — A four-tab form for Pay & Hours, Federal W-4, State, and Deductions.
 - **Results** — Two sub-tabs: **Period** (per-paycheck itemized taxes, deductions, net pay, doughnut chart, Save to Compare, Save as New Paycheck, and CSV/PDF export) and **Annual** (annualized projections, current paycheck number, and estimated year-end over/under withholding).
 - **Compare** — Side-by-side comparison. Falls back to a 1-vs-1 saved-vs-current view, or renders a multi-scenario layout when scenarios are pushed from Saved Paychecks via `ComparisonSession`.
-- **Saved Paychecks** — Lists previously saved paycheck calculations with options to reload inputs into the calculator, rename, or delete entries, and push one or more into the multi-scenario comparison.
-- **Self-Employment** — Three-tab input form (business income, expenses, QBI) for Schedule SE / Form 8995 calculations.
+- **Saved** — Lists previously saved paycheck calculations with options to reload inputs into the calculator, rename, or delete entries, and push one or more into the multi-scenario comparison.
+
+### Self-Employment
+
+- **SE Inputs** — Three-tab input form (business income, expenses, QBI) for Schedule SE / Form 8995 calculations.
 - **SE Results** — Two-tab results view showing self-employment tax breakdown and QBI deduction.
-- **Annual Projection / Jobs & YTD / Other Income & Adjustments / Credits / Quarterly Estimates / What-If** — Phase 8 flyout pages that share a single `AnnualTaxSession`. Together they collect Form 1040 inputs, credits, estimated-tax and what-if scenarios, and persist saved annual scenarios via `JsonAnnualScenarioRepository`.
+
+### Annual Tax Planner
+
+Wizard-style sequence of Phase 8 tabs that share a single `AnnualTaxSession` and persist saved annual scenarios via `JsonAnnualScenarioRepository`:
+
+- **Jobs & YTD** — Multi-job income and year-to-date withholding inputs.
+- **Adjustments** — Other Income & Adjustments to gross income (Schedule 1).
+- **Credits** — Tax credits (CTC, EITC, education, etc.).
+- **Estimates** — Quarterly estimated-tax payments.
+- **What-If** — Scenario testing on top of the current projection.
+- **Projection** — Annual projection summarizing the planner inputs.
 - **Annual Results** — Year-end estimate combining withholding, credits, NIIT, and balance due / refund.
 
 The Blazor Server head exposes a streamlined two-page flow — **Inputs** and **Results** — backed by a scoped `CalculatorSessionState` that stores the in-flight `PaycheckInput` and `PaycheckResult` between page navigations within a circuit.
