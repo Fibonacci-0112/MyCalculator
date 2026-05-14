@@ -23,7 +23,7 @@ A cross-platform paycheck calculator that computes net pay, tax withholdings, an
 - **Export Results** — Exports per-period paycheck results to CSV or PDF (powered by QuestPDF) and shares via the native OS share sheet.
 - **Results Visualization** — Doughnut chart breakdown of gross pay by category (federal tax, state tax, Social Security, Medicare, net pay).
 - **Side-by-Side Comparison** — Save a snapshot of one calculation and compare it against the current inputs.
-- **Saved Paychecks** — Persist named paycheck calculations to local JSON storage, reload them into the calculator, and manage saved entries from a dedicated page.
+- **Saved Paychecks** — Persist named paycheck calculations to local JSON (MAUI) or browser `localStorage` (Blazor), reload them into the calculator, and manage saved entries from a dedicated page.
 - **Multiple Pay Frequencies** — Weekly, Bi-Weekly, Semi-Monthly, Monthly, Quarterly, Semi-Annual, Annual, and Daily.
 
 ## Project Structure
@@ -47,9 +47,13 @@ PaycheckCalc.slnx
 │   ├── Storage/               # JsonPaycheckRepository, JsonAnnualScenarioRepository (local JSON persistence)
 │   └── MauiProgram.cs         # DI configuration & app startup
 ├── PaycheckCalc.Blazor/       # Blazor Server (Blazor Web App, net11.0) web head
-│   ├── Components/            # Razor components and pages (Inputs, Results)
-│   ├── Services/              # CalculatorSessionState (shared per-circuit state)
-│   ├── wwwroot/               # Static assets; tax JSON is content-linked from Core/Data at build
+│   ├── Components/            # Razor components and pages (Home, Inputs, Results,
+│   │                          #   SavedPaychecks, SelfEmployment, SelfEmploymentResults)
+│   ├── Services/              # CalculatorSessionState, SelfEmploymentSessionState
+│   │                          #   (per-circuit state) + LocalStoragePaycheckRepository
+│   │                          #   (browser localStorage IPaycheckRepository)
+│   ├── wwwroot/               # Static assets; tax JSON content-linked from Core/Data at build
+│   │                          #   plus js/paycheckStorage.js JS interop shim
 │   └── Program.cs             # Web host, DI, and tax-data loading
 ├── PaycheckCalc.Core/         # Business logic (no UI dependencies)
 │   ├── Models/                # PaycheckInput/Result, Enums, Deduction, AnnualProjection,
@@ -216,7 +220,7 @@ Wizard-style sequence of Phase 8 tabs that share a single `AnnualTaxSession` and
 - **Projection** — Annual projection summarizing the planner inputs.
 - **Annual Results** — Year-end estimate combining withholding, credits, NIIT, and balance due / refund.
 
-The Blazor Server head exposes a streamlined two-page flow — **Inputs** and **Results** — backed by a scoped `CalculatorSessionState` that stores the in-flight `PaycheckInput` and `PaycheckResult` between page navigations within a circuit.
+The Blazor Server head mirrors the MAUI feature surface at a smaller scale. Its `NavMenu` groups three sections — **Paycheck** (Inputs / Results / Saved Paychecks), **Self-Employment** (SE Inputs / SE Results), and **Home**. Per-circuit state lives in two scoped services, `CalculatorSessionState` and `SelfEmploymentSessionState`, and saved paychecks persist across browser sessions through `LocalStoragePaycheckRepository`, a `IPaycheckRepository` implementation backed by `localStorage` via a small JS-interop shim (`wwwroot/js/paycheckStorage.js`).
 
 ## Documentation
 
