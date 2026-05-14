@@ -12,7 +12,7 @@ A cross-platform paycheck calculator that computes net pay, tax withholdings, an
   - **Flat-rate state** — Pennsylvania (3.07%).
   - **All other states** — Each implements its own withholding rules (W-4 / state-specific certificate, standard deductions, allowances / exemptions, graduated brackets or flat rate, and state-specific credits). Examples include Alabama (graduated + dependents + federal deduction), Arkansas (DFA formula method), California (Method B, EDD DE 44 withholding tables + SDI), Colorado (flat 4.4% + DR 0004 Table 1 allowance + FMLI), Connecticut (TPG-211 table-driven withholding + PFMLI), Delaware (DE W-4, 7 graduated brackets + $110 personal credit), Georgia (flat 5.19% per HB 111 + G-4 allowances and dependent deductions), Illinois (flat 4.95% + IL-W-4 allowances), Ohio (IT-4 exemptions + two-bracket formula), Oklahoma (OW-2), Oregon (OR-W-4 with per-allowance tax credit), Utah (flat 4.5% with phase-out allowance credit), Virginia (VA-4), Wisconsin (WT-4), West Virginia (IT-104), and the remaining states that use an annualized graduated-bracket approach with state-specific deductions and allowances.
 - **Local / Sub-State Taxes** — Plugin-based local (city / county / school district) withholding with calculators for Pennsylvania Act 32 EIT + LST, New York City, Ohio RITA and CCA, and Maryland county surtax, all JSON-backed.
-- **State Disability / Family Leave Insurance** — California SDI and Connecticut PFMLI are computed alongside state withholding with dynamic labels on the results screen and exports.
+- **State Disability / Family Leave Insurance** — California SDI, Colorado FMLI (0.044%), Connecticut PFMLI, and the Washington WA Cares Fund (0.58% LTC premium) are computed alongside state withholding with dynamic labels on the results screen and exports.
 - **Pre-Tax & Post-Tax Deductions** — Supports configurable deductions that reduce taxable wages.
 - **Dynamic State Inputs** — Each state declares its own input schema (filing status, allowances, dependents, extra withholding), and the UI renders fields dynamically.
 - **Annual Projection** — Estimates annualized gross, taxes, and net pay; tracks current paycheck number and remaining pay periods, and projects year-end over/under withholding.
@@ -90,7 +90,7 @@ PaycheckCalc.slnx
 | **Target Platforms** | Android, Windows 10+ (MAUI); modern browsers via server-rendered Blazor |
 | **UI Pattern** | MVVM with [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) on MAUI; Razor components on Blazor |
 | **Test Framework** | xUnit 2.9.3 |
-| **PDF Export** | [QuestPDF](https://www.questpdf.com/) 2025.12.4 |
+| **PDF Export** | [QuestPDF](https://www.questpdf.com/) 2026.5.0 |
 | **Tax Data** | JSON-based IRS 15-T, Federal 1040, and state / local tax bracket tables (2026) |
 
 ## Prerequisites
