@@ -249,6 +249,14 @@
                                         Reduces State Wages
                                     </label>
                                 </div>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox"
+                                           id="@($"rfw{idx}")"
+                                           @bind="d.ReducesFicaWages" />
+                                    <label class="form-check-label small" for="@($"rfw{idx}")">
+                                        Reduces FICA Wages
+                                    </label>
+                                </div>
                                 <button type="button" class="btn btn-sm btn-outline-danger"
                                         @onclick="() => Session.Deductions.RemoveAt(idx)">
                                     ✕ Remove
