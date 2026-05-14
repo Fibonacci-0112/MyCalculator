@@ -14,6 +14,7 @@ public sealed class PaycheckResult
     public decimal StateDisabilityInsurance { get; init; }
     public string StateDisabilityInsuranceLabel { get; init; } = "State Disability Insurance";
 
+    public decimal FicaTaxableWages { get; init; }
     public decimal SocialSecurityWithholding { get; init; }
     public decimal MedicareWithholding { get; init; }
     public decimal AdditionalMedicareWithholding { get; init; }
