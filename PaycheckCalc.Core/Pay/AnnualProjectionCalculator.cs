@@ -36,7 +36,7 @@ public sealed class AnnualProjectionCalculator
         decimal annualPreTaxDeductions = R(result.PreTaxDeductions * periods);
         decimal annualPostTaxDeductions = R(result.PostTaxDeductions * periods);
         decimal annualFedTaxable = R(result.FederalTaxableIncome * periods);
-        decimal annualFicaTaxable = R((result.GrossPay - result.PreTaxDeductions) * periods);
+        decimal annualFicaTaxable = R(result.FicaTaxableWages * periods);
         decimal annualStateTaxable = R(result.StateTaxableWages * periods);
         decimal annualFedWithholding = R(result.FederalWithholding * periods);
         decimal annualStateWithholding = R(result.StateWithholding * periods);
