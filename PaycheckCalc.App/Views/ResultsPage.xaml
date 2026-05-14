@@ -87,7 +87,7 @@
                 <!-- ═══════════════════════════════════════════════════ -->
                 <VerticalStackLayout Spacing="12" IsVisible="{Binding IsResultTab0Visible}">
 
-                <!-- Income card: Gross Pay, Federal Taxable Income, State Taxable Income -->
+                <!-- Income card: Gross Pay, Federal Taxable Income, FICA Taxable Income, State Taxable Income -->
                 <Border BackgroundColor="White" StrokeThickness="0"
                         StrokeShape="RoundRectangle 12" Padding="16,8">
                     <VerticalStackLayout Spacing="0">
@@ -104,6 +104,15 @@
                         <Grid ColumnDefinitions="*,Auto" Padding="0,10">
                             <Label Text="Federal Taxable Income" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
                             <Label Text="{Binding ResultCard.FederalTaxableIncome, StringFormat='{0:C}'}"
+                                   Grid.Column="1"
+                                   TextColor="#37474F" FontAttributes="Bold"
+                                   FontSize="15" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="#F0F0F0" />
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,10">
+                            <Label Text="FICA Taxable Income" TextColor="#37474F" FontSize="15" VerticalTextAlignment="Center" />
+                            <Label Text="{Binding ResultCard.FicaTaxableWages, StringFormat='{0:C}'}"
                                    Grid.Column="1"
                                    TextColor="#37474F" FontAttributes="Bold"
                                    FontSize="15" VerticalTextAlignment="Center" />

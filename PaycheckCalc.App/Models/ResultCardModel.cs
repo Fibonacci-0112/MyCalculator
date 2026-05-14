@@ -10,6 +10,7 @@ public sealed class ResultCardModel
     // ── Income ──────────────────────────────────────────────
     public decimal GrossPay { get; init; }
     public decimal FederalTaxableIncome { get; init; }
+    public decimal FicaTaxableWages { get; init; }
     public decimal StateTaxableWages { get; init; }
 
     // ── Tax withholdings ────────────────────────────────────

@@ -16,6 +16,7 @@ public static class ResultCardMapper
         {
             GrossPay = result.GrossPay,
             FederalTaxableIncome = result.FederalTaxableIncome,
+            FicaTaxableWages = result.FicaTaxableWages,
             StateTaxableWages = result.StateTaxableWages,
             FederalWithholding = result.FederalWithholding,
             SocialSecurityWithholding = result.SocialSecurityWithholding,
