@@ -2,6 +2,7 @@ using PaycheckCalc.Blazor.Components;
 using PaycheckCalc.Blazor.Services;
 using PaycheckCalc.Core.Pay;
 using PaycheckCalc.Core.Models;
+using PaycheckCalc.Core.Storage;
 using PaycheckCalc.Core.Tax.Alabama;
 using PaycheckCalc.Core.Tax.Arizona;
 using PaycheckCalc.Core.Tax.Arkansas;
@@ -233,6 +234,12 @@ builder.Services.AddSingleton<Form1040ESCalculator>();
 
 // ── Per-user (per-circuit) in-memory calculator session shared by pages ─────
 builder.Services.AddScoped<CalculatorSessionState>();
+builder.Services.AddScoped<SelfEmploymentSessionState>();
+
+// ── Saved-paychecks persistence backed by browser localStorage via JS interop ─
+// Scoped because IJSRuntime is scoped per circuit; the repository's in-memory
+// cache must match a single browser's localStorage view.
+builder.Services.AddScoped<IPaycheckRepository, LocalStoragePaycheckRepository>();
 
 var app = builder.Build();
 

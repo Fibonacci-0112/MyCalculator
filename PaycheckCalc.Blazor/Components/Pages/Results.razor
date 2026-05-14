@@ -1,5 +1,7 @@
 @page "/results"
+@using PaycheckCalc.Core.Storage
 @inject CalculatorSessionState Session
+@inject IPaycheckRepository Repo
 @inject NavigationManager Nav
 
 <PageTitle>Results — PaycheckCalc</PageTitle>
@@ -188,14 +190,54 @@ else
         </div>
     </div>
 
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 align-items-center flex-wrap">
         <button class="btn btn-outline-secondary" @onclick='() => Nav.NavigateTo("inputs")'>
             ← Edit Inputs
         </button>
+        <input class="form-control" style="max-width: 220px;" placeholder="Paycheck name"
+               @bind="_saveName" />
+        <button class="btn btn-success" @onclick="SaveAsync" disabled="@_saving">
+            💾 @(_saving ? "Saving…" : "Save Paycheck")
+        </button>
+        @if (_saveMessage is not null)
+        {
+            <span class="text-success small">@_saveMessage</span>
+        }
+        <a class="btn btn-link" href="saved">View saved →</a>
     </div>
 }
 
 @code {
+    private string _saveName = "";
+    private bool _saving;
+    private string? _saveMessage;
+
+    private async Task SaveAsync()
+    {
+        if (Session.LastResult is null) return;
+        _saving = true;
+        _saveMessage = null;
+        try
+        {
+            var name = string.IsNullOrWhiteSpace(_saveName)
+                ? $"Paycheck {DateTime.Now:g}"
+                : _saveName.Trim();
+            var paycheck = new SavedPaycheck
+            {
+                Name   = name,
+                Input  = Session.BuildInput(),
+                Result = Session.LastResult,
+            };
+            await Repo.SaveAsync(paycheck);
+            _saveMessage = $"Saved as \"{name}\".";
+            _saveName = "";
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
     // Paychecks-per-year multiplier for the annualized preview card.
     private static int PayRate(PayFrequency f) => f switch
     {

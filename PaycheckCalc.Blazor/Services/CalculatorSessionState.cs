@@ -48,6 +48,46 @@ public sealed class CalculatorSessionState
     public PaycheckResult? LastResult { get; set; }
 
     /// <summary>
+    /// Replace the current session values with the data from a previously
+    /// saved <see cref="PaycheckInput"/> (e.g. when loading a saved paycheck
+    /// from the Saved Paychecks page back into the calculator).
+    /// </summary>
+    public void LoadFromInput(PaycheckInput input)
+    {
+        HourlyRate         = input.HourlyRate;
+        RegularHours       = input.RegularHours;
+        OvertimeHours      = input.OvertimeHours;
+        OvertimeMultiplier = input.OvertimeMultiplier;
+        Frequency          = input.Frequency;
+        PaycheckNumber     = input.PaycheckNumber <= 0 ? 1 : input.PaycheckNumber;
+        State              = input.State;
+        StateInputValues   = input.StateInputValues is null
+            ? new StateInputValues()
+            : new StateInputValues(input.StateInputValues);
+
+        FederalFilingStatus           = input.FederalW4.FilingStatus;
+        FederalStep2Checked           = input.FederalW4.Step2Checked;
+        FederalStep3Credits           = input.FederalW4.Step3TaxCredits;
+        FederalStep4aOtherIncome      = input.FederalW4.Step4aOtherIncome;
+        FederalStep4bDeductions       = input.FederalW4.Step4bDeductions;
+        FederalStep4cExtraWithholding = input.FederalW4.Step4cExtraWithholding;
+
+        Deductions.Clear();
+        foreach (var d in input.Deductions)
+        {
+            Deductions.Add(new DeductionEntry
+            {
+                Name                     = d.Name,
+                Amount                   = d.Amount,
+                AmountType               = d.AmountType,
+                Type                     = d.Type,
+                ReducesStateTaxableWages = d.ReducesStateTaxableWages,
+                ReducesFicaWages         = d.ReducesFicaWages,
+            });
+        }
+    }
+
+    /// <summary>
     /// Build a <see cref="PaycheckInput"/> from the current session values.
     /// </summary>
     public PaycheckInput BuildInput() => new()
