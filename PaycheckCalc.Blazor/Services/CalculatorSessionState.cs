@@ -87,6 +87,7 @@ public sealed class DeductionEntry
     public DeductionAmountType AmountType { get; set; } = DeductionAmountType.Dollar;
     public DeductionType Type { get; set; } = DeductionType.PreTax;
     public bool ReducesStateTaxableWages { get; set; } = true;
+    public bool ReducesFicaWages { get; set; } = true;
 
     public Deduction ToDomain() => new()
     {
@@ -95,5 +96,6 @@ public sealed class DeductionEntry
         AmountType               = AmountType,
         Type                     = Type,
         ReducesStateTaxableWages = ReducesStateTaxableWages,
+        ReducesFicaWages         = ReducesFicaWages,
     };
 }
