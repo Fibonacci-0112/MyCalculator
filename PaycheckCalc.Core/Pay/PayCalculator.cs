@@ -35,10 +35,13 @@ public sealed class PayCalculator
 
         var preTaxState = input.Deductions.Where(d => d.Type == DeductionType.PreTax && d.ReducesStateTaxableWages).Sum(d => d.EffectiveAmount(gross));
 
-        var ficaWages = Math.Max(0m, gross - preTax);
+        // 401(k)/403(b)/457 deductions reduce federal/state taxable income but NOT FICA wages.
+        // Only Section 125 deductions (ReducesFicaWages = true) are excluded from FICA wages.
+        var ficaPreTax = input.Deductions.Where(d => d.Type == DeductionType.PreTax && d.ReducesFicaWages).Sum(d => d.EffectiveAmount(gross));
+        var ficaWages = Math.Max(0m, gross - ficaPreTax);
         var (ss, medicare, addl) = _fica.Calculate(ficaWages, input.YtdSocialSecurityWages, input.YtdMedicareWages);
 
-        var fedTaxable = ficaWages;
+        var fedTaxable = Math.Max(0m, gross - preTax);
         var federal = _fed.CalculateWithholding(fedTaxable, input.Frequency, input.FederalW4);
 
         var calc = _stateRegistry.GetCalculator(input.State);
@@ -71,6 +74,7 @@ public sealed class PayCalculator
             StateWithholding = RoundMoney(stateResult.Withholding),
             StateDisabilityInsurance = RoundMoney(stateResult.DisabilityInsurance),
             StateDisabilityInsuranceLabel = stateResult.DisabilityInsuranceLabel,
+            FicaTaxableWages = RoundMoney(ficaWages),
             SocialSecurityWithholding = RoundMoney(ss),
             MedicareWithholding = RoundMoney(medicare),
             AdditionalMedicareWithholding = RoundMoney(addl),
