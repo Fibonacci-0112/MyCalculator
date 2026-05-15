@@ -212,6 +212,9 @@ builder.Services.AddSingleton(new PayCalculator(stateRegistry, fica, irs15t, loc
 // ── Annual projection & Form 1040 engine ────────────────────────────────────
 builder.Services.AddSingleton(new AnnualProjectionCalculator(irs15t, fica));
 
+// ── Dashboard YTD aggregation ───────────────────────────────────────────────
+builder.Services.AddSingleton<YtdSummaryCalculator>();
+
 var seCalc = new SelfEmploymentTaxCalculator(fica);
 builder.Services.AddSingleton(seCalc);
 builder.Services.AddSingleton<QbiDeductionCalculator>();
