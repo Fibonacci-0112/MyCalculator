@@ -1,5 +1,7 @@
 @page "/results"
+@using PaycheckCalc.Core.Explanation
 @using PaycheckCalc.Core.Storage
+@using PaycheckCalc.Blazor.Components.Shared
 @inject CalculatorSessionState Session
 @inject IPaycheckRepository Repo
 @inject NavigationManager Nav
@@ -27,7 +29,10 @@ else
             <table class="table table-sm mb-0 align-middle">
                 <tbody>
                     <tr class="table-success">
-                        <th>Gross Pay</th>
+                        <th>
+                            Gross Pay
+                            @ExplainButton(r.Explanation, ExplanationLineKey.GrossPay)
+                        </th>
                         <td class="text-end fw-bold">@r.GrossPay.ToString("C")</td>
                     </tr>
                     <tr>
@@ -57,42 +62,63 @@ else
                         </tr>
                     }
                     <tr>
-                        <td>Federal Withholding</td>
+                        <td>
+                            Federal Withholding
+                            @ExplainButton(r.Explanation, ExplanationLineKey.FederalWithholding)
+                        </td>
                         <td class="text-end text-danger">(@r.FederalWithholding.ToString("C"))</td>
                     </tr>
                     <tr>
-                        <td>Social Security (6.2%)</td>
+                        <td>
+                            Social Security (6.2%)
+                            @ExplainButton(r.Explanation, ExplanationLineKey.SocialSecurity)
+                        </td>
                         <td class="text-end text-danger">(@r.SocialSecurityWithholding.ToString("C"))</td>
                     </tr>
                     <tr>
-                        <td>Medicare (1.45%)</td>
+                        <td>
+                            Medicare (1.45%)
+                            @ExplainButton(r.Explanation, ExplanationLineKey.Medicare)
+                        </td>
                         <td class="text-end text-danger">(@r.MedicareWithholding.ToString("C"))</td>
                     </tr>
                     @if (r.AdditionalMedicareWithholding != 0)
                     {
                         <tr>
-                            <td>Additional Medicare (0.9%)</td>
+                            <td>
+                                Additional Medicare (0.9%)
+                                @ExplainButton(r.Explanation, ExplanationLineKey.AdditionalMedicare)
+                            </td>
                             <td class="text-end text-danger">(@r.AdditionalMedicareWithholding.ToString("C"))</td>
                         </tr>
                     }
                     @if (r.StateWithholding != 0)
                     {
                         <tr>
-                            <td>State Tax (@r.State)</td>
+                            <td>
+                                State Tax (@r.State)
+                                @ExplainButton(r.Explanation, ExplanationLineKey.StateWithholding)
+                            </td>
                             <td class="text-end text-danger">(@r.StateWithholding.ToString("C"))</td>
                         </tr>
                     }
                     @if (r.StateDisabilityInsurance != 0)
                     {
                         <tr>
-                            <td>@r.StateDisabilityInsuranceLabel</td>
+                            <td>
+                                @r.StateDisabilityInsuranceLabel
+                                @ExplainButton(r.Explanation, ExplanationLineKey.StateDisability)
+                            </td>
                             <td class="text-end text-danger">(@r.StateDisabilityInsurance.ToString("C"))</td>
                         </tr>
                     }
                     @if (r.LocalWithholding != 0)
                     {
                         <tr>
-                            <td>Local Tax@(string.IsNullOrEmpty(r.LocalityLabel) ? "" : $" ({r.LocalityLabel})")</td>
+                            <td>
+                                Local Tax@(string.IsNullOrEmpty(r.LocalityLabel) ? "" : $" ({r.LocalityLabel})")
+                                @ExplainButton(r.Explanation, ExplanationLineKey.LocalWithholding)
+                            </td>
                             <td class="text-end text-danger">(@r.LocalWithholding.ToString("C"))</td>
                         </tr>
                     }
@@ -115,7 +141,10 @@ else
                         <td class="text-end">(@r.TotalTaxes.ToString("C"))</td>
                     </tr>
                     <tr class="table-primary fw-bold">
-                        <th>Net Pay (this period)</th>
+                        <th>
+                            Net Pay (this period)
+                            @ExplainButton(r.Explanation, ExplanationLineKey.NetPay)
+                        </th>
                         <td class="text-end">@r.NetPay.ToString("C")</td>
                     </tr>
                 </tbody>
@@ -205,12 +234,32 @@ else
         }
         <a class="btn btn-link" href="saved">View saved →</a>
     </div>
+
+    <ExplanationModal Explanation="_selectedExplanation" OnClose="CloseExplanation" />
 }
 
 @code {
     private string _saveName = "";
     private bool _saving;
     private string? _saveMessage;
+    private LineExplanation? _selectedExplanation;
+
+    private RenderFragment ExplainButton(PaycheckExplanation explanation, ExplanationLineKey key) => builder =>
+    {
+        var line = explanation.Get(key);
+        if (line is null) return;
+        builder.OpenElement(0, "button");
+        builder.AddAttribute(1, "type", "button");
+        builder.AddAttribute(2, "class", "btn btn-link btn-sm p-0 ms-1 align-baseline");
+        builder.AddAttribute(3, "title", $"Show how {line.Title} was calculated");
+        builder.AddAttribute(4, "aria-label", $"Show how {line.Title} was calculated");
+        builder.AddAttribute(5, "onclick", EventCallback.Factory.Create(this, () => OpenExplanation(line)));
+        builder.AddMarkupContent(6, "<span aria-hidden=\"true\">&#9432;</span>");
+        builder.CloseElement();
+    };
+
+    private void OpenExplanation(LineExplanation line) => _selectedExplanation = line;
+    private void CloseExplanation() => _selectedExplanation = null;
 
     private async Task SaveAsync()
     {

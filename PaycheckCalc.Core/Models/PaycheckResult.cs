@@ -1,3 +1,4 @@
+using PaycheckCalc.Core.Explanation;
 using PaycheckCalc.Core.Tax.Local;
 
 namespace PaycheckCalc.Core.Models;
@@ -53,6 +54,14 @@ public sealed class PaycheckResult
                                 + FederalWithholding
                                 + LocalWithholding + LocalHeadTax;
     public decimal NetPay { get; init; }
+
+    /// <summary>
+    /// "Show Your Work" breakdown — one <see cref="LineExplanation"/> per visible
+    /// paycheck line. Defaults to <see cref="PaycheckExplanation.Empty"/> when not
+    /// populated. The UI uses <see cref="PaycheckExplanation.Get"/> to look up the
+    /// breakdown for a specific line.
+    /// </summary>
+    public PaycheckExplanation Explanation { get; init; } = PaycheckExplanation.Empty;
 }
 
 /// <summary>One entry in <see cref="PaycheckResult.LocalBreakdown"/>.</summary>
