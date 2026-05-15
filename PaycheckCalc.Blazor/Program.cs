@@ -58,8 +58,6 @@ using PaycheckCalc.Core.Tax.Pennsylvania;
 using PaycheckCalc.Core.Tax.SelfEmployment;
 using PaycheckCalc.Core.Tax.State;
 using PaycheckCalc.Core.Tax.State.Annual;
-using PaycheckCalc.CloudSync;
-using PaycheckCalc.CloudSync.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -254,27 +252,10 @@ builder.Services.AddSingleton<Form1040ESCalculator>();
 builder.Services.AddScoped<CalculatorSessionState>();
 builder.Services.AddScoped<SelfEmploymentSessionState>();
 
-// ── Saved-paychecks persistence ───────────────────────────────────────────────
-// When CloudSync is enabled, use CosmosPaycheckRepository (cloud-primary).
-// Otherwise fall back to LocalStoragePaycheckRepository (browser localStorage).
-// Both are scoped because ISyncTokenProvider / IJSRuntime are scoped per circuit.
-var cloudSyncOptions = builder.Configuration
-    .GetSection("CloudSync")
-    .Get<CloudSyncOptions>() ?? new CloudSyncOptions();
-builder.Services.AddSingleton(cloudSyncOptions);
-builder.Services.AddScoped<ISyncTokenProvider, LocalStorageSyncTokenProvider>();
-
-if (cloudSyncOptions.Enabled && !string.IsNullOrWhiteSpace(cloudSyncOptions.ConnectionString))
-{
-    builder.Services.AddScoped<IPaycheckRepository>(sp =>
-        new CosmosPaycheckRepository(
-            cloudSyncOptions,
-            sp.GetRequiredService<ISyncTokenProvider>()));
-}
-else
-{
-    builder.Services.AddScoped<IPaycheckRepository, LocalStoragePaycheckRepository>();
-}
+// ── Saved-paychecks persistence backed by browser localStorage via JS interop ─
+// Scoped because IJSRuntime is scoped per circuit; the repository's in-memory
+// cache must match a single browser's localStorage view.
+builder.Services.AddScoped<IPaycheckRepository, LocalStoragePaycheckRepository>();
 
 var app = builder.Build();
 
