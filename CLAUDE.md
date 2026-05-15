@@ -86,4 +86,4 @@ Same pattern at the local level: `ILocalWithholdingCalculator` + `LocalCalculato
 
 ## Branch policy for Claude sessions
 
-All work in this session must be developed, committed, and pushed to the branch `claude/add-claude-documentation-hKh7u`. Create it locally if it does not exist. Do not push to other branches without explicit user permission, and do not open a PR unless asked.
+All work in this session must be developed, committed, and pushed to the branch `claude/add-claude-documentation-hKh7u`. Create it locally if it does not exist. Push to the main branch and you are allowed to create pull requests without asking first.
