@@ -63,6 +63,8 @@ using PaycheckCalc.Core.Tax.Federal.Annual;
 using PaycheckCalc.Core.Tax.State;
 using PaycheckCalc.Core.Tax.State.Annual;
 using PaycheckCalc.Core.Tax.SelfEmployment;
+using PaycheckCalc.CloudSync;
+using PaycheckCalc.CloudSync.Storage;
 
 namespace PaycheckCalc.App;
 
@@ -451,8 +453,23 @@ public static class MauiProgram
         // Dashboard YTD aggregation (shared with the Blazor head)
         builder.Services.AddSingleton<YtdSummaryCalculator>();
 
-        builder.Services.AddSingleton<IPaycheckRepository>(
-            new JsonPaycheckRepository(FileSystem.AppDataDirectory));
+        // ── Cloud sync (optional) ─────────────────────────────────────────────
+        var cloudSyncOptions = MauiCloudSyncOptionsProvider.LoadAsync().GetAwaiter().GetResult();
+        builder.Services.AddSingleton(cloudSyncOptions);
+        builder.Services.AddSingleton<ISyncTokenProvider, SecureStorageSyncTokenProvider>();
+
+        if (cloudSyncOptions.Enabled && !string.IsNullOrWhiteSpace(cloudSyncOptions.ConnectionString))
+        {
+            builder.Services.AddSingleton<IPaycheckRepository>(sp =>
+                new CosmosPaycheckRepository(
+                    cloudSyncOptions,
+                    sp.GetRequiredService<ISyncTokenProvider>()));
+        }
+        else
+        {
+            builder.Services.AddSingleton<IPaycheckRepository>(
+                new JsonPaycheckRepository(FileSystem.AppDataDirectory));
+        }
 
         // ── Self-Employment calculators ─────────────────────
         builder.Services.AddSingleton<SelfEmploymentTaxCalculator>(sp =>
@@ -527,6 +544,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<QuarterlyEstimatesPage>();
         builder.Services.AddSingleton<WhatIfPage>();
         builder.Services.AddSingleton<AnnualTaxResultsPage>();
+        builder.Services.AddSingleton<CloudSyncViewModel>();
+        builder.Services.AddSingleton<CloudSyncPage>();
         builder.Services.AddSingleton<AppShell>();
 
         return builder.Build();

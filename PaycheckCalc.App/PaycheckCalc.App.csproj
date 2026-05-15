@@ -48,6 +48,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PaycheckCalc.Core\PaycheckCalc.Core.csproj" />
+    <ProjectReference Include="..\PaycheckCalc.CloudSync\PaycheckCalc.CloudSync.csproj" />
   </ItemGroup>
 
   <ItemGroup>
