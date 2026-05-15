@@ -75,8 +75,4 @@
                           ContentTemplate="{DataTemplate views:AnnualTaxResultsPage}" />
         </Tab>
     </FlyoutItem>
-    <FlyoutItem Title="Cloud Sync" Route="CloudSync">
-        <ShellContent Route="CloudSyncSettings"
-                      ContentTemplate="{DataTemplate views:CloudSyncPage}" />
-    </FlyoutItem>
 </Shell>
