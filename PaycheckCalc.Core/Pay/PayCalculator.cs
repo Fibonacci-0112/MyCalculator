@@ -41,7 +41,11 @@ public sealed class PayCalculator
         var ficaWages = Math.Max(0m, gross - ficaPreTax);
         var (ss, medicare, addl) = _fica.Calculate(ficaWages, input.YtdSocialSecurityWages, input.YtdMedicareWages);
 
-        var fedTaxable = Math.Max(0m, gross - preTax);
+        // Roth 401(k)/403(b) and similar after-tax retirement deductions do NOT
+        // reduce federal taxable income. Only deductions with
+        // ReducesFederalTaxableWages = true reduce it.
+        var fedPreTax = input.Deductions.Where(d => d.Type == DeductionType.PreTax && d.ReducesFederalTaxableWages).Sum(d => d.EffectiveAmount(gross));
+        var fedTaxable = Math.Max(0m, gross - fedPreTax);
         var federal = _fed.CalculateWithholding(fedTaxable, input.Frequency, input.FederalW4);
 
         var calc = _stateRegistry.GetCalculator(input.State);

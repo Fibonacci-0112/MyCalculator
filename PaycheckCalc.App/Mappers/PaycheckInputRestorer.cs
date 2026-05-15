@@ -41,6 +41,7 @@ public static class PaycheckInputRestorer
                 Name = d.Name,
                 Amount = d.Amount,
                 AmountType = d.AmountType,
+                ReducesFederalTaxableWages = d.ReducesFederalTaxableWages,
                 ReducesStateTaxableWages = d.ReducesStateTaxableWages,
                 ReducesFicaWages = d.ReducesFicaWages
             };

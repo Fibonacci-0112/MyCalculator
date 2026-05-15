@@ -77,12 +77,13 @@ public sealed class CalculatorSessionState
         {
             Deductions.Add(new DeductionEntry
             {
-                Name                     = d.Name,
-                Amount                   = d.Amount,
-                AmountType               = d.AmountType,
-                Type                     = d.Type,
-                ReducesStateTaxableWages = d.ReducesStateTaxableWages,
-                ReducesFicaWages         = d.ReducesFicaWages,
+                Name                       = d.Name,
+                Amount                     = d.Amount,
+                AmountType                 = d.AmountType,
+                Type                       = d.Type,
+                ReducesFederalTaxableWages = d.ReducesFederalTaxableWages,
+                ReducesStateTaxableWages   = d.ReducesStateTaxableWages,
+                ReducesFicaWages           = d.ReducesFicaWages,
             });
         }
     }
@@ -126,16 +127,18 @@ public sealed class DeductionEntry
     public decimal Amount { get; set; }
     public DeductionAmountType AmountType { get; set; } = DeductionAmountType.Dollar;
     public DeductionType Type { get; set; } = DeductionType.PreTax;
+    public bool ReducesFederalTaxableWages { get; set; } = true;
     public bool ReducesStateTaxableWages { get; set; } = true;
     public bool ReducesFicaWages { get; set; } = true;
 
     public Deduction ToDomain() => new()
     {
-        Name                     = Name,
-        Amount                   = Amount,
-        AmountType               = AmountType,
-        Type                     = Type,
-        ReducesStateTaxableWages = ReducesStateTaxableWages,
-        ReducesFicaWages         = ReducesFicaWages,
+        Name                       = Name,
+        Amount                     = Amount,
+        AmountType                 = AmountType,
+        Type                       = Type,
+        ReducesFederalTaxableWages = ReducesFederalTaxableWages,
+        ReducesStateTaxableWages   = ReducesStateTaxableWages,
+        ReducesFicaWages           = ReducesFicaWages,
     };
 }

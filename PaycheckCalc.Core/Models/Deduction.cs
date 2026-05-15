@@ -6,6 +6,15 @@ public sealed class Deduction
     public DeductionType Type { get; init; }
     public decimal Amount { get; init; }
     public DeductionAmountType AmountType { get; init; } = DeductionAmountType.Dollar;
+
+    /// <summary>
+    /// True (default) for traditional 401(k)/403(b)/457 and Section 125 cafeteria-plan
+    /// deductions that reduce federal taxable income. False for Roth 401(k)/403(b)
+    /// contributions, which are funded with after-tax dollars and do NOT reduce the
+    /// federal withholding base.
+    /// </summary>
+    public bool ReducesFederalTaxableWages { get; init; } = true;
+
     public bool ReducesStateTaxableWages { get; init; } = true;
 
     /// <summary>

@@ -243,10 +243,18 @@
                             <div class="col-md-2 d-flex flex-column">
                                 <div class="form-check form-switch mb-2">
                                     <input class="form-check-input" type="checkbox"
+                                           id="@($"rfed{idx}")"
+                                           @bind="d.ReducesFederalTaxableWages" />
+                                    <label class="form-check-label small" for="@($"rfed{idx}")">
+                                        Reduces Federal Taxable Income
+                                    </label>
+                                </div>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox"
                                            id="@($"rsw{idx}")"
                                            @bind="d.ReducesStateTaxableWages" />
                                     <label class="form-check-label small" for="@($"rsw{idx}")">
-                                        Reduces State Wages
+                                        Reduces State Taxable Income
                                     </label>
                                 </div>
                                 <div class="form-check form-switch mb-2">
@@ -254,7 +262,7 @@
                                            id="@($"rfw{idx}")"
                                            @bind="d.ReducesFicaWages" />
                                     <label class="form-check-label small" for="@($"rfw{idx}")">
-                                        Reduces FICA Wages
+                                        Reduces FICA Taxable Income
                                     </label>
                                 </div>
                                 <button type="button" class="btn btn-sm btn-outline-danger"

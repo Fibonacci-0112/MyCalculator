@@ -17,6 +17,7 @@ public partial class DeductionItemViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsDollarAmount))]
     public partial DeductionAmountType AmountType { get; set; } = DeductionAmountType.Dollar;
 
+    [ObservableProperty] public partial bool ReducesFederalTaxableWages { get; set; } = true;
     [ObservableProperty] public partial bool ReducesStateTaxableWages { get; set; } = true;
     [ObservableProperty] public partial bool ReducesFicaWages { get; set; } = true;
 
@@ -66,6 +67,7 @@ public partial class DeductionItemViewModel : ObservableObject
         Type = Type,
         Amount = Amount,
         AmountType = AmountType,
+        ReducesFederalTaxableWages = ReducesFederalTaxableWages,
         ReducesStateTaxableWages = ReducesStateTaxableWages,
         ReducesFicaWages = ReducesFicaWages
     };
