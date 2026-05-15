@@ -1,3 +1,5 @@
+using PaycheckCalc.Core.Explanation;
+
 namespace PaycheckCalc.App.Models;
 
 /// <summary>
@@ -41,4 +43,10 @@ public sealed class ResultCardModel
 
     /// <summary>Human-readable state name for display (e.g., "California").</summary>
     public string StateName { get; init; } = "";
+
+    /// <summary>
+    /// "Show Your Work" breakdown for each visible paycheck line, used by the
+    /// info-icon modals on the results page. Defaults to an empty aggregate.
+    /// </summary>
+    public PaycheckExplanation Explanation { get; init; } = PaycheckExplanation.Empty;
 }

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using PaycheckCalc.App.Helpers;
 using PaycheckCalc.App.Mappers;
 using PaycheckCalc.App.Models;
+using PaycheckCalc.Core.Explanation;
 using PaycheckCalc.Core.Export;
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Pay;
@@ -11,6 +12,8 @@ using PaycheckCalc.Core.Tax.Federal;
 using PaycheckCalc.Core.Tax.State;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Globalization;
+using System.Text;
 
 namespace PaycheckCalc.App.ViewModels;
 
@@ -332,6 +335,63 @@ public partial class CalculatorViewModel : ObservableObject
     private void SaveForCompare()
     {
         SavedScenario = ScenarioMapper.Capture(this);
+    }
+
+    /// <summary>
+    /// Opens a "Show Your Work" alert for the paycheck line identified by
+    /// <paramref name="keyName"/>. Bound from XAML info-icon TapGestureRecognizers
+    /// with a CommandParameter naming one of <see cref="ExplanationLineKey"/>.
+    /// </summary>
+    [RelayCommand]
+    private async Task ShowExplanation(string keyName)
+    {
+        if (ResultCard is null || string.IsNullOrEmpty(keyName)) return;
+        if (!Enum.TryParse<ExplanationLineKey>(keyName, out var key)) return;
+
+        var line = ResultCard.Explanation.Get(key);
+        if (line is null) return;
+
+        var shell = Shell.Current;
+        if (shell is null) return;
+
+        await shell.DisplayAlert(line.Title, FormatExplanation(line), "OK");
+    }
+
+    private static string FormatExplanation(LineExplanation line)
+    {
+        var sb = new StringBuilder();
+        var us = CultureInfo.GetCultureInfo("en-US");
+
+        sb.Append("Total: ").Append(line.FinalAmount.ToString("C", us));
+        sb.AppendLine();
+        sb.AppendLine();
+
+        var i = 1;
+        foreach (var step in line.Steps)
+        {
+            sb.Append(i++).Append(". ").Append(step.Label);
+            if (step.Value is not null)
+            {
+                sb.Append(" — ").Append(step.Value.Value.ToString("C", us));
+            }
+            sb.AppendLine();
+            if (!string.IsNullOrEmpty(step.Detail))
+            {
+                sb.Append("   ").AppendLine(step.Detail);
+            }
+            if (!string.IsNullOrEmpty(step.Formula))
+            {
+                sb.Append("   ").AppendLine(step.Formula);
+            }
+            sb.AppendLine();
+        }
+
+        if (!string.IsNullOrEmpty(line.Reference))
+        {
+            sb.Append("Source: ").Append(line.Reference);
+        }
+
+        return sb.ToString();
     }
 
     public IReadOnlyList<PickerItem<PayFrequency>> Frequencies { get; } =

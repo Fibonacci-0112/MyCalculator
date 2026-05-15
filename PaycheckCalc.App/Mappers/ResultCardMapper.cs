@@ -29,7 +29,8 @@ public static class ResultCardMapper
             PostTaxDeductions = result.PostTaxDeductions,
             TotalTaxes = result.TotalTaxes,
             NetPay = result.NetPay,
-            StateName = EnumDisplay.UsStateName(result.State.ToString())
+            StateName = EnumDisplay.UsStateName(result.State.ToString()),
+            Explanation = result.Explanation
         };
     }
 }
