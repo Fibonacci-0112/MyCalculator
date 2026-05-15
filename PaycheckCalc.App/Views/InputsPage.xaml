@@ -236,7 +236,7 @@
                                 <DataTemplate>
                                     <Border BackgroundColor="#F8FAFF" StrokeThickness="1" Stroke="#E0E0E0"
                                             StrokeShape="RoundRectangle 8" Padding="12">
-                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto"
+                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto"
                                               RowSpacing="8" ColumnSpacing="8">
                                             <Entry Grid.Row="0" Grid.Column="0" Placeholder="Name (e.g. 401k)"
                                                    Text="{Binding Name}" TextColor="Black" BackgroundColor="#EEF2FF"
@@ -270,9 +270,21 @@
                                                         SelectedItem="{Binding SelectedDeductionTypePickerItem}" TextColor="Black" />
                                             </Grid>
                                             <Grid Grid.Row="4" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                                                <Label Text="Reduces State Taxable Wages" TextColor="#37474F" FontSize="13"
+                                                <Label Text="Reduces Federal Taxable Income" TextColor="#37474F" FontSize="13"
+                                                       VerticalTextAlignment="Center" />
+                                                <Switch Grid.Column="1" IsToggled="{Binding ReducesFederalTaxableWages}"
+                                                        OnColor="#1565C0" />
+                                            </Grid>
+                                            <Grid Grid.Row="5" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <Label Text="Reduces State Taxable Income" TextColor="#37474F" FontSize="13"
                                                        VerticalTextAlignment="Center" />
                                                 <Switch Grid.Column="1" IsToggled="{Binding ReducesStateTaxableWages}"
+                                                        OnColor="#1565C0" />
+                                            </Grid>
+                                            <Grid Grid.Row="6" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <Label Text="Reduces FICA Taxable Income" TextColor="#37474F" FontSize="13"
+                                                       VerticalTextAlignment="Center" />
+                                                <Switch Grid.Column="1" IsToggled="{Binding ReducesFicaWages}"
                                                         OnColor="#1565C0" />
                                             </Grid>
                                         </Grid>
