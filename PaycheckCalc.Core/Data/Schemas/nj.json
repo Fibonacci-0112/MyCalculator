@@ -1,0 +1,15 @@
+{
+  "state": "NJ",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "NJ-W4 Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single (Status A)",
+      "options": ["Single (Status A)", "Married/Civil Union (Status B)", "Married/Civil Union Sep. (Status C)", "Head of Household (Status D)", "Surviving Partner (Status E)"]
+    },
+    { "key": "Allowances", "label": "NJ-W4 Allowances", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

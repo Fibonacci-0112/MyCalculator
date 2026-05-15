@@ -33,7 +33,7 @@ public class MontanaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsMontana()
     {
-        var calc = new MontanaWithholdingCalculator();
+        var calc = new MontanaWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.MT, calc.State);
     }
 
@@ -42,7 +42,7 @@ public class MontanaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Exemptions_AdditionalWithholding()
     {
-        var calc = new MontanaWithholdingCalculator();
+        var calc = new MontanaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -54,7 +54,7 @@ public class MontanaWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsIncludeHeadOfHousehold()
     {
-        var calc = new MontanaWithholdingCalculator();
+        var calc = new MontanaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -323,7 +323,7 @@ public class MontanaWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new MontanaWithholdingCalculator();
+        var calc = new MontanaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "InvalidStatus" };
 
         var errors = calc.Validate(values);
@@ -335,7 +335,7 @@ public class MontanaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeExemptions_ReturnsError()
     {
-        var calc = new MontanaWithholdingCalculator();
+        var calc = new MontanaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -351,7 +351,7 @@ public class MontanaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new MontanaWithholdingCalculator();
+        var calc = new MontanaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -367,7 +367,7 @@ public class MontanaWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidInputs_ReturnsNoErrors()
     {
-        var calc = new MontanaWithholdingCalculator();
+        var calc = new MontanaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Married",
@@ -390,7 +390,7 @@ public class MontanaWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new MontanaWithholdingCalculator();
+        var calc = new MontanaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.MT,
             GrossWages: GrossWages,

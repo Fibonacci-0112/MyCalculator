@@ -26,7 +26,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsLouisiana()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.LA, calc.State);
     }
 
@@ -35,7 +35,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_WithThreeOptions()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "FilingStatus");
@@ -53,7 +53,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsDependents()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "Dependents");
         Assert.Equal("Dependents (Line 6B)", field.Label);
         Assert.Equal(StateFieldType.Integer, field.FieldType);
@@ -63,7 +63,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAdditionalWithholding()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "AdditionalWithholding");
         Assert.Equal("Additional Withholding (Line 7)", field.Label);
         Assert.Equal(StateFieldType.Decimal, field.FieldType);
@@ -78,7 +78,7 @@ public class LouisianaWithholdingCalculatorTest
     [InlineData("Head of Household")]
     public void Validate_ValidFilingStatus_ReturnsNoErrors(string status)
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = status };
         Assert.Empty(calc.Validate(values));
     }
@@ -86,7 +86,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "Exempt" };
         var errors = calc.Validate(values);
         Assert.Single(errors);
@@ -96,7 +96,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeDependents_ReturnsError()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = LouisianaWithholdingCalculator.StatusSingle,
@@ -110,7 +110,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = LouisianaWithholdingCalculator.StatusSingle,
@@ -133,7 +133,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Single_Biweekly_SpansAllThreeBrackets_MatchesFormula()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.LA,
             GrossWages: 3_000m,
@@ -159,7 +159,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Single_LowIncome_FirstBracketOnly()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.LA,
             GrossWages: 800m,
@@ -181,7 +181,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Single_BelowPersonalExemption_WithholdsZero()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.LA,
             GrossWages: 150m,
@@ -211,7 +211,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Married_Biweekly_WithDependents_SpansTwoBrackets()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.LA,
             GrossWages: 4_000m,
@@ -238,7 +238,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Married_Annual_HighIncome_SpansAllThreeBrackets()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.LA,
             GrossWages: 200_000m,
@@ -268,7 +268,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void HeadOfHousehold_UsesMarriedBracketsAndExemption()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.LA,
             GrossWages: 5_000m,
@@ -298,7 +298,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void Dependents_ReduceAnnualTaxableIncome()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.LA,
             GrossWages: 2_000m,
@@ -321,7 +321,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void AdditionalWithholding_IsAddedAfterCalculation()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.LA,
             GrossWages: 3_000m,
@@ -351,7 +351,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void PreTaxDeductions_ReducePerPeriodTaxableWages()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.LA,
             GrossWages: 3_000m,
@@ -374,7 +374,7 @@ public class LouisianaWithholdingCalculatorTest
     [Fact]
     public void ZeroGrossWages_ReturnsZeroWithholding()
     {
-        var calc = new LouisianaWithholdingCalculator();
+        var calc = new LouisianaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.LA,
             GrossWages: 0m,

@@ -1,0 +1,16 @@
+{
+  "state": "CA",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married", "Head of Household"]
+    },
+    { "key": "RegularAllowances", "label": "Regular Allowances (DE 4 Line 1)", "type": "Integer", "default": 0 },
+    { "key": "EstimatedDeductionAllowances", "label": "Estimated Deduction Allowances (DE 4 Line 2)", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Extra Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

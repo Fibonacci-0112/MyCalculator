@@ -59,31 +59,9 @@ public sealed class OhioWithholdingCalculator : IStateWithholdingCalculator
     /// <summary>Ohio withholding rate on annual taxable income over $26,050 (2.75%).</summary>
     public const decimal TopRate = 0.0275m;
 
-    // ── Schema ───────────────────────────────────────────────────────
-
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "Exemptions",
-            Label = "IT-4 Exemptions",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Additional Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
     // ── IStateWithholdingCalculator ──────────────────────────────────
 
     public UsState State => UsState.OH;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {

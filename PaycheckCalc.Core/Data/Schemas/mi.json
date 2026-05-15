@@ -1,0 +1,7 @@
+{
+  "state": "MI",
+  "fields": [
+    { "key": "Exemptions", "label": "MI-W4 Exemptions", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Extra Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

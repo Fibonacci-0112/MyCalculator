@@ -1,0 +1,15 @@
+{
+  "state": "SC",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "SC W-4 Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married", "Head of Household"]
+    },
+    { "key": "Allowances", "label": "SC W-4 Allowances", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

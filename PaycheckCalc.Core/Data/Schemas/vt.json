@@ -1,0 +1,15 @@
+{
+  "state": "VT",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "W-4VT Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married", "Head of Household"]
+    },
+    { "key": "Allowances", "label": "W-4VT Allowances", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

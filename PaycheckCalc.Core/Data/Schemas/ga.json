@@ -1,0 +1,16 @@
+{
+  "state": "GA",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "G-4 Filing Status (Line 3)",
+      "type": "Picker",
+      "required": true,
+      "default": "A — Single",
+      "options": ["A — Single", "B — Married Filing Separately / Both Spouses Working", "C — Married Filing Jointly, One Spouse Working", "D — Head of Household", "Exempt"]
+    },
+    { "key": "Dependents", "label": "Dependents (Line 4)", "type": "Integer", "default": 0 },
+    { "key": "AdditionalAllowances", "label": "Additional Allowances (Line 5)", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding (Line 6)", "type": "Decimal", "default": 0 }
+  ]
+}

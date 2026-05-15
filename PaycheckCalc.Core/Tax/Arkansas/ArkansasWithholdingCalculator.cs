@@ -11,30 +11,10 @@ public sealed class ArkansasWithholdingCalculator : IStateWithholdingCalculator
 {
     private readonly ArkansasFormulaCalculator _inner;
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "Exemptions",
-            Label = "# Exemptions",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Additional State Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
     public ArkansasWithholdingCalculator(ArkansasFormulaCalculator inner)
         => _inner = inner;
 
     public UsState State => UsState.AR;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
         => [];

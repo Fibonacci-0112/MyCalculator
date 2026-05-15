@@ -32,7 +32,7 @@ public class RhodeIslandWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsRhodeIsland()
     {
-        var calc = new RhodeIslandWithholdingCalculator();
+        var calc = new RhodeIslandWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.RI, calc.State);
     }
 
@@ -41,7 +41,7 @@ public class RhodeIslandWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Exemptions_AdditionalWithholding()
     {
-        var calc = new RhodeIslandWithholdingCalculator();
+        var calc = new RhodeIslandWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -53,7 +53,7 @@ public class RhodeIslandWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsIncludeAllThree()
     {
-        var calc = new RhodeIslandWithholdingCalculator();
+        var calc = new RhodeIslandWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -367,7 +367,7 @@ public class RhodeIslandWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new RhodeIslandWithholdingCalculator();
+        var calc = new RhodeIslandWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "InvalidStatus" };
 
         var errors = calc.Validate(values);
@@ -379,7 +379,7 @@ public class RhodeIslandWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeExemptions_ReturnsError()
     {
-        var calc = new RhodeIslandWithholdingCalculator();
+        var calc = new RhodeIslandWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -395,7 +395,7 @@ public class RhodeIslandWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new RhodeIslandWithholdingCalculator();
+        var calc = new RhodeIslandWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Married",
@@ -411,7 +411,7 @@ public class RhodeIslandWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidInputs_ReturnsNoErrors()
     {
-        var calc = new RhodeIslandWithholdingCalculator();
+        var calc = new RhodeIslandWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Head of Household",
@@ -434,7 +434,7 @@ public class RhodeIslandWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new RhodeIslandWithholdingCalculator();
+        var calc = new RhodeIslandWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.RI,
             GrossWages: GrossWages,

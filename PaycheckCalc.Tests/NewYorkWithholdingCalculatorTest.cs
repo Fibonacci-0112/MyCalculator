@@ -52,7 +52,7 @@ public class NewYorkWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsNewYork()
     {
-        var calc = new NewYorkWithholdingCalculator();
+        var calc = new NewYorkWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.NY, calc.State);
     }
 
@@ -61,7 +61,7 @@ public class NewYorkWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc = new NewYorkWithholdingCalculator();
+        var calc = new NewYorkWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -73,7 +73,7 @@ public class NewYorkWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_HasThreeOptions()
     {
-        var calc = new NewYorkWithholdingCalculator();
+        var calc = new NewYorkWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal(NewYorkWithholdingCalculator.StatusSingle, field.DefaultValue);
@@ -374,7 +374,7 @@ public class NewYorkWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new NewYorkWithholdingCalculator();
+        var calc = new NewYorkWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "InvalidStatus" };
 
         var errors = calc.Validate(values);
@@ -386,7 +386,7 @@ public class NewYorkWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAllowances_ReturnsError()
     {
-        var calc = new NewYorkWithholdingCalculator();
+        var calc = new NewYorkWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = NewYorkWithholdingCalculator.StatusSingle,
@@ -402,7 +402,7 @@ public class NewYorkWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new NewYorkWithholdingCalculator();
+        var calc = new NewYorkWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = NewYorkWithholdingCalculator.StatusSingle,
@@ -418,7 +418,7 @@ public class NewYorkWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidInputs_ReturnsNoErrors()
     {
-        var calc = new NewYorkWithholdingCalculator();
+        var calc = new NewYorkWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = NewYorkWithholdingCalculator.StatusMarried,
@@ -434,7 +434,7 @@ public class NewYorkWithholdingCalculatorTest
     [Fact]
     public void Validate_AllThreeStatuses_AreValid()
     {
-        var calc = new NewYorkWithholdingCalculator();
+        var calc = new NewYorkWithholdingCalculator(TestSchemas.Provider);
         foreach (var status in new[]
         {
             NewYorkWithholdingCalculator.StatusSingle,
@@ -458,7 +458,7 @@ public class NewYorkWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new NewYorkWithholdingCalculator();
+        var calc = new NewYorkWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.NY,
             GrossWages: GrossWages,

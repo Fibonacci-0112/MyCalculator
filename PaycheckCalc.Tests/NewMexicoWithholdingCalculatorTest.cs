@@ -40,7 +40,7 @@ public class NewMexicoWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsNewMexico()
     {
-        var calc = new NewMexicoWithholdingCalculator();
+        var calc = new NewMexicoWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.NM, calc.State);
     }
 
@@ -49,7 +49,7 @@ public class NewMexicoWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Exemptions_AdditionalWithholding()
     {
-        var calc = new NewMexicoWithholdingCalculator();
+        var calc = new NewMexicoWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -61,7 +61,7 @@ public class NewMexicoWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsIncludeHeadOfHousehold()
     {
-        var calc = new NewMexicoWithholdingCalculator();
+        var calc = new NewMexicoWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -396,7 +396,7 @@ public class NewMexicoWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new NewMexicoWithholdingCalculator();
+        var calc = new NewMexicoWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "InvalidStatus" };
 
         var errors = calc.Validate(values);
@@ -408,7 +408,7 @@ public class NewMexicoWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeExemptions_ReturnsError()
     {
-        var calc = new NewMexicoWithholdingCalculator();
+        var calc = new NewMexicoWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -424,7 +424,7 @@ public class NewMexicoWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new NewMexicoWithholdingCalculator();
+        var calc = new NewMexicoWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Married",
@@ -440,7 +440,7 @@ public class NewMexicoWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidInputs_ReturnsNoErrors()
     {
-        var calc = new NewMexicoWithholdingCalculator();
+        var calc = new NewMexicoWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Head of Household",
@@ -463,7 +463,7 @@ public class NewMexicoWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new NewMexicoWithholdingCalculator();
+        var calc = new NewMexicoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.NM,
             GrossWages: GrossWages,

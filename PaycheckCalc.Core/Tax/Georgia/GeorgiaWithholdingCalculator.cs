@@ -85,57 +85,23 @@ public sealed class GeorgiaWithholdingCalculator : IStateWithholdingCalculator
     public const string StatusD = "D — Head of Household";
     public const string StatusExempt = "Exempt";
 
-    private static readonly IReadOnlyList<string> FilingStatusOptions =
-        [StatusA, StatusB, StatusC, StatusD, StatusExempt];
-
-    // ── Schema ───────────────────────────────────────────────────────
-
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "FilingStatus",
-            Label = "G-4 Filing Status (Line 3)",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = StatusA,
-            Options = FilingStatusOptions
-        },
-        new()
-        {
-            Key = "Dependents",
-            Label = "Dependents (Line 4)",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalAllowances",
-            Label = "Additional Allowances (Line 5)",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Additional Withholding (Line 6)",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
     // ── IStateWithholdingCalculator ──────────────────────────────────
 
-    public UsState State => UsState.GA;
+    private readonly IReadOnlyList<string> _filingStatusOptions;
 
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
+    public GeorgiaWithholdingCalculator(IStateSchemaProvider schemaProvider)
+    {
+        _filingStatusOptions = schemaProvider.GetOptions(UsState.GA, "FilingStatus");
+    }
+
+    public UsState State => UsState.GA;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {
         var errors = new List<string>();
         var status = values.GetValueOrDefault<string>("FilingStatus", "");
-        if (!FilingStatusOptions.Contains(status))
-            errors.Add($"Filing Status must be one of: {string.Join(", ", FilingStatusOptions)}.");
+        if (!_filingStatusOptions.Contains(status))
+            errors.Add($"Filing Status must be one of: {string.Join(", ", _filingStatusOptions)}.");
 
         if (values.GetValueOrDefault("Dependents", 0) < 0)
             errors.Add("Dependents cannot be negative.");

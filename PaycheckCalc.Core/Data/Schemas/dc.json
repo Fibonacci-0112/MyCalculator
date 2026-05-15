@@ -1,0 +1,15 @@
+{
+  "state": "DC",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "D-4 Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married Filing Jointly", "Married Filing Separately", "Head of Household"]
+    },
+    { "key": "Allowances", "label": "D-4 Withholding Allowances", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

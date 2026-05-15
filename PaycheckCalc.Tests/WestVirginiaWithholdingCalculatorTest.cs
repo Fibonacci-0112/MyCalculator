@@ -35,7 +35,7 @@ public class WestVirginiaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsWestVirginia()
     {
-        var calc = new WestVirginiaWithholdingCalculator();
+        var calc = new WestVirginiaWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.WV, calc.State);
     }
 
@@ -44,7 +44,7 @@ public class WestVirginiaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Exemptions_AdditionalWithholding()
     {
-        var calc = new WestVirginiaWithholdingCalculator();
+        var calc = new WestVirginiaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -56,7 +56,7 @@ public class WestVirginiaWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_HasSingleAndMarried()
     {
-        var calc = new WestVirginiaWithholdingCalculator();
+        var calc = new WestVirginiaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -73,7 +73,7 @@ public class WestVirginiaWithholdingCalculatorTest
     [InlineData("Married")]
     public void Validate_ValidFilingStatus_ReturnsNoErrors(string status)
     {
-        var calc = new WestVirginiaWithholdingCalculator();
+        var calc = new WestVirginiaWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = status });
         Assert.Empty(errors);
     }
@@ -81,7 +81,7 @@ public class WestVirginiaWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new WestVirginiaWithholdingCalculator();
+        var calc = new WestVirginiaWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Head of Household" });
         Assert.Single(errors);
     }
@@ -89,7 +89,7 @@ public class WestVirginiaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeExemptions_ReturnsError()
     {
-        var calc = new WestVirginiaWithholdingCalculator();
+        var calc = new WestVirginiaWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -101,7 +101,7 @@ public class WestVirginiaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new WestVirginiaWithholdingCalculator();
+        var calc = new WestVirginiaWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -370,7 +370,7 @@ public class WestVirginiaWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new WestVirginiaWithholdingCalculator();
+        var calc = new WestVirginiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.WV,
             GrossWages: GrossWages,

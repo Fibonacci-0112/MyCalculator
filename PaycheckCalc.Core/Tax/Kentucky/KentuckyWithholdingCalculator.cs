@@ -51,27 +51,7 @@ public sealed class KentuckyWithholdingCalculator : IStateWithholdingCalculator
     /// </summary>
     private const decimal AllowanceCreditAmount = 10m;
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "Allowances",
-            Label = "K-4 Allowances",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
     public UsState State => UsState.KY;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {

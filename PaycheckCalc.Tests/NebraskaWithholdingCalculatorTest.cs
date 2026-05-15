@@ -44,7 +44,7 @@ public class NebraskaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsNebraska()
     {
-        var calc = new NebraskaWithholdingCalculator();
+        var calc = new NebraskaWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.NE, calc.State);
     }
 
@@ -53,7 +53,7 @@ public class NebraskaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc = new NebraskaWithholdingCalculator();
+        var calc = new NebraskaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -65,7 +65,7 @@ public class NebraskaWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsIncludeHeadOfHousehold()
     {
-        var calc = new NebraskaWithholdingCalculator();
+        var calc = new NebraskaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -312,7 +312,7 @@ public class NebraskaWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new NebraskaWithholdingCalculator();
+        var calc = new NebraskaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "InvalidStatus" };
 
         var errors = calc.Validate(values);
@@ -324,7 +324,7 @@ public class NebraskaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAllowances_ReturnsError()
     {
-        var calc = new NebraskaWithholdingCalculator();
+        var calc = new NebraskaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -340,7 +340,7 @@ public class NebraskaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new NebraskaWithholdingCalculator();
+        var calc = new NebraskaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -356,7 +356,7 @@ public class NebraskaWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidInputs_ReturnsNoErrors()
     {
-        var calc = new NebraskaWithholdingCalculator();
+        var calc = new NebraskaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Married",
@@ -379,7 +379,7 @@ public class NebraskaWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new NebraskaWithholdingCalculator();
+        var calc = new NebraskaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.NE,
             GrossWages: GrossWages,

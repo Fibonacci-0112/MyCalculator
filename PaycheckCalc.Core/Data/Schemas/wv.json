@@ -1,0 +1,15 @@
+{
+  "state": "WV",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "IT-104 Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married"]
+    },
+    { "key": "Exemptions", "label": "IT-104 Personal Exemptions", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

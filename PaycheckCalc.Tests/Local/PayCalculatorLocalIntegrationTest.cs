@@ -159,7 +159,7 @@ public class PayCalculatorLocalIntegrationTest
         stateRegistry.Register(new PennsylvaniaWithholdingCalculator());
         // MD → generic percentage-method adapter. Reuse StateTaxConfigs2026.
         foreach (var (state, config) in StateTaxConfigs2026.Configs)
-            stateRegistry.Register(new PercentageMethodWithholdingAdapter(state, config));
+            stateRegistry.Register(new PercentageMethodWithholdingAdapter(state, config, TestSchemas.Provider));
 
         var fica = new FicaCalculator();
         var fed = new Irs15TPercentageCalculator(

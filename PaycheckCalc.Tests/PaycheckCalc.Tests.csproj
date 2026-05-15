@@ -69,5 +69,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Link>md_county_surtax_2026.json</Link>
     </None>
+    <None Include="..\PaycheckCalc.Core\Data\Schemas\*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>Schemas\%(Filename)%(Extension)</Link>
+    </None>
   </ItemGroup>
 </Project>

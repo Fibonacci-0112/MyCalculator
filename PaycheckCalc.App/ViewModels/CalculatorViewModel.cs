@@ -23,14 +23,16 @@ public partial class CalculatorViewModel : ObservableObject
     private readonly PayCalculator _calc;
     private readonly AnnualProjectionCalculator _projectionCalc;
     private readonly StateCalculatorRegistry _stateRegistry;
+    private readonly IStateSchemaProvider _schemaProvider;
     private readonly IPaycheckRepository _repo;
     private UsState _previousState;
 
-    public CalculatorViewModel(PayCalculator calc, AnnualProjectionCalculator projectionCalc, StateCalculatorRegistry stateRegistry, IPaycheckRepository repo)
+    public CalculatorViewModel(PayCalculator calc, AnnualProjectionCalculator projectionCalc, StateCalculatorRegistry stateRegistry, IStateSchemaProvider schemaProvider, IPaycheckRepository repo)
     {
         _calc = calc;
         _projectionCalc = projectionCalc;
         _stateRegistry = stateRegistry;
+        _schemaProvider = schemaProvider;
         _repo = repo;
         Frequency = PayFrequency.Biweekly;
         SelectedFrequencyPickerItem = Frequencies.FirstOrDefault(f => f.Value == Frequency);
@@ -155,8 +157,7 @@ public partial class CalculatorViewModel : ObservableObject
 
         if (_stateRegistry.IsSupported(SelectedState))
         {
-            var calc = _stateRegistry.GetCalculator(SelectedState);
-            foreach (var field in calc.GetInputSchema())
+            foreach (var field in _schemaProvider.GetSchema(SelectedState))
             {
                 var vm = new StateFieldViewModel(field);
                 // Restore cached values if available

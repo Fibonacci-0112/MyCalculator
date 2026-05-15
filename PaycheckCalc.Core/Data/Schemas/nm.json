@@ -1,0 +1,15 @@
+{
+  "state": "NM",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "NM RPD-41272 Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married", "Head of Household"]
+    },
+    { "key": "Exemptions", "label": "NM RPD-41272 Exemptions", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

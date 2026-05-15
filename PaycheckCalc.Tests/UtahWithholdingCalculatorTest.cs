@@ -38,7 +38,7 @@ public class UtahWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsUtah()
     {
-        var calc = new UtahWithholdingCalculator();
+        var calc = new UtahWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.UT, calc.State);
     }
 
@@ -47,7 +47,7 @@ public class UtahWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc   = new UtahWithholdingCalculator();
+        var calc   = new UtahWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -59,7 +59,7 @@ public class UtahWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsAreSingleAndMarried()
     {
-        var calc  = new UtahWithholdingCalculator();
+        var calc  = new UtahWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -74,7 +74,7 @@ public class UtahWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidSingle_ReturnsNoErrors()
     {
-        var calc   = new UtahWithholdingCalculator();
+        var calc   = new UtahWithholdingCalculator(TestSchemas.Provider);
         var values = BuildValues("Single", 0, 0m);
 
         Assert.Empty(calc.Validate(values));
@@ -83,7 +83,7 @@ public class UtahWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidMarried_ReturnsNoErrors()
     {
-        var calc   = new UtahWithholdingCalculator();
+        var calc   = new UtahWithholdingCalculator(TestSchemas.Provider);
         var values = BuildValues("Married", 2, 10m);
 
         Assert.Empty(calc.Validate(values));
@@ -92,7 +92,7 @@ public class UtahWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc   = new UtahWithholdingCalculator();
+        var calc   = new UtahWithholdingCalculator(TestSchemas.Provider);
         var values = BuildValues("HeadOfHousehold", 0, 0m);
         var errors = calc.Validate(values);
 
@@ -103,7 +103,7 @@ public class UtahWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAllowances_ReturnsError()
     {
-        var calc   = new UtahWithholdingCalculator();
+        var calc   = new UtahWithholdingCalculator(TestSchemas.Provider);
         var values = BuildValues("Single", -1, 0m);
         var errors = calc.Validate(values);
 
@@ -114,7 +114,7 @@ public class UtahWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc   = new UtahWithholdingCalculator();
+        var calc   = new UtahWithholdingCalculator(TestSchemas.Provider);
         var values = BuildValues("Single", 0, -5m);
         var errors = calc.Validate(values);
 
@@ -401,7 +401,7 @@ public class UtahWithholdingCalculatorTest
         decimal extraWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc    = new UtahWithholdingCalculator();
+        var calc    = new UtahWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.UT,
             GrossWages: GrossWages,

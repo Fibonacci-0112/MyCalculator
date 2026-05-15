@@ -1,0 +1,15 @@
+{
+  "state": "NY",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "IT-2104 Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married", "Head of Household"]
+    },
+    { "key": "Allowances", "label": "IT-2104 Allowances", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

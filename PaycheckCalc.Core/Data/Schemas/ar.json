@@ -1,0 +1,7 @@
+{
+  "state": "AR",
+  "fields": [
+    { "key": "Exemptions", "label": "# Exemptions", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional State Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

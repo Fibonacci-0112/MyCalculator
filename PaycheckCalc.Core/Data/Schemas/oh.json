@@ -1,0 +1,7 @@
+{
+  "state": "OH",
+  "fields": [
+    { "key": "Exemptions", "label": "IT-4 Exemptions", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

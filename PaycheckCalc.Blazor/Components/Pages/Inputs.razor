@@ -1,5 +1,6 @@
 @page "/inputs"
 @inject StateCalculatorRegistry StateRegistry
+@inject IStateSchemaProvider SchemaProvider
 @inject PayCalculator PayCalculator
 @inject CalculatorSessionState Session
 @inject NavigationManager Nav
@@ -320,10 +321,9 @@
 
     private void RefreshStateSchema()
     {
-        var calc = StateRegistry.IsSupported(Session.State)
-            ? StateRegistry.GetCalculator(Session.State)
-            : null;
-        _stateSchema = calc?.GetInputSchema() ?? Array.Empty<StateFieldDefinition>();
+        _stateSchema = StateRegistry.IsSupported(Session.State)
+            ? SchemaProvider.GetSchema(Session.State)
+            : Array.Empty<StateFieldDefinition>();
 
         // Seed defaults for any fields not already set (e.g. first visit to this state).
         foreach (var field in _stateSchema)

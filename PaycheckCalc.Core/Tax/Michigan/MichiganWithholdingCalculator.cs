@@ -32,27 +32,7 @@ public sealed class MichiganWithholdingCalculator : IStateWithholdingCalculator
     /// <summary>Annual value of one MI-W4 exemption for 2026.</summary>
     private const decimal ExemptionAmount = 5_900m;
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "Exemptions",
-            Label = "MI-W4 Exemptions",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
     public UsState State => UsState.MI;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {

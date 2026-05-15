@@ -28,7 +28,7 @@ public class OklahomaOw2RoundingTest
     public void OklahomaWithholdingCalculator_ReturnsCorrectResult()
     {
         var inner = LoadOkCalculator();
-        var calc = new OklahomaWithholdingCalculator(inner);
+        var calc = new OklahomaWithholdingCalculator(inner, TestSchemas.Provider);
 
         Assert.Equal(UsState.OK, calc.State);
 

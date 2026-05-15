@@ -16,12 +16,14 @@ public partial class SelfEmploymentViewModel : ObservableObject
 {
     private readonly SelfEmploymentCalculator _calc;
     private readonly StateCalculatorRegistry _stateRegistry;
+    private readonly IStateSchemaProvider _schemaProvider;
     private UsState _previousState;
 
-    public SelfEmploymentViewModel(SelfEmploymentCalculator calc, StateCalculatorRegistry stateRegistry)
+    public SelfEmploymentViewModel(SelfEmploymentCalculator calc, StateCalculatorRegistry stateRegistry, IStateSchemaProvider schemaProvider)
     {
         _calc = calc;
         _stateRegistry = stateRegistry;
+        _schemaProvider = schemaProvider;
         SelectedState = UsState.TX;
         _previousState = SelectedState;
         SelectedStatePickerItem = StatePickerItems.FirstOrDefault(s => s.Value == SelectedState);
@@ -123,8 +125,7 @@ public partial class SelfEmploymentViewModel : ObservableObject
 
         if (_stateRegistry.IsSupported(SelectedState))
         {
-            var calc = _stateRegistry.GetCalculator(SelectedState);
-            foreach (var field in calc.GetInputSchema())
+            foreach (var field in _schemaProvider.GetSchema(SelectedState))
             {
                 var vm = new StateFieldViewModel(field);
                 if (_stateFieldCache.TryGetValue(SelectedState, out var cache) &&

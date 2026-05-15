@@ -31,7 +31,7 @@ public class SouthCarolinaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsSouthCarolina()
     {
-        var calc = new SouthCarolinaWithholdingCalculator();
+        var calc = new SouthCarolinaWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.SC, calc.State);
     }
 
@@ -40,7 +40,7 @@ public class SouthCarolinaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc = new SouthCarolinaWithholdingCalculator();
+        var calc = new SouthCarolinaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -52,7 +52,7 @@ public class SouthCarolinaWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsIncludeHeadOfHousehold()
     {
-        var calc = new SouthCarolinaWithholdingCalculator();
+        var calc = new SouthCarolinaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -283,7 +283,7 @@ public class SouthCarolinaWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new SouthCarolinaWithholdingCalculator();
+        var calc = new SouthCarolinaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "InvalidStatus" };
 
         var errors = calc.Validate(values);
@@ -295,7 +295,7 @@ public class SouthCarolinaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAllowances_ReturnsError()
     {
-        var calc = new SouthCarolinaWithholdingCalculator();
+        var calc = new SouthCarolinaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -311,7 +311,7 @@ public class SouthCarolinaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new SouthCarolinaWithholdingCalculator();
+        var calc = new SouthCarolinaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Married",
@@ -327,7 +327,7 @@ public class SouthCarolinaWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidInputs_ReturnsNoErrors()
     {
-        var calc = new SouthCarolinaWithholdingCalculator();
+        var calc = new SouthCarolinaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Head of Household",
@@ -350,7 +350,7 @@ public class SouthCarolinaWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new SouthCarolinaWithholdingCalculator();
+        var calc = new SouthCarolinaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.SC,
             GrossWages: GrossWages,

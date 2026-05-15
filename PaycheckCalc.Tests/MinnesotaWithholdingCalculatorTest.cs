@@ -33,7 +33,7 @@ public class MinnesotaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsMinnesota()
     {
-        var calc = new MinnesotaWithholdingCalculator();
+        var calc = new MinnesotaWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.MN, calc.State);
     }
 
@@ -42,7 +42,7 @@ public class MinnesotaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc = new MinnesotaWithholdingCalculator();
+        var calc = new MinnesotaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -54,7 +54,7 @@ public class MinnesotaWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsIncludeHeadOfHousehold()
     {
-        var calc = new MinnesotaWithholdingCalculator();
+        var calc = new MinnesotaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -320,7 +320,7 @@ public class MinnesotaWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new MinnesotaWithholdingCalculator();
+        var calc = new MinnesotaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.MN,
             GrossWages: GrossWages,

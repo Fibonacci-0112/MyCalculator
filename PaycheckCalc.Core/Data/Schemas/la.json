@@ -1,0 +1,15 @@
+{
+  "state": "LA",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "L-4 Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married", "Head of Household"]
+    },
+    { "key": "Dependents", "label": "Dependents (Line 6B)", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding (Line 7)", "type": "Decimal", "default": 0 }
+  ]
+}

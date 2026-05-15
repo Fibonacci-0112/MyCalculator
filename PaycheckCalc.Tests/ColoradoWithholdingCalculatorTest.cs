@@ -9,7 +9,7 @@ public class ColoradoWithholdingCalculatorTest
     {
         var dataPath = Path.Combine(AppContext.BaseDirectory, "co_dr0004_2026.json");
         var json = File.ReadAllText(dataPath);
-        return new ColoradoWithholdingCalculator(json);
+        return new ColoradoWithholdingCalculator(json, TestSchemas.Provider);
     }
 
     [Fact]

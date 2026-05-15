@@ -180,7 +180,7 @@ public class PercentageMethodWithholdingAdapterExtendedTest
     {
         foreach (var (state, config) in StateTaxConfigs2026.Configs)
         {
-            var calc = new PercentageMethodWithholdingAdapter(state, config);
+            var calc = new PercentageMethodWithholdingAdapter(state, config, TestSchemas.Provider);
             var context = new CommonWithholdingContext(
                 state,
                 GrossWages: 5000m,
@@ -456,6 +456,6 @@ public class PercentageMethodWithholdingAdapterExtendedTest
             BracketsSingle = [new TaxBracket { Floor = 0m, Ceiling = null, Rate = 0.05m }],
             BracketsMarried = [new TaxBracket { Floor = 0m, Ceiling = null, Rate = 0.05m }]
         };
-        return new PercentageMethodWithholdingAdapter(state, config);
+        return new PercentageMethodWithholdingAdapter(state, config, TestSchemas.Provider);
     }
 }

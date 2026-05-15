@@ -45,7 +45,7 @@ public class NewJerseyWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsNewJersey()
     {
-        var calc = new NewJerseyWithholdingCalculator();
+        var calc = new NewJerseyWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.NJ, calc.State);
     }
 
@@ -54,7 +54,7 @@ public class NewJerseyWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc = new NewJerseyWithholdingCalculator();
+        var calc = new NewJerseyWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -66,7 +66,7 @@ public class NewJerseyWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsStatusA_HasFiveOptions()
     {
-        var calc = new NewJerseyWithholdingCalculator();
+        var calc = new NewJerseyWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal(NewJerseyWithholdingCalculator.StatusA, field.DefaultValue);
@@ -357,7 +357,7 @@ public class NewJerseyWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new NewJerseyWithholdingCalculator();
+        var calc = new NewJerseyWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "InvalidStatus" };
 
         var errors = calc.Validate(values);
@@ -369,7 +369,7 @@ public class NewJerseyWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAllowances_ReturnsError()
     {
-        var calc = new NewJerseyWithholdingCalculator();
+        var calc = new NewJerseyWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = NewJerseyWithholdingCalculator.StatusA,
@@ -385,7 +385,7 @@ public class NewJerseyWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new NewJerseyWithholdingCalculator();
+        var calc = new NewJerseyWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = NewJerseyWithholdingCalculator.StatusA,
@@ -401,7 +401,7 @@ public class NewJerseyWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidInputs_ReturnsNoErrors()
     {
-        var calc = new NewJerseyWithholdingCalculator();
+        var calc = new NewJerseyWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = NewJerseyWithholdingCalculator.StatusB,
@@ -417,7 +417,7 @@ public class NewJerseyWithholdingCalculatorTest
     [Fact]
     public void Validate_AllFiveStatusCodes_AreValid()
     {
-        var calc = new NewJerseyWithholdingCalculator();
+        var calc = new NewJerseyWithholdingCalculator(TestSchemas.Provider);
         foreach (var status in new[]
         {
             NewJerseyWithholdingCalculator.StatusA,
@@ -443,7 +443,7 @@ public class NewJerseyWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new NewJerseyWithholdingCalculator();
+        var calc = new NewJerseyWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.NJ,
             GrossWages: GrossWages,

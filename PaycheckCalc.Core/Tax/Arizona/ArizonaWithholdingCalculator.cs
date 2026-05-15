@@ -53,31 +53,7 @@ public sealed class ArizonaWithholdingCalculator : IStateWithholdingCalculator
     /// <summary>Default rate used when no valid A-4 is on file (2.0%).</summary>
     internal const string DefaultRateLabel = "2.0%";
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "WithholdingRate",
-            Label = "A-4 Withholding Rate",
-            FieldType = StateFieldType.Picker,
-            // 2.0% is the Arizona default when an employee has not filed
-            // a completed Form A-4 (ADOR "Arizona Withholding Percentage
-            // Election" guidance).
-            DefaultValue = DefaultRateLabel,
-            Options = [.. A4Rates.Keys]
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
     public UsState State => UsState.AZ;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {

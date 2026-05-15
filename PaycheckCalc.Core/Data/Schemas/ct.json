@@ -1,0 +1,15 @@
+{
+  "state": "CT",
+  "fields": [
+    {
+      "key": "WithholdingCode",
+      "label": "Withholding Code (CT-W4 Line 1)",
+      "type": "Picker",
+      "required": true,
+      "default": "Code A",
+      "options": ["Code A", "Code B", "Code C", "Code D", "Code E", "Code F", "No Form CT-W4"]
+    },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding (CT-W4 Line 2)", "type": "Decimal", "default": 0 },
+    { "key": "ReducedWithholding", "label": "Reduced Withholding (CT-W4 Line 3)", "type": "Decimal", "default": 0 }
+  ]
+}

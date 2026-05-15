@@ -10,7 +10,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsDelaware()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.DE, calc.State);
     }
 
@@ -19,7 +19,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_WithFourOptions()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "FilingStatus");
@@ -38,7 +38,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAllowances()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "Allowances");
@@ -50,7 +50,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsExtraWithholding()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "AdditionalWithholding");
@@ -68,7 +68,7 @@ public class DelawareWithholdingCalculatorTest
     [InlineData("Head of Household")]
     public void Validate_ValidFilingStatus_ReturnsNoErrors(string status)
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = status };
         Assert.Empty(calc.Validate(values));
     }
@@ -76,7 +76,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "Invalid" };
         var errors = calc.Validate(values);
         Assert.Single(errors);
@@ -88,7 +88,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void Single_Biweekly_NoAllowances()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -124,7 +124,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void Single_Monthly_WithAllowances()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -162,7 +162,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void MarriedJoint_Biweekly_WithAllowances()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -202,7 +202,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void MarriedSeparate_UsesSmallStandardDeduction()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -240,7 +240,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void HeadOfHousehold_UsesSmallStandardDeduction()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -279,7 +279,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void HighIncome_TopBracketAt6Point6Percent()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -316,7 +316,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void PreTaxDeductions_ReduceTaxableWages()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -348,7 +348,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void ExtraWithholding_IsAdded()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -373,7 +373,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void ZeroGrossWages_ReturnsZeroWithholding()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -390,7 +390,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void LowIncome_BelowStandardDeduction_ZeroTax()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         // annual = 100 * 26 = 2,600 which is below std ded of 3,250
         var context = new CommonWithholdingContext(
@@ -414,7 +414,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void LargeAllowances_CreditExceedsTax_FloorAtZero()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -442,7 +442,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void DeductionsExceedGross_TaxableWagesFloorAtZero()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -462,7 +462,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void Weekly_PayFrequency()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -497,7 +497,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void Annual_PayFrequency()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -536,7 +536,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void CombinedScenario_AllInputs()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         // Semimonthly employee: $5000 gross, $800 pre-tax, MFJ, 2 allowances, $10 extra
         var context = new CommonWithholdingContext(
@@ -580,7 +580,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void NoDisabilityInsurance()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DE,
@@ -598,7 +598,7 @@ public class DelawareWithholdingCalculatorTest
     [Fact]
     public void IncomeAtExactBracketBoundary_60000()
     {
-        var calc = new DelawareWithholdingCalculator();
+        var calc = new DelawareWithholdingCalculator(TestSchemas.Provider);
 
         // Engineer taxable income to be exactly $60,000 (bracket boundary)
         // Need annual wage - std ded = 60,000 → annual = 63,250

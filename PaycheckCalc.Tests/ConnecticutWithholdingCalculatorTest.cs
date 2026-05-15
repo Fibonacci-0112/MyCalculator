@@ -9,7 +9,7 @@ public class ConnecticutWithholdingCalculatorTest
     {
         var dataPath = Path.Combine(AppContext.BaseDirectory, "connecticut_withholding_2026.json");
         var json = File.ReadAllText(dataPath);
-        return new ConnecticutWithholdingCalculator(json);
+        return new ConnecticutWithholdingCalculator(json, TestSchemas.Provider);
     }
 
     [Fact]

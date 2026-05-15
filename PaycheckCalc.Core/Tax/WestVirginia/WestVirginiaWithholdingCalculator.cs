@@ -86,51 +86,29 @@ public sealed class WestVirginiaWithholdingCalculator : IStateWithholdingCalcula
     public const string StatusSingle = "Single";
     public const string StatusMarried = "Married";
 
-    private static readonly IReadOnlyList<string> FilingStatusOptions =
-        [StatusSingle, StatusMarried];
 
     // ── Schema ───────────────────────────────────────────────────────
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "FilingStatus",
-            Label = "IT-104 Filing Status",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = StatusSingle,
-            Options = FilingStatusOptions
-        },
-        new()
-        {
-            Key = "Exemptions",
-            Label = "IT-104 Personal Exemptions",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Additional Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
 
     // ── IStateWithholdingCalculator ──────────────────────────────────
 
-    public UsState State => UsState.WV;
+        private readonly IReadOnlyList<string> _filingStatusOptions;
 
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
+    public WestVirginiaWithholdingCalculator(IStateSchemaProvider schemaProvider)
+    {
+        _filingStatusOptions = schemaProvider.GetOptions(UsState.WV, "FilingStatus");
+    }
+
+public UsState State => UsState.WV;
+
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {
         var errors = new List<string>();
 
         var status = values.GetValueOrDefault<string>("FilingStatus", "");
-        if (!FilingStatusOptions.Contains(status))
-            errors.Add($"Filing Status must be one of: {string.Join(", ", FilingStatusOptions)}.");
+        if (!_filingStatusOptions.Contains(status))
+            errors.Add($"Filing Status must be one of: {string.Join(", ", _filingStatusOptions)}.");
 
         if (values.GetValueOrDefault("Exemptions", 0) < 0)
             errors.Add("Exemptions cannot be negative.");

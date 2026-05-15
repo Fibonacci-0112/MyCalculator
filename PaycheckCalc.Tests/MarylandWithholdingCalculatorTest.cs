@@ -41,7 +41,7 @@ public class MarylandWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsMaryland()
     {
-        var calc = new MarylandWithholdingCalculator();
+        var calc = new MarylandWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.MD, calc.State);
     }
 
@@ -50,7 +50,7 @@ public class MarylandWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Exemptions_AdditionalWithholding()
     {
-        var calc = new MarylandWithholdingCalculator();
+        var calc = new MarylandWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -62,7 +62,7 @@ public class MarylandWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsSingleMarriedHoH()
     {
-        var calc = new MarylandWithholdingCalculator();
+        var calc = new MarylandWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -333,7 +333,7 @@ public class MarylandWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new MarylandWithholdingCalculator();
+        var calc = new MarylandWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.MD,
             GrossWages: GrossWages,

@@ -221,7 +221,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_State_ReturnsCalifornia()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         Assert.Equal(UsState.CA, calc.State);
     }
@@ -230,7 +230,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_Schema_HasFourFields()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(4, schema.Count);
@@ -248,7 +248,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_Validate_InvalidFilingStatus()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Invalid" });
 
@@ -259,7 +259,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_Validate_ValidFilingStatuses()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         Assert.Empty(calc.Validate(new StateInputValues { ["FilingStatus"] = "Single" }));
         Assert.Empty(calc.Validate(new StateInputValues { ["FilingStatus"] = "Married" }));
@@ -270,7 +270,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_Calculate_MatchesCoreCalculator()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.CA,
@@ -296,7 +296,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_AdditionalWithholding_IsAdded()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.CA,
@@ -322,7 +322,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_PreTaxDeductions_ReduceWages()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.CA,
@@ -354,7 +354,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_Sdi_CalculatedOnAllGrossWages()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         // SDI = 1.3% × $5,000 = $65.00
         var context = new CommonWithholdingContext(
@@ -379,7 +379,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_Sdi_ZeroGrossWages_ReturnsZero()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.CA,
@@ -404,7 +404,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_Sdi_NotReducedByPreTaxDeductions()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         // Gross = $10,000, pre-tax deductions = $3,000
         // SDI should be 1.3% × $10,000 = $130 (ALL wages, not reduced by pre-tax)
@@ -434,7 +434,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_SingleWorkaround_Subtracts3Cents()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         // Single filing status: withholding should be reduced by $0.03
         var context = new CommonWithholdingContext(
@@ -477,7 +477,7 @@ public class CaliforniaPercentageCalculatorTest
     public void WithholdingCalculator_SingleWorkaround_ZeroWithholding_StaysZero()
     {
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         // Zero gross wages → $0 withholding; workaround should not make it negative
         var context = new CommonWithholdingContext(
@@ -504,7 +504,7 @@ public class CaliforniaPercentageCalculatorTest
         // California SDI should be labeled "State Disability Insurance (SDI)",
         // not the generic "State Disability Insurance" used as the default.
         var inner = LoadCalculator();
-        var calc = new CaliforniaWithholdingCalculator(inner);
+        var calc = new CaliforniaWithholdingCalculator(inner, TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.CA, GrossWages: 5000m,

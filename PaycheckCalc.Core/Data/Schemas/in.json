@@ -1,0 +1,8 @@
+{
+  "state": "IN",
+  "fields": [
+    { "key": "Exemptions", "label": "WH-4 Exemptions", "type": "Integer", "default": 0 },
+    { "key": "DependentExemptions", "label": "Additional Dependent Exemptions", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Extra Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

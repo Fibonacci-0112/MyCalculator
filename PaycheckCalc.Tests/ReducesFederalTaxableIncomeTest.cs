@@ -122,7 +122,7 @@ public sealed class ReducesFederalTaxableIncomeTest
     {
         var registry = new StateCalculatorRegistry();
         var okJson = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "ok_ow2_2026_percentage.json"));
-        registry.Register(new OklahomaWithholdingCalculator(new OklahomaOw2PercentageCalculator(okJson)));
+        registry.Register(new OklahomaWithholdingCalculator(new OklahomaOw2PercentageCalculator(okJson), TestSchemas.Provider));
         var fica = new FicaCalculator();
         var fedJson = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "us_irs_15t_2026_percentage_automated.json"));
         var fed = new Irs15TPercentageCalculator(fedJson);

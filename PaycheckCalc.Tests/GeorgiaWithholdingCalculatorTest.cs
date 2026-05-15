@@ -21,7 +21,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsGeorgia()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.GA, calc.State);
     }
 
@@ -30,7 +30,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_WithFiveOptions()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "FilingStatus");
@@ -50,7 +50,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsDependents()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "Dependents");
         Assert.Equal("Dependents (Line 4)", field.Label);
         Assert.Equal(StateFieldType.Integer, field.FieldType);
@@ -60,7 +60,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAdditionalAllowances()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "AdditionalAllowances");
         Assert.Equal("Additional Allowances (Line 5)", field.Label);
         Assert.Equal(StateFieldType.Integer, field.FieldType);
@@ -70,7 +70,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAdditionalWithholding()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "AdditionalWithholding");
         Assert.Equal("Additional Withholding (Line 6)", field.Label);
         Assert.Equal(StateFieldType.Decimal, field.FieldType);
@@ -87,7 +87,7 @@ public class GeorgiaWithholdingCalculatorTest
     [InlineData("Exempt")]
     public void Validate_ValidFilingStatus_ReturnsNoErrors(string status)
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = status };
         Assert.Empty(calc.Validate(values));
     }
@@ -95,7 +95,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "Something Else" };
         var errors = calc.Validate(values);
         Assert.Single(errors);
@@ -105,7 +105,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeNumericFields_ReturnErrors()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = GeorgiaWithholdingCalculator.StatusA,
@@ -125,7 +125,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void StatusA_Single_Biweekly_NoDependents_MatchesFormula()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.GA,
             GrossWages: 2_000m, // $52,000 / 26
@@ -149,7 +149,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void StatusC_MarriedJointOneSpouse_AppliesLargerStandardDeduction()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.GA,
             GrossWages: 3_000m, // $78,000 / 26
@@ -170,7 +170,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void StatusB_UsesSingleStandardDeduction()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.GA,
             GrossWages: 3_000m,
@@ -192,7 +192,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void StatusD_HeadOfHousehold_UsesSingleStandardDeduction()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.GA,
             GrossWages: 2_000m,
@@ -215,7 +215,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void Dependents_ReduceTaxableIncome()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.GA,
             GrossWages: 2_000m,
@@ -239,7 +239,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void AdditionalAllowances_ReduceTaxableIncome()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.GA,
             GrossWages: 2_000m,
@@ -261,7 +261,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void AdditionalWithholding_IsAddedAfterCalculation()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.GA,
             GrossWages: 2_000m,
@@ -282,7 +282,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void Exempt_WithholdsZero()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.GA,
             GrossWages: 5_000m,
@@ -305,7 +305,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void LowWages_ZeroOutByAllowances_WithholdsZero()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.GA,
             GrossWages: 400m, // annual = 10,400
@@ -328,7 +328,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void PreTaxDeductions_ReducePerPeriodTaxableWages()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.GA,
             GrossWages: 2_000m,
@@ -352,7 +352,7 @@ public class GeorgiaWithholdingCalculatorTest
     [Fact]
     public void AnnualFrequency_ReturnsAnnualTax()
     {
-        var calc = new GeorgiaWithholdingCalculator();
+        var calc = new GeorgiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.GA,
             GrossWages: 80_000m,
