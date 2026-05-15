@@ -13,6 +13,10 @@
        Shell.FlyoutBackgroundColor="#F0F4FF"
        FlyoutBehavior="Flyout">
 
+    <FlyoutItem Title="Dashboard" Route="Dashboard">
+        <ShellContent Route="Home"
+                      ContentTemplate="{DataTemplate views:DashboardPage}" />
+    </FlyoutItem>
     <FlyoutItem Title="Paycheck Calculator" Route="Paycheck">
         <Tab Title="Inputs">
             <ShellContent Route="Inputs"

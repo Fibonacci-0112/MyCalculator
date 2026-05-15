@@ -426,6 +426,9 @@ public static class MauiProgram
                 sp.GetRequiredService<Irs15TPercentageCalculator>(),
                 sp.GetRequiredService<FicaCalculator>()));
 
+        // Dashboard YTD aggregation (shared with the Blazor head)
+        builder.Services.AddSingleton<YtdSummaryCalculator>();
+
         builder.Services.AddSingleton<IPaycheckRepository>(
             new JsonPaycheckRepository(FileSystem.AppDataDirectory));
 
@@ -473,6 +476,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ComparisonSession>();
 
         builder.Services.AddSingleton<CalculatorViewModel>();
+        builder.Services.AddSingleton<DashboardViewModel>();
         builder.Services.AddSingleton<SavedPaychecksViewModel>();
         builder.Services.AddSingleton<CompareViewModel>();
         builder.Services.AddSingleton<SelfEmploymentViewModel>();
@@ -483,6 +487,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<CreditsViewModel>();
         builder.Services.AddSingleton<QuarterlyEstimatesViewModel>();
         builder.Services.AddSingleton<WhatIfViewModel>();
+        builder.Services.AddSingleton<DashboardPage>();
         builder.Services.AddSingleton<InputsPage>();
         builder.Services.AddSingleton<PayHoursPage>();
         builder.Services.AddSingleton<FederalPage>();
