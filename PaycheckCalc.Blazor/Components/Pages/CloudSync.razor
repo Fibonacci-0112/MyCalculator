@@ -1,0 +1,97 @@
+@page "/sync"
+@using Microsoft.Extensions.Configuration
+@using PaycheckCalc.CloudSync
+@inject ISyncTokenProvider TokenProvider
+@inject IConfiguration Configuration
+
+<PageTitle>Cloud Sync — PaycheckCalc</PageTitle>
+
+<h1>Cloud Sync Settings</h1>
+
+@{
+    var opts = Configuration.GetSection("CloudSync").Get<CloudSyncOptions>() ?? new CloudSyncOptions();
+}
+
+@if (!opts.Enabled)
+{
+    <div class="alert alert-info">
+        <strong>Cloud sync is not enabled.</strong>
+        To enable it, set <code>CloudSync:Enabled = true</code> and provide a
+        <code>CloudSync:ConnectionString</code> in your server configuration
+        (or via the <code>CloudSync__ConnectionString</code> environment variable).
+    </div>
+}
+else
+{
+    <div class="alert alert-success">
+        <strong>Cloud sync is active</strong> — your paychecks are stored in Azure Cosmos DB
+        (<code>@opts.DatabaseId</code> / <code>@opts.ContainerId</code>).
+    </div>
+}
+
+<div class="card mt-3" style="max-width: 600px;">
+    <div class="card-header"><strong>Your Sync Token</strong></div>
+    <div class="card-body">
+        <p class="text-muted small">
+            This token is your device's partition key in Cosmos DB.
+            To access the same paychecks from another browser, paste this token there.
+        </p>
+
+        @if (_token is null)
+        {
+            <p class="text-muted fst-italic">Loading…</p>
+        }
+        else
+        {
+            <div class="input-group mb-2">
+                <input type="text" class="form-control font-monospace" value="@_token" readonly />
+                <button class="btn btn-outline-primary" @onclick="CopyTokenAsync">Copy</button>
+            </div>
+        }
+
+        <hr />
+        <p class="text-muted small mb-1">To use a different token (e.g. pasted from another device):</p>
+        <div class="input-group">
+            <input type="text" class="form-control"
+                   @bind="_tokenInput"
+                   placeholder="Paste token here" />
+            <button class="btn btn-outline-secondary" @onclick="ApplyTokenAsync">Apply</button>
+        </div>
+
+        @if (_status is not null)
+        {
+            <div class="alert alert-info mt-2 py-2 small">@_status</div>
+        }
+    </div>
+</div>
+
+@code {
+    private string? _token;
+    private string _tokenInput = "";
+    private string? _status;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        _token = await TokenProvider.GetOrCreateTokenAsync();
+        StateHasChanged();
+    }
+
+    private async Task CopyTokenAsync()
+    {
+        // Full clipboard API requires JS; surfacing the token for manual copy is sufficient here.
+        _status = "Select the token text above and copy it (Ctrl+C / Cmd+C).";
+        await Task.CompletedTask;
+    }
+
+    private async Task ApplyTokenAsync()
+    {
+        var t = _tokenInput.Trim();
+        if (string.IsNullOrWhiteSpace(t)) return;
+        await TokenProvider.SetTokenAsync(t);
+        _token = t;
+        _tokenInput = "";
+        _status = "Token updated. Reload the page to reconnect with the new token.";
+        StateHasChanged();
+    }
+}
