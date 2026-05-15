@@ -1,0 +1,15 @@
+{
+  "state": "AL",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["0", "Single", "Married Filing Jointly", "Married Filing Separately", "Head of Family"]
+    },
+    { "key": "Dependents", "label": "Number of Dependents", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Extra Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

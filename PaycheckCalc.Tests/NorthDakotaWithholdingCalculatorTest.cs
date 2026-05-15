@@ -39,7 +39,7 @@ public class NorthDakotaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsNorthDakota()
     {
-        var calc = new NorthDakotaWithholdingCalculator();
+        var calc = new NorthDakotaWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.ND, calc.State);
     }
 
@@ -48,7 +48,7 @@ public class NorthDakotaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_AdditionalWithholding()
     {
-        var calc = new NorthDakotaWithholdingCalculator();
+        var calc = new NorthDakotaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(2, schema.Count);
@@ -59,7 +59,7 @@ public class NorthDakotaWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsIncludeHeadOfHousehold()
     {
-        var calc = new NorthDakotaWithholdingCalculator();
+        var calc = new NorthDakotaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -354,7 +354,7 @@ public class NorthDakotaWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new NorthDakotaWithholdingCalculator();
+        var calc = new NorthDakotaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "InvalidStatus" };
 
         var errors = calc.Validate(values);
@@ -366,7 +366,7 @@ public class NorthDakotaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new NorthDakotaWithholdingCalculator();
+        var calc = new NorthDakotaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -382,7 +382,7 @@ public class NorthDakotaWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidInputs_ReturnsNoErrors()
     {
-        var calc = new NorthDakotaWithholdingCalculator();
+        var calc = new NorthDakotaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Married",
@@ -397,7 +397,7 @@ public class NorthDakotaWithholdingCalculatorTest
     [Fact]
     public void Validate_AllFilingStatuses_AreAccepted()
     {
-        var calc = new NorthDakotaWithholdingCalculator();
+        var calc = new NorthDakotaWithholdingCalculator(TestSchemas.Provider);
 
         foreach (var status in new[] { "Single", "Married", "Head of Household" })
         {
@@ -415,7 +415,7 @@ public class NorthDakotaWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new NorthDakotaWithholdingCalculator();
+        var calc = new NorthDakotaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.ND,
             GrossWages: GrossWages,

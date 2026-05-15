@@ -10,46 +10,21 @@ namespace PaycheckCalc.Core.Tax.Alabama;
 /// </summary>
 public sealed class AlabamaWithholdingCalculator : IStateWithholdingCalculator
 {
-    private static readonly IReadOnlyList<string> FilingStatusOptions =
-        ["0", "Single", "Married Filing Jointly", "Married Filing Separately", "Head of Family"];
+    private readonly IReadOnlyList<string> _filingStatusOptions;
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "FilingStatus",
-            Label = "Filing Status",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = "Single",
-            Options = FilingStatusOptions
-        },
-        new()
-        {
-            Key = "Dependents",
-            Label = "Number of Dependents",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
+    public AlabamaWithholdingCalculator(IStateSchemaProvider schemaProvider)
+    {
+        _filingStatusOptions = schemaProvider.GetOptions(UsState.AL, "FilingStatus");
+    }
 
     public UsState State => UsState.AL;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {
         var errors = new List<string>();
         var status = values.GetValueOrDefault<string>("FilingStatus", "");
-        if (!FilingStatusOptions.Contains(status))
-            errors.Add($"Filing Status must be one of: {string.Join(", ", FilingStatusOptions)}.");
+        if (!_filingStatusOptions.Contains(status))
+            errors.Add($"Filing Status must be one of: {string.Join(", ", _filingStatusOptions)}.");
         return errors;
     }
 

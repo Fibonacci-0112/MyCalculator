@@ -32,7 +32,7 @@ public class SelfEmploymentCalculatorTest
         // Register Oklahoma for state tax testing
         var okJson = File.ReadAllText("ok_ow2_2026_percentage.json");
         var okCalc = new OklahomaOw2PercentageCalculator(okJson);
-        registry.Register(new OklahomaWithholdingCalculator(okCalc));
+        registry.Register(new OklahomaWithholdingCalculator(okCalc, TestSchemas.Provider));
 
         _calc = new SelfEmploymentCalculator(seTax, qbi, fed, registry);
     }

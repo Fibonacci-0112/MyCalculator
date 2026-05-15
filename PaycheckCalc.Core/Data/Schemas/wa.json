@@ -1,0 +1,6 @@
+{
+  "state": "WA",
+  "fields": [
+    { "key": "WaCaresExempt", "label": "WA Cares Fund Exempt", "type": "Toggle", "default": false }
+  ]
+}

@@ -65,57 +65,28 @@ public sealed class DelawareWithholdingCalculator : IStateWithholdingCalculator
         (60_000m, null,    0.066m)
     ];
 
-    // ── Filing status options exposed to the UI ──────────────────────
+    // ── Filing status constants ──────────────────────────────────────
 
     private const string StatusSingle = "Single";
     private const string StatusMarriedJoint = "Married Filing Jointly";
-    private const string StatusMarriedSeparate = "Married Filing Separately";
-    private const string StatusHeadOfHousehold = "Head of Household";
-
-    private static readonly IReadOnlyList<string> FilingStatusOptions =
-        [StatusSingle, StatusMarriedJoint, StatusMarriedSeparate, StatusHeadOfHousehold];
-
-    // ── Schema ───────────────────────────────────────────────────────
-
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "FilingStatus",
-            Label = "Filing Status",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = StatusSingle,
-            Options = FilingStatusOptions
-        },
-        new()
-        {
-            Key = "Allowances",
-            Label = "DE W-4 Allowances",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
 
     // ── IStateWithholdingCalculator ──────────────────────────────────
 
-    public UsState State => UsState.DE;
+    private readonly IReadOnlyList<string> _filingStatusOptions;
 
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
+    public DelawareWithholdingCalculator(IStateSchemaProvider schemaProvider)
+    {
+        _filingStatusOptions = schemaProvider.GetOptions(UsState.DE, "FilingStatus");
+    }
+
+    public UsState State => UsState.DE;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {
         var errors = new List<string>();
         var status = values.GetValueOrDefault<string>("FilingStatus", "");
-        if (!FilingStatusOptions.Contains(status))
-            errors.Add($"Filing Status must be one of: {string.Join(", ", FilingStatusOptions)}.");
+        if (!_filingStatusOptions.Contains(status))
+            errors.Add($"Filing Status must be one of: {string.Join(", ", _filingStatusOptions)}.");
         return errors;
     }
 

@@ -1,0 +1,6 @@
+{
+  "state": "IA",
+  "fields": [
+    { "key": "AdditionalWithholding", "label": "Extra Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

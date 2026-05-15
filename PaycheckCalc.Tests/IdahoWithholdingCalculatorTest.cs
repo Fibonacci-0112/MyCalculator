@@ -21,7 +21,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsIdaho()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.ID, calc.State);
     }
 
@@ -30,7 +30,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_WithSingleAndMarriedOptions()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "FilingStatus");
@@ -47,7 +47,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAllowances()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "Allowances");
         Assert.Equal("ID W-4 Allowances", field.Label);
         Assert.Equal(StateFieldType.Integer, field.FieldType);
@@ -57,7 +57,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAdditionalWithholding()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "AdditionalWithholding");
         Assert.Equal("Additional Withholding", field.Label);
         Assert.Equal(StateFieldType.Decimal, field.FieldType);
@@ -71,7 +71,7 @@ public class IdahoWithholdingCalculatorTest
     [InlineData("Married")]
     public void Validate_ValidFilingStatus_ReturnsNoErrors(string status)
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = status };
         Assert.Empty(calc.Validate(values));
     }
@@ -79,7 +79,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "Something Else" };
         var errors = calc.Validate(values);
         Assert.Single(errors);
@@ -89,7 +89,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeNumericFields_ReturnErrors()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = IdahoWithholdingCalculator.StatusSingle,
@@ -107,7 +107,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void Single_Biweekly_NoAllowances_MatchesFormula()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.ID,
             GrossWages: 2_000m, // $52,000 / 26
@@ -130,7 +130,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void Married_Biweekly_AppliesLargerStandardDeduction()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.ID,
             GrossWages: 3_000m, // $78,000 / 26
@@ -153,7 +153,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void Allowances_ReduceTaxableIncome()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.ID,
             GrossWages: 2_000m,
@@ -177,7 +177,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void PreTaxDeductions_ReducePerPeriodTaxableWages()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.ID,
             GrossWages: 2_000m,
@@ -201,7 +201,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void LowWages_ZeroedOutByStandardDeduction_WithholdsZero()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.ID,
             GrossWages: 200m, // annual = 10,400, below $16,100 std ded
@@ -222,7 +222,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void AdditionalWithholding_IsAddedAfterCalculation()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.ID,
             GrossWages: 2_000m,
@@ -245,7 +245,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void AnnualFrequency_ReturnsAnnualTax()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.ID,
             GrossWages: 60_000m,
@@ -269,7 +269,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void CombinedScenario_Married_Allowance_PreTax_ExtraWithholding()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.ID,
             GrossWages: 3_500m,
@@ -293,7 +293,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void ZeroGrossWages_ReturnsZeroWithholding()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.ID,
             GrossWages: 0m,
@@ -314,7 +314,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void DeductionsExceedGross_TaxableWagesFloorAtZero()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.ID,
             GrossWages: 500m,
@@ -336,7 +336,7 @@ public class IdahoWithholdingCalculatorTest
     [Fact]
     public void NoDisabilityInsurance()
     {
-        var calc = new IdahoWithholdingCalculator();
+        var calc = new IdahoWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.ID,
             GrossWages: 2_000m,

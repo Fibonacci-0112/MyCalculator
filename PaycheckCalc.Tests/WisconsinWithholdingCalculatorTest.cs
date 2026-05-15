@@ -36,7 +36,7 @@ public class WisconsinWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsWisconsin()
     {
-        var calc = new WisconsinWithholdingCalculator();
+        var calc = new WisconsinWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.WI, calc.State);
     }
 
@@ -45,7 +45,7 @@ public class WisconsinWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc = new WisconsinWithholdingCalculator();
+        var calc = new WisconsinWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -57,7 +57,7 @@ public class WisconsinWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_HasThreeOptions()
     {
-        var calc = new WisconsinWithholdingCalculator();
+        var calc = new WisconsinWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -76,7 +76,7 @@ public class WisconsinWithholdingCalculatorTest
     [InlineData("Head of Household")]
     public void Validate_ValidFilingStatus_ReturnsNoErrors(string status)
     {
-        var calc = new WisconsinWithholdingCalculator();
+        var calc = new WisconsinWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = status });
         Assert.Empty(errors);
     }
@@ -84,7 +84,7 @@ public class WisconsinWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new WisconsinWithholdingCalculator();
+        var calc = new WisconsinWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Jointly" });
         Assert.Single(errors);
     }
@@ -92,7 +92,7 @@ public class WisconsinWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAllowances_ReturnsError()
     {
-        var calc = new WisconsinWithholdingCalculator();
+        var calc = new WisconsinWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -104,7 +104,7 @@ public class WisconsinWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new WisconsinWithholdingCalculator();
+        var calc = new WisconsinWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -391,7 +391,7 @@ public class WisconsinWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new WisconsinWithholdingCalculator();
+        var calc = new WisconsinWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.WI,
             GrossWages: GrossWages,

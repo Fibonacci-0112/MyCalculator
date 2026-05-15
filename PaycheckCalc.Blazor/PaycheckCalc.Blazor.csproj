@@ -58,6 +58,9 @@
     <Content Include="..\PaycheckCalc.Core\Data\Federal2026\federal_1040_brackets_2026.json"
              Link="wwwroot\data\federal_1040_brackets_2026.json"
              CopyToOutputDirectory="Always" />
+    <Content Include="..\PaycheckCalc.Core\Data\Schemas\*.json"
+             Link="wwwroot\data\schemas\%(Filename)%(Extension)"
+             CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>

@@ -88,6 +88,19 @@ var ohCcaJson  = File.ReadAllText(DataPath("oh_cca_2026.json"));
 var mdJson     = File.ReadAllText(DataPath("md_county_surtax_2026.json"));
 var f1040Json  = File.ReadAllText(DataPath("federal_1040_brackets_2026.json"));
 
+// ── State UI schemas (declarative JSON) ─────────────────────────────────────
+// Each schema lives at Data/Schemas/<state>.json and is loaded once into the
+// JsonStateSchemaProvider, decoupling UI field definitions from calculator code.
+var schemaJsonMap = new Dictionary<UsState, string>();
+foreach (var state in Enum.GetValues<UsState>())
+{
+    var path = DataPath(Path.Combine("schemas", $"{state.ToString().ToLowerInvariant()}.json"));
+    if (File.Exists(path))
+        schemaJsonMap[state] = File.ReadAllText(path);
+}
+var schemaProvider = new JsonStateSchemaProvider(schemaJsonMap);
+builder.Services.AddSingleton<IStateSchemaProvider>(schemaProvider);
+
 // ── FICA ────────────────────────────────────────────────────────────────────
 var fica = new FicaCalculator();
 builder.Services.AddSingleton(fica);
@@ -99,79 +112,79 @@ builder.Services.AddSingleton(irs15t);
 // ── State withholding registry ──────────────────────────────────────────────
 var arFormulaCalc = new ArkansasFormulaCalculator(arJson);
 var caPercentCalc = new CaliforniaPercentageCalculator(caJson);
-var coCalc        = new ColoradoWithholdingCalculator(coJson);
-var ctCalc        = new ConnecticutWithholdingCalculator(ctJson);
+var coCalc        = new ColoradoWithholdingCalculator(coJson, schemaProvider);
+var ctCalc        = new ConnecticutWithholdingCalculator(ctJson, schemaProvider);
 var okCalc        = new OklahomaOw2PercentageCalculator(okJson);
 
 var stateRegistry = new StateCalculatorRegistry();
 
 // Dedicated state calculators
-stateRegistry.Register(new AlabamaWithholdingCalculator());
+stateRegistry.Register(new AlabamaWithholdingCalculator(schemaProvider));
 stateRegistry.Register(new ArizonaWithholdingCalculator());
 stateRegistry.Register(new ArkansasWithholdingCalculator(arFormulaCalc));
-stateRegistry.Register(new CaliforniaWithholdingCalculator(caPercentCalc));
+stateRegistry.Register(new CaliforniaWithholdingCalculator(caPercentCalc, schemaProvider));
 stateRegistry.Register(coCalc);
 stateRegistry.Register(ctCalc);
-stateRegistry.Register(new DelawareWithholdingCalculator());
-stateRegistry.Register(new DistrictOfColumbiaWithholdingCalculator());
-stateRegistry.Register(new GeorgiaWithholdingCalculator());
-stateRegistry.Register(new HawaiiWithholdingCalculator());
-stateRegistry.Register(new IdahoWithholdingCalculator());
+stateRegistry.Register(new DelawareWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new DistrictOfColumbiaWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new GeorgiaWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new HawaiiWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new IdahoWithholdingCalculator(schemaProvider));
 stateRegistry.Register(new IllinoisWithholdingCalculator());
 stateRegistry.Register(new IndianaWithholdingCalculator());
 stateRegistry.Register(new IowaWithholdingCalculator());
-stateRegistry.Register(new KansasWithholdingCalculator());
+stateRegistry.Register(new KansasWithholdingCalculator(schemaProvider));
 stateRegistry.Register(new KentuckyWithholdingCalculator());
-stateRegistry.Register(new LouisianaWithholdingCalculator());
-stateRegistry.Register(new MaineWithholdingCalculator());
-stateRegistry.Register(new MarylandWithholdingCalculator());
-stateRegistry.Register(new MassachusettsWithholdingCalculator());
+stateRegistry.Register(new LouisianaWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new MaineWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new MarylandWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new MassachusettsWithholdingCalculator(schemaProvider));
 stateRegistry.Register(new MichiganWithholdingCalculator());
-stateRegistry.Register(new MinnesotaWithholdingCalculator());
-stateRegistry.Register(new MississippiWithholdingCalculator());
-stateRegistry.Register(new MissouriWithholdingCalculator());
-stateRegistry.Register(new MontanaWithholdingCalculator());
-stateRegistry.Register(new NebraskaWithholdingCalculator());
-stateRegistry.Register(new NewJerseyWithholdingCalculator());
-stateRegistry.Register(new NewMexicoWithholdingCalculator());
-stateRegistry.Register(new NewYorkWithholdingCalculator());
-stateRegistry.Register(new NorthCarolinaWithholdingCalculator());
-stateRegistry.Register(new NorthDakotaWithholdingCalculator());
+stateRegistry.Register(new MinnesotaWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new MississippiWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new MissouriWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new MontanaWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new NebraskaWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new NewJerseyWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new NewMexicoWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new NewYorkWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new NorthCarolinaWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new NorthDakotaWithholdingCalculator(schemaProvider));
 stateRegistry.Register(new OhioWithholdingCalculator());
-stateRegistry.Register(new OregonWithholdingCalculator());
-stateRegistry.Register(new RhodeIslandWithholdingCalculator());
-stateRegistry.Register(new SouthCarolinaWithholdingCalculator());
+stateRegistry.Register(new OregonWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new RhodeIslandWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new SouthCarolinaWithholdingCalculator(schemaProvider));
 
 // Utah — federal W-4 filing statuses (Single/Married), flat 4.5% rate,
 // phase-out allowance credit ($450/$900 per allowance for Single/Married,
 // phased out at 1.3% of wages above $9,107/$18,213) per Utah Publication 14 (2026)
-stateRegistry.Register(new UtahWithholdingCalculator());
+stateRegistry.Register(new UtahWithholdingCalculator(schemaProvider));
 
 // Vermont — W-4VT filing statuses (Single/Married/Head of Household),
 // no state standard deduction, $5,400 per W-4VT allowance, and four
 // graduated brackets (3.35%/6.60%/7.60%/8.75%) per Vermont Department
 // of Taxes BP-55 (2026 Income Tax Withholding Instructions, Tables, and Charts)
-stateRegistry.Register(new VermontWithholdingCalculator());
+stateRegistry.Register(new VermontWithholdingCalculator(schemaProvider));
 
 // Virginia — VA-4 filing statuses (Single/Married/Head of Household),
 // $8,750 standard deduction for Single and $17,500 for Married/HoH,
 // $930 per VA-4 personal exemption, and four graduated brackets
 // (2%/3%/5%/5.75% at $0/$3,000/$5,000/$17,000) per the Virginia
 // Department of Taxation Employer Withholding Instructions (Pub. 93045, 2026)
-stateRegistry.Register(new VirginiaWithholdingCalculator());
+stateRegistry.Register(new VirginiaWithholdingCalculator(schemaProvider));
 
 // West Virginia — IT-104 filing statuses (Single/Married), no state standard
 // deduction, $2,000 per IT-104 personal exemption, and five graduated brackets
 // (3%/4%/4.5%/6%/6.5% at $0/$10,000/$25,000/$40,000/$60,000)
 // per the WV State Tax Dept. Form IT-104 and WV Code § 11-21-71 (2026)
-stateRegistry.Register(new WestVirginiaWithholdingCalculator());
+stateRegistry.Register(new WestVirginiaWithholdingCalculator(schemaProvider));
 
 // Wisconsin — WT-4 filing statuses (Single/Married/Head of Household),
 // $12,760/$23,170/$16,840 standard deduction, $700 per WT-4 allowance,
 // and four graduated brackets (3.54%/4.65%/5.30%/7.65%) where Single
 // and Head of Household share bracket thresholds per WI DOR Pub W-166 (2026)
-stateRegistry.Register(new WisconsinWithholdingCalculator());
-stateRegistry.Register(new OklahomaWithholdingCalculator(okCalc));
+stateRegistry.Register(new WisconsinWithholdingCalculator(schemaProvider));
+stateRegistry.Register(new OklahomaWithholdingCalculator(okCalc, schemaProvider));
 stateRegistry.Register(new PennsylvaniaWithholdingCalculator());
 
 // Washington — no income tax; WA Cares Fund (Long-Term Care) at 0.58 %
@@ -192,7 +205,7 @@ foreach (var state in noTaxStates)
 
 // All remaining states via annualized percentage method
 foreach (var (state, config) in StateTaxConfigs2026.Configs)
-    stateRegistry.Register(new PercentageMethodWithholdingAdapter(state, config));
+    stateRegistry.Register(new PercentageMethodWithholdingAdapter(state, config, schemaProvider));
 
 builder.Services.AddSingleton(stateRegistry);
 

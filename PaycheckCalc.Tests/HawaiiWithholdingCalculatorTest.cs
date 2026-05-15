@@ -22,7 +22,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsHawaii()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.HI, calc.State);
     }
 
@@ -31,7 +31,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_WithSingleAndMarriedOptions()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "FilingStatus");
@@ -48,7 +48,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAllowances()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "Allowances");
@@ -60,7 +60,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAdditionalWithholding()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "AdditionalWithholding");
@@ -76,7 +76,7 @@ public class HawaiiWithholdingCalculatorTest
     [InlineData(HawaiiWithholdingCalculator.StatusMarried)]
     public void Validate_ValidFilingStatus_ReturnsNoErrors(string status)
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = status };
         Assert.Empty(calc.Validate(values));
     }
@@ -84,7 +84,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "Bogus" };
         var errors = calc.Validate(values);
 
@@ -94,7 +94,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAllowances_ReturnsError()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = HawaiiWithholdingCalculator.StatusSingle,
@@ -107,7 +107,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = HawaiiWithholdingCalculator.StatusSingle,
@@ -139,7 +139,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Calculate_Single_Biweekly_2000_NoAllowances()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.HI, GrossWages: 2_000m,
             PayPeriod: PayFrequency.Biweekly, Year: 2026);
@@ -168,7 +168,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Calculate_Single_TwoAllowances_ReducesWithholding()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.HI, GrossWages: 2_000m,
             PayPeriod: PayFrequency.Biweekly, Year: 2026);
@@ -190,7 +190,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Calculate_Single_BelowStandardDeduction_ReturnsZero()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.HI, GrossWages: 30m,
             PayPeriod: PayFrequency.Weekly, Year: 2026);
@@ -210,7 +210,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Calculate_ZeroGrossWages_ReturnsZero()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.HI, GrossWages: 0m,
             PayPeriod: PayFrequency.Biweekly, Year: 2026);
@@ -241,7 +241,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Calculate_Single_HighEarner_ReachesTopBracket()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.HI, GrossWages: 30_000m,
             PayPeriod: PayFrequency.Monthly, Year: 2026);
@@ -274,7 +274,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Calculate_Married_Biweekly_2000_NoAllowances()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.HI, GrossWages: 2_000m,
             PayPeriod: PayFrequency.Biweekly, Year: 2026);
@@ -301,7 +301,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Calculate_Married_Biweekly_3000_ThreeAllowances()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.HI, GrossWages: 3_000m,
             PayPeriod: PayFrequency.Biweekly, Year: 2026);
@@ -326,7 +326,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Calculate_AdditionalWithholding_IsAdded()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.HI, GrossWages: 2_000m,
             PayPeriod: PayFrequency.Biweekly, Year: 2026);
@@ -353,7 +353,7 @@ public class HawaiiWithholdingCalculatorTest
     [Fact]
     public void Calculate_PreTaxDeductions_ReduceTaxableWages()
     {
-        var calc = new HawaiiWithholdingCalculator();
+        var calc = new HawaiiWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.HI, GrossWages: 2_000m,
             PayPeriod: PayFrequency.Biweekly, Year: 2026,

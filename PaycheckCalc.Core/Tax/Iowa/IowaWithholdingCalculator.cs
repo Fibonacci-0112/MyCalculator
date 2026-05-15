@@ -29,20 +29,7 @@ public sealed class IowaWithholdingCalculator : IStateWithholdingCalculator
     /// <summary>Iowa flat state income tax withholding rate for 2026 (3.65%).</summary>
     private const decimal FlatRate = 0.0365m;
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
     public UsState State => UsState.IA;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values) => Array.Empty<string>();
 

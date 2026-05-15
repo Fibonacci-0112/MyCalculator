@@ -10,49 +10,22 @@ namespace PaycheckCalc.Core.Tax.State;
 public sealed class PercentageMethodWithholdingAdapter : IStateWithholdingCalculator
 {
     private readonly PercentageMethodStateTaxCalculator _inner;
+    private readonly IReadOnlyList<string> _filingStatusOptions;
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "FilingStatus",
-            Label = "Filing Status",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = "Single",
-            Options = ["Single", "Married"]
-        },
-        new()
-        {
-            Key = "Allowances",
-            Label = "State Allowances",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
-    public PercentageMethodWithholdingAdapter(UsState state, PercentageMethodConfig config)
+    public PercentageMethodWithholdingAdapter(UsState state, PercentageMethodConfig config, IStateSchemaProvider schemaProvider)
     {
         _inner = new PercentageMethodStateTaxCalculator(state, config);
+        _filingStatusOptions = schemaProvider.GetOptions(state, "FilingStatus");
     }
 
     public UsState State => _inner.State;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {
         var errors = new List<string>();
         var status = values.GetValueOrDefault<string>("FilingStatus", "");
-        if (status != "Single" && status != "Married")
-            errors.Add("Filing Status must be 'Single' or 'Married'.");
+        if (_filingStatusOptions.Count > 0 && !_filingStatusOptions.Contains(status))
+            errors.Add($"Filing Status must be one of: {string.Join(", ", _filingStatusOptions)}.");
         return errors;
     }
 

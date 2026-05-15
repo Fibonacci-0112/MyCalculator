@@ -1,0 +1,15 @@
+{
+  "state": "DE",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married Filing Jointly", "Married Filing Separately", "Head of Household"]
+    },
+    { "key": "Allowances", "label": "DE W-4 Allowances", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Extra Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

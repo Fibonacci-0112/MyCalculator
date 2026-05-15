@@ -1,0 +1,7 @@
+{
+  "state": "KY",
+  "fields": [
+    { "key": "Allowances", "label": "K-4 Allowances", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Extra Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

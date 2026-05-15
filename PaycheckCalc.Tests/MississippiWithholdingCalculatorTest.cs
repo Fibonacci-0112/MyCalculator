@@ -30,7 +30,7 @@ public class MississippiWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsMississippi()
     {
-        var calc = new MississippiWithholdingCalculator();
+        var calc = new MississippiWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.MS, calc.State);
     }
 
@@ -39,7 +39,7 @@ public class MississippiWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Dependents_AdditionalWithholding()
     {
-        var calc = new MississippiWithholdingCalculator();
+        var calc = new MississippiWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -51,7 +51,7 @@ public class MississippiWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_ThreeOptions()
     {
-        var calc = new MississippiWithholdingCalculator();
+        var calc = new MississippiWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("89-350 Filing Status", field.Label);
@@ -68,7 +68,7 @@ public class MississippiWithholdingCalculatorTest
     [Fact]
     public void Schema_Dependents_IsIntegerDefaultZero()
     {
-        var calc = new MississippiWithholdingCalculator();
+        var calc = new MississippiWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "Dependents");
 
         Assert.Equal("Dependents (Line 6)", field.Label);
@@ -79,7 +79,7 @@ public class MississippiWithholdingCalculatorTest
     [Fact]
     public void Schema_AdditionalWithholding_IsDecimalDefaultZero()
     {
-        var calc = new MississippiWithholdingCalculator();
+        var calc = new MississippiWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "AdditionalWithholding");
 
         Assert.Equal("Additional Withholding", field.Label);
@@ -95,7 +95,7 @@ public class MississippiWithholdingCalculatorTest
     [InlineData("Head of Household")]
     public void Validate_ValidFilingStatuses_ReturnNoErrors(string status)
     {
-        var calc = new MississippiWithholdingCalculator();
+        var calc = new MississippiWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = status };
         Assert.Empty(calc.Validate(values));
     }
@@ -103,7 +103,7 @@ public class MississippiWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new MississippiWithholdingCalculator();
+        var calc = new MississippiWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "Exempt" };
         var errors = calc.Validate(values);
         Assert.Single(errors);
@@ -113,7 +113,7 @@ public class MississippiWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeDependents_ReturnsError()
     {
-        var calc = new MississippiWithholdingCalculator();
+        var calc = new MississippiWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = MississippiWithholdingCalculator.StatusSingle,
@@ -127,7 +127,7 @@ public class MississippiWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new MississippiWithholdingCalculator();
+        var calc = new MississippiWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = MississippiWithholdingCalculator.StatusSingle,
@@ -310,7 +310,7 @@ public class MississippiWithholdingCalculatorTest
     [Fact]
     public void Single_PreTaxDeductions_ReduceTaxableWagesAndWithholding()
     {
-        var calc = new MississippiWithholdingCalculator();
+        var calc = new MississippiWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.MS,
             GrossWages: 3_000m,
@@ -351,7 +351,7 @@ public class MississippiWithholdingCalculatorTest
         int dependents = 0,
         decimal additionalWithholding = 0m)
     {
-        var calc = new MississippiWithholdingCalculator();
+        var calc = new MississippiWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             State: UsState.MS,
             GrossWages: GrossWages,

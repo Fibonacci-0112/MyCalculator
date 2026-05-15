@@ -1,0 +1,22 @@
+{
+  "state": "CO",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "Filing Status (from IRS Form W-4 Step 1c)",
+      "type": "Picker",
+      "required": true,
+      "default": "Single or Married Filing Separately",
+      "options": ["Single or Married Filing Separately", "Head of Household", "Married Filing Jointly or Qualifying Surviving Spouse"]
+    },
+    {
+      "key": "NumberOfJobs",
+      "label": "Number of Jobs",
+      "type": "Picker",
+      "required": true,
+      "default": "1",
+      "options": ["1", "2", "3", "4"]
+    },
+    { "key": "AdditionalWithholding", "label": "Extra Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

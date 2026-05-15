@@ -1,0 +1,17 @@
+{
+  "state": "MA",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "M-4 Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married", "Head of Household"]
+    },
+    { "key": "Dependents", "label": "Dependents", "type": "Integer", "default": 0 },
+    { "key": "BlindExemptions", "label": "Blind Exemptions", "type": "Integer", "default": 0 },
+    { "key": "AgeExemptions", "label": "Age 65+ Exemptions", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding (M-4 Line 4)", "type": "Decimal", "default": 0 }
+  ]
+}

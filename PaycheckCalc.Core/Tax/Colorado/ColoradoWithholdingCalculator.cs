@@ -25,70 +25,33 @@ public sealed class ColoradoWithholdingCalculator : IStateWithholdingCalculator
     private const decimal FmliRate = 0.00044m;
 
     private readonly IReadOnlyList<CoDr0004Allowance> _allowances;
+    private readonly IReadOnlyList<string> _filingStatusOptions;
+    private readonly IReadOnlyList<string> _numberOfJobsOptions;
 
-    private static readonly IReadOnlyList<string> FilingStatusOptions =
-    [
-        "Single or Married Filing Separately",
-        "Head of Household",
-        "Married Filing Jointly or Qualifying Surviving Spouse"
-    ];
-
-    private static readonly IReadOnlyList<string> NumberOfJobsOptions =
-        ["1", "2", "3", "4"];
-
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "FilingStatus",
-            Label = "Filing Status (from IRS Form W-4 Step 1c)",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = "Single or Married Filing Separately",
-            Options = FilingStatusOptions
-        },
-        new()
-        {
-            Key = "NumberOfJobs",
-            Label = "Number of Jobs",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = "1",
-            Options = NumberOfJobsOptions
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
-    public ColoradoWithholdingCalculator(string json)
+    public ColoradoWithholdingCalculator(string json, IStateSchemaProvider schemaProvider)
     {
         var root = JsonSerializer.Deserialize<CoDr0004Root>(json,
                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
                    ?? throw new InvalidOperationException("Failed to deserialize Colorado DR 0004 JSON data.");
 
         _allowances = root.Allowances;
+        _filingStatusOptions = schemaProvider.GetOptions(UsState.CO, "FilingStatus");
+        _numberOfJobsOptions = schemaProvider.GetOptions(UsState.CO, "NumberOfJobs");
     }
 
     public UsState State => UsState.CO;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {
         var errors = new List<string>();
 
         var status = values.GetValueOrDefault<string>("FilingStatus", "");
-        if (!FilingStatusOptions.Contains(status))
-            errors.Add($"Filing Status must be one of: {string.Join(", ", FilingStatusOptions)}.");
+        if (!_filingStatusOptions.Contains(status))
+            errors.Add($"Filing Status must be one of: {string.Join(", ", _filingStatusOptions)}.");
 
         var jobs = values.GetValueOrDefault<string>("NumberOfJobs", "");
-        if (!NumberOfJobsOptions.Contains(jobs))
-            errors.Add($"Number of Jobs must be one of: {string.Join(", ", NumberOfJobsOptions)}.");
+        if (!_numberOfJobsOptions.Contains(jobs))
+            errors.Add($"Number of Jobs must be one of: {string.Join(", ", _numberOfJobsOptions)}.");
 
         return errors;
     }

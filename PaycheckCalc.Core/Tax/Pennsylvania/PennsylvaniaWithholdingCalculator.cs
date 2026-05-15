@@ -12,20 +12,7 @@ public sealed class PennsylvaniaWithholdingCalculator : IStateWithholdingCalcula
 {
     private const decimal FlatRate = 0.0307m;
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
     public UsState State => UsState.PA;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values) => [];
 

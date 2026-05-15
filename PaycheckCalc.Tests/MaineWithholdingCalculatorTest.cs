@@ -29,7 +29,7 @@ public class MaineWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsMaine()
     {
-        var calc = new MaineWithholdingCalculator();
+        var calc = new MaineWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.ME, calc.State);
     }
 
@@ -38,7 +38,7 @@ public class MaineWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc = new MaineWithholdingCalculator();
+        var calc = new MaineWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -50,7 +50,7 @@ public class MaineWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsSingleMarried()
     {
-        var calc = new MaineWithholdingCalculator();
+        var calc = new MaineWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -236,7 +236,7 @@ public class MaineWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new MaineWithholdingCalculator();
+        var calc = new MaineWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.ME,
             GrossWages: GrossWages,

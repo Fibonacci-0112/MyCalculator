@@ -24,21 +24,7 @@ public sealed class WashingtonWithholdingCalculator : IStateWithholdingCalculato
     /// <summary>Display label for the WA Cares Fund line item.</summary>
     private const string WaCaresLabel = "WA Cares Fund (Long-Term Care)";
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "WaCaresExempt",
-            Label = "WA Cares Fund Exempt",
-            FieldType = StateFieldType.Toggle,
-            IsRequired = false,
-            DefaultValue = false
-        }
-    ];
-
     public UsState State => UsState.WA;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     /// <summary>
     /// No required fields — validation always passes.

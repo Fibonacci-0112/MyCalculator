@@ -1,0 +1,15 @@
+{
+  "state": "NE",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "NE W-4N Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married", "Head of Household"]
+    },
+    { "key": "Allowances", "label": "NE W-4N Allowances", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

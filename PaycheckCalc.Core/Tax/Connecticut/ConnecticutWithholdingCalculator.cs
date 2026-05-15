@@ -53,49 +53,11 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
     /// <summary>Display label used for PFMLI on the results screen and exports.</summary>
     private const string PfmliLabel = "Family Leave Insurance (FLI)";
 
-    // ── Schema / UI definitions ─────────────────────────────────────
-
-    private static readonly IReadOnlyList<string> WithholdingCodeOptions =
-    [
-        "Code A",
-        "Code B",
-        "Code C",
-        "Code D",
-        "Code E",
-        "Code F",
-        "No Form CT-W4"
-    ];
-
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "WithholdingCode",
-            Label = "Withholding Code (CT-W4 Line 1)",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = "Code A",
-            Options = WithholdingCodeOptions
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Additional Withholding (CT-W4 Line 2)",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        },
-        new()
-        {
-            Key = "ReducedWithholding",
-            Label = "Reduced Withholding (CT-W4 Line 3)",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
+    private readonly IReadOnlyList<string> _withholdingCodeOptions;
 
     // ── Construction ────────────────────────────────────────────────
 
-    public ConnecticutWithholdingCalculator(string json)
+    public ConnecticutWithholdingCalculator(string json, IStateSchemaProvider schemaProvider)
     {
         var root = JsonSerializer.Deserialize<CtWithholdingRoot>(json,
                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
@@ -114,13 +76,13 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
         ResolveReferences(_initialTax, itRefs);
         ResolveReferences(_phaseOutAddBack, abRefs);
         ResolveReferences(_taxRecapture, rcRefs);
+
+        _withholdingCodeOptions = schemaProvider.GetOptions(UsState.CT, "WithholdingCode");
     }
 
     // ── IStateWithholdingCalculator ─────────────────────────────────
 
     public UsState State => UsState.CT;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {
@@ -130,8 +92,8 @@ public sealed class ConnecticutWithholdingCalculator : IStateWithholdingCalculat
         // value (e.g., from MAUI Picker binding initialization) doesn't produce
         // a spurious validation error that blocks the calculation.
         var code = values.GetValueOrDefault<string>("WithholdingCode", "Code A");
-        if (!WithholdingCodeOptions.Contains(code))
-            errors.Add($"Invalid Withholding Code. Valid options are: {string.Join(", ", WithholdingCodeOptions)}.");
+        if (!_withholdingCodeOptions.Contains(code))
+            errors.Add($"Invalid Withholding Code. Valid options are: {string.Join(", ", _withholdingCodeOptions)}.");
 
         return errors;
     }

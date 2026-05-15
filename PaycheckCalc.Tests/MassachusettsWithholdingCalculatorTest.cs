@@ -10,7 +10,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsMassachusetts()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.MA, calc.State);
     }
 
@@ -19,7 +19,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "FilingStatus");
@@ -36,7 +36,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsDependents()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "Dependents");
@@ -48,7 +48,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsBlindExemptions()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "BlindExemptions");
@@ -60,7 +60,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAgeExemptions()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "AgeExemptions");
@@ -72,7 +72,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAdditionalWithholding()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "AdditionalWithholding");
@@ -85,7 +85,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidSingleStatus_ReturnsEmpty()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Single" });
         Assert.Empty(errors);
     }
@@ -93,7 +93,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidMarriedStatus_ReturnsEmpty()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Married" });
         Assert.Empty(errors);
     }
@@ -101,7 +101,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidHeadOfHouseholdStatus_ReturnsEmpty()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Head of Household" });
         Assert.Empty(errors);
     }
@@ -109,7 +109,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Invalid" });
         Assert.Single(errors);
         Assert.Contains("Filing Status", errors[0]);
@@ -118,7 +118,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeDependents_ReturnsError()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -130,7 +130,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeBlindExemptions_ReturnsError()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -142,7 +142,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAgeExemptions_ReturnsError()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -156,7 +156,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Biweekly_Single_NoExemptions_FlatRateOnAnnualizedWages()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.MA,
@@ -185,7 +185,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Monthly_Married_NoExemptions_PersonalExemptionApplied()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.MA,
@@ -211,7 +211,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Biweekly_HeadOfHousehold_NoExemptions_HoHPersonalExemptionApplied()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.MA,
@@ -239,7 +239,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Monthly_Single_TwoDependents_ReduceTaxableIncome()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.MA,
@@ -269,7 +269,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Weekly_Single_OneBlindExemption_ReducesTaxableIncome()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.MA,
@@ -299,7 +299,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Monthly_Married_TwoAgeExemptions_ReduceTaxableIncome()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.MA,
@@ -329,7 +329,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Annual_Single_IncomeAbove1M_SurtaxApplied()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         // $1,200,000 annual wages, no exemptions (single, filing with $4,400 exemption)
         var context = new CommonWithholdingContext(
@@ -359,7 +359,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Biweekly_Single_HighIncome_SurtaxApplied()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         // Biweekly $50,000 gross (annualizes to $1,300,000), no exemptions
         var context = new CommonWithholdingContext(
@@ -389,7 +389,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void Annual_Single_IncomeExactly1M_NoSurtax()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         // Exactly $1,000,000 annual wages
         var context = new CommonWithholdingContext(
@@ -417,7 +417,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void PreTaxDeductions_ReduceStateTaxableWages()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.MA,
@@ -447,7 +447,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void ExtraWithholding_IsAddedAfterTaxCalc()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.MA,
@@ -471,7 +471,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void ZeroGrossWages_ReturnsZeroWithholding()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.MA,
@@ -488,7 +488,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void DeductionsExceedGross_TaxableWagesFloorAtZero()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.MA,
@@ -506,7 +506,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void LowIncome_PersonalExemptionExceedsAnnualWages_ZeroTax()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         // Biweekly $100: annual = $2,600, personal exemption = $4,400 > wages
         var context = new CommonWithholdingContext(
@@ -527,7 +527,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void CombinedScenario_AllExemptionTypes_PreTaxAndExtraWithholding()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         // Married employee, $5,000 gross biweekly, $300 pre-tax,
         // 2 dependents, 1 blind exemption, 1 age-65+ exemption, $20 extra.
@@ -568,7 +568,7 @@ public class MassachusettsWithholdingCalculatorTest
     [Fact]
     public void NoDisabilityInsurance()
     {
-        var calc = new MassachusettsWithholdingCalculator();
+        var calc = new MassachusettsWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.MA,

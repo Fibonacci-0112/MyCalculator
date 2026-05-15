@@ -63,44 +63,22 @@ public sealed class KansasWithholdingCalculator : IStateWithholdingCalculator
     /// <summary>Rate applied to income above the bracket threshold (5.58%).</summary>
     private const decimal UpperRate = 0.0558m;
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "FilingStatus",
-            Label = "Filing Status",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = "Single",
-            Options = ["Single", "Married"]
-        },
-        new()
-        {
-            Key = "Allowances",
-            Label = "K-4 Allowances",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
+    private readonly IReadOnlyList<string> _filingStatusOptions;
+
+    public KansasWithholdingCalculator(IStateSchemaProvider schemaProvider)
+    {
+        _filingStatusOptions = schemaProvider.GetOptions(UsState.KS, "FilingStatus");
+    }
 
     public UsState State => UsState.KS;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {
         var errors = new List<string>();
 
         var status = values.GetValueOrDefault<string>("FilingStatus", "");
-        if (status != "Single" && status != "Married")
-            errors.Add("Filing Status must be 'Single' or 'Married'.");
+        if (!_filingStatusOptions.Contains(status))
+            errors.Add($"Filing Status must be one of: {string.Join(", ", _filingStatusOptions)}.");
 
         var allowances = values.GetValueOrDefault("Allowances", 0);
         if (allowances < 0)

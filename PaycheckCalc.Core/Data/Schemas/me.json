@@ -1,0 +1,15 @@
+{
+  "state": "ME",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "W-4ME Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married"]
+    },
+    { "key": "Allowances", "label": "W-4ME Allowances", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

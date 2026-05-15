@@ -10,60 +10,25 @@ namespace PaycheckCalc.Core.Tax.California;
 public sealed class CaliforniaWithholdingCalculator : IStateWithholdingCalculator
 {
     private readonly CaliforniaPercentageCalculator _inner;
+    private readonly IReadOnlyList<string> _filingStatusOptions;
 
     /// <summary>2026 California SDI rate (1.3%) applied to all gross wages.</summary>
     private const decimal SdiRate = 0.013m;
 
-    private static readonly IReadOnlyList<string> FilingStatusOptions =
-        ["Single", "Married", "Head of Household"];
-
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "FilingStatus",
-            Label = "Filing Status",
-            FieldType = StateFieldType.Picker,
-            IsRequired = true,
-            DefaultValue = "Single",
-            Options = FilingStatusOptions
-        },
-        new()
-        {
-            Key = "RegularAllowances",
-            Label = "Regular Allowances (DE 4 Line 1)",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "EstimatedDeductionAllowances",
-            Label = "Estimated Deduction Allowances (DE 4 Line 2)",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
-    public CaliforniaWithholdingCalculator(CaliforniaPercentageCalculator inner)
-        => _inner = inner;
+    public CaliforniaWithholdingCalculator(CaliforniaPercentageCalculator inner, IStateSchemaProvider schemaProvider)
+    {
+        _inner = inner;
+        _filingStatusOptions = schemaProvider.GetOptions(UsState.CA, "FilingStatus");
+    }
 
     public UsState State => UsState.CA;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {
         var errors = new List<string>();
         var status = values.GetValueOrDefault<string>("FilingStatus", "");
-        if (!FilingStatusOptions.Contains(status))
-            errors.Add($"Filing Status must be one of: {string.Join(", ", FilingStatusOptions)}.");
+        if (!_filingStatusOptions.Contains(status))
+            errors.Add($"Filing Status must be one of: {string.Join(", ", _filingStatusOptions)}.");
         return errors;
     }
 

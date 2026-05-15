@@ -14,8 +14,6 @@ public sealed class NoIncomeTaxWithholdingAdapter : IStateWithholdingCalculator
 
     public UsState State { get; }
 
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => [];
-
     public IReadOnlyList<string> Validate(StateInputValues values) => [];
 
     public StateWithholdingResult Calculate(CommonWithholdingContext context, StateInputValues values)

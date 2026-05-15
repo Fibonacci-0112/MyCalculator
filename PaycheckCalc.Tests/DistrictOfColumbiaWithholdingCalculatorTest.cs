@@ -10,7 +10,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsDC()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.DC, calc.State);
     }
 
@@ -19,7 +19,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_WithFourOptions()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "FilingStatus");
@@ -38,7 +38,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAllowances()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "Allowances");
@@ -50,7 +50,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAdditionalWithholding()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "AdditionalWithholding");
@@ -68,7 +68,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [InlineData("Head of Household")]
     public void Validate_ValidFilingStatus_ReturnsNoErrors(string status)
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = status };
         Assert.Empty(calc.Validate(values));
     }
@@ -76,7 +76,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "Invalid" };
         var errors = calc.Validate(values);
         Assert.Single(errors);
@@ -86,7 +86,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAllowances_ReturnsError()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -99,7 +99,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -114,7 +114,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void Single_Biweekly_NoAllowances_MidBrackets()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DC,
@@ -147,7 +147,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void Single_Annual_TopBracketsPartial()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DC,
@@ -180,7 +180,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void MarriedJoint_Monthly_WithAllowances()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DC,
@@ -214,7 +214,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void MarriedSeparate_Biweekly_UsesSingleStandardDeduction()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DC,
@@ -248,7 +248,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void HeadOfHousehold_Semimonthly_AppliesExtraWithholding()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DC,
@@ -282,7 +282,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void PreTaxDeductions_ReduceTaxableWagesBeforeAnnualization()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DC,
@@ -318,7 +318,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void Allowances_ReduceAnnualTaxableWages()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DC,
@@ -351,7 +351,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void LowWage_WithLargeAllowances_ClampsToZero()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DC,
@@ -378,7 +378,7 @@ public class DistrictOfColumbiaWithholdingCalculatorTest
     [Fact]
     public void Single_VeryHighIncome_AppliesTopBracket()
     {
-        var calc = new DistrictOfColumbiaWithholdingCalculator();
+        var calc = new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.DC,

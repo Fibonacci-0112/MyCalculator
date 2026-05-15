@@ -43,7 +43,7 @@ public class OregonWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsOregon()
     {
-        var calc = new OregonWithholdingCalculator();
+        var calc = new OregonWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.OR, calc.State);
     }
 
@@ -52,7 +52,7 @@ public class OregonWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsExpectedFields()
     {
-        var calc = new OregonWithholdingCalculator();
+        var calc = new OregonWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -64,7 +64,7 @@ public class OregonWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsIncludeHeadOfHousehold()
     {
-        var calc = new OregonWithholdingCalculator();
+        var calc = new OregonWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -428,7 +428,7 @@ public class OregonWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new OregonWithholdingCalculator();
+        var calc = new OregonWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues { ["FilingStatus"] = "InvalidStatus" };
 
         var errors = calc.Validate(values);
@@ -440,7 +440,7 @@ public class OregonWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAllowances_ReturnsError()
     {
-        var calc = new OregonWithholdingCalculator();
+        var calc = new OregonWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -456,7 +456,7 @@ public class OregonWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new OregonWithholdingCalculator();
+        var calc = new OregonWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -472,7 +472,7 @@ public class OregonWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidInputs_ReturnsNoErrors()
     {
-        var calc = new OregonWithholdingCalculator();
+        var calc = new OregonWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Married",
@@ -488,7 +488,7 @@ public class OregonWithholdingCalculatorTest
     [Fact]
     public void Validate_AllFilingStatuses_AreAccepted()
     {
-        var calc = new OregonWithholdingCalculator();
+        var calc = new OregonWithholdingCalculator(TestSchemas.Provider);
 
         foreach (var status in new[] { "Single", "Married", "Head of Household" })
         {
@@ -507,7 +507,7 @@ public class OregonWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new OregonWithholdingCalculator();
+        var calc = new OregonWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.OR,
             GrossWages: GrossWages,

@@ -52,7 +52,7 @@ public sealed class SelfEmploymentInput
 
     /// <summary>
     /// Dynamic state-specific input values populated by the UI from the
-    /// calculator's <see cref="IStateWithholdingCalculator.GetInputSchema"/>.
+    /// state's schema (see <see cref="IStateSchemaProvider.GetSchema"/>).
     /// </summary>
     public StateInputValues? StateInputValues { get; init; }
 

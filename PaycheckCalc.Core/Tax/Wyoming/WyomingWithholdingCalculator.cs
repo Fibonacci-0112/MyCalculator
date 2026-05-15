@@ -23,12 +23,6 @@ public sealed class WyomingWithholdingCalculator : IStateWithholdingCalculator
     public UsState State => UsState.WY;
 
     /// <summary>
-    /// Wyoming has no income tax and no employee-paid payroll assessments,
-    /// so no state-specific input fields are required.
-    /// </summary>
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => [];
-
-    /// <summary>
     /// No required fields — validation always passes.
     /// </summary>
     public IReadOnlyList<string> Validate(StateInputValues values) => [];

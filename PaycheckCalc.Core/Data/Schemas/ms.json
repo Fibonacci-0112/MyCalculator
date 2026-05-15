@@ -1,0 +1,15 @@
+{
+  "state": "MS",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "89-350 Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married", "Head of Household"]
+    },
+    { "key": "Dependents", "label": "Dependents (Line 6)", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

@@ -32,7 +32,7 @@ public class VirginiaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsVirginia()
     {
-        var calc = new VirginiaWithholdingCalculator();
+        var calc = new VirginiaWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.VA, calc.State);
     }
 
@@ -41,7 +41,7 @@ public class VirginiaWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Exemptions_AdditionalWithholding()
     {
-        var calc = new VirginiaWithholdingCalculator();
+        var calc = new VirginiaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -53,7 +53,7 @@ public class VirginiaWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsIncludeHeadOfHousehold()
     {
-        var calc = new VirginiaWithholdingCalculator();
+        var calc = new VirginiaWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -72,7 +72,7 @@ public class VirginiaWithholdingCalculatorTest
     [InlineData("Head of Household")]
     public void Validate_ValidFilingStatus_ReturnsNoErrors(string status)
     {
-        var calc = new VirginiaWithholdingCalculator();
+        var calc = new VirginiaWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = status });
         Assert.Empty(errors);
     }
@@ -80,7 +80,7 @@ public class VirginiaWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new VirginiaWithholdingCalculator();
+        var calc = new VirginiaWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Invalid" });
         Assert.Single(errors);
     }
@@ -88,7 +88,7 @@ public class VirginiaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeExemptions_ReturnsError()
     {
-        var calc = new VirginiaWithholdingCalculator();
+        var calc = new VirginiaWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -100,7 +100,7 @@ public class VirginiaWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new VirginiaWithholdingCalculator();
+        var calc = new VirginiaWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -368,7 +368,7 @@ public class VirginiaWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new VirginiaWithholdingCalculator();
+        var calc = new VirginiaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.VA,
             GrossWages: GrossWages,

@@ -44,34 +44,7 @@ public sealed class IndianaWithholdingCalculator : IStateWithholdingCalculator
     /// <summary>Annual value of one WH-4 Line 4 additional dependent exemption (2023+).</summary>
     private const decimal DependentExemptionAmount = 3_000m;
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "Exemptions",
-            Label = "WH-4 Exemptions",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "DependentExemptions",
-            Label = "Additional Dependent Exemptions",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
     public UsState State => UsState.IN;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values)
     {

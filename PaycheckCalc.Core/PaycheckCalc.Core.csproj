@@ -47,6 +47,9 @@
     <None Include="Data\md_county_surtax_2026.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\Schemas\*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <!-- net11.0-only packages (preview package, QuestPDF PDF rendering) -->

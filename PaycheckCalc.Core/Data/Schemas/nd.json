@@ -1,0 +1,14 @@
+{
+  "state": "ND",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "ND Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married", "Head of Household"]
+    },
+    { "key": "AdditionalWithholding", "label": "Additional Withholding", "type": "Decimal", "default": 0 }
+  ]
+}

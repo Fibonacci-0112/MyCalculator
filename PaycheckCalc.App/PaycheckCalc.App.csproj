@@ -37,6 +37,7 @@
 	<MauiAsset Include="..\PaycheckCalc.Core\Data\oh_rita_2026.json" LogicalName="oh_rita_2026.json" />
 	<MauiAsset Include="..\PaycheckCalc.Core\Data\oh_cca_2026.json" LogicalName="oh_cca_2026.json" />
 	<MauiAsset Include="..\PaycheckCalc.Core\Data\md_county_surtax_2026.json" LogicalName="md_county_surtax_2026.json" />
+	<MauiAsset Include="..\PaycheckCalc.Core\Data\Schemas\*.json" LogicalName="schemas\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

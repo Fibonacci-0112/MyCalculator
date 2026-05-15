@@ -38,13 +38,13 @@ public class AnnualStateTaxCalculatorTest
         foreach (var (state, config) in StateTaxConfigs2026.Configs)
         {
             if (state == UsState.UT)
-                registry.Register(new PercentageMethodWithholdingAdapter(state, config));
+                registry.Register(new PercentageMethodWithholdingAdapter(state, config, TestSchemas.Provider));
         }
 
         // Georgia — dedicated calculator (flat 5.19%, $12,000 / $24,000 std
         // deductions, $4,000 dependent allowance) per the 2026 Employer's
         // Tax Guide.
-        registry.Register(new GeorgiaWithholdingCalculator());
+        registry.Register(new GeorgiaWithholdingCalculator(TestSchemas.Provider));
 
         return registry;
     }

@@ -25,34 +25,7 @@ public sealed class IllinoisWithholdingCalculator : IStateWithholdingCalculator
     /// <summary>Annual exemption per additional allowance (IL-W-4 Line 2).</summary>
     private const decimal AdditionalAllowanceAmount = 1_000m;
 
-    private static readonly IReadOnlyList<StateFieldDefinition> Schema =
-    [
-        new()
-        {
-            Key = "BasicAllowances",
-            Label = "Basic Allowances",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalAllowances",
-            Label = "Additional Allowances",
-            FieldType = StateFieldType.Integer,
-            DefaultValue = 0
-        },
-        new()
-        {
-            Key = "AdditionalWithholding",
-            Label = "Extra Withholding",
-            FieldType = StateFieldType.Decimal,
-            DefaultValue = 0m
-        }
-    ];
-
     public UsState State => UsState.IL;
-
-    public IReadOnlyList<StateFieldDefinition> GetInputSchema() => Schema;
 
     public IReadOnlyList<string> Validate(StateInputValues values) => [];
 

@@ -10,7 +10,7 @@ public class KansasWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsKansas()
     {
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.KS, calc.State);
     }
 
@@ -19,7 +19,7 @@ public class KansasWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus()
     {
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "FilingStatus");
@@ -35,7 +35,7 @@ public class KansasWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsAllowances()
     {
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "Allowances");
@@ -47,7 +47,7 @@ public class KansasWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsExtraWithholding()
     {
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         var field = Assert.Single(schema, f => f.Key == "AdditionalWithholding");
@@ -61,7 +61,7 @@ public class KansasWithholdingCalculatorTest
     [Fact]
     public void Validate_DefaultValues_ReturnsEmpty()
     {
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -73,7 +73,7 @@ public class KansasWithholdingCalculatorTest
     [Fact]
     public void Validate_MarriedStatus_ReturnsEmpty()
     {
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Married" });
         Assert.Empty(errors);
     }
@@ -81,7 +81,7 @@ public class KansasWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "HeadOfHousehold" });
         Assert.Contains(errors, e => e.Contains("Filing Status", StringComparison.OrdinalIgnoreCase));
     }
@@ -89,7 +89,7 @@ public class KansasWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAllowances_ReturnsError()
     {
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -108,7 +108,7 @@ public class KansasWithholdingCalculatorTest
         // Lower bracket:  23,000 × 5.20% = 1,196.00
         // Upper bracket: 103,395 × 5.58% = 5,769.441
         // Annual tax = 6,965.441 ÷ 26 = 267.90157… → rounds to 267.90
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.KS,
@@ -129,7 +129,7 @@ public class KansasWithholdingCalculatorTest
         // $800 biweekly, Single, no allowances.
         // Annual = 800 × 26 = 20,800 − 3,605 = 17,195 (< 23,000 threshold).
         // Tax = 17,195 × 5.20% = 894.14 ÷ 26 = 34.39384… → rounds to 34.39
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.KS,
@@ -151,7 +151,7 @@ public class KansasWithholdingCalculatorTest
         // Annual = 130,000 − 3,605 − 2,250 = 124,145.
         // Lower: 23,000 × 5.20% = 1,196.00; Upper: 101,145 × 5.58% = 5,643.891
         // Annual tax = 6,839.891 ÷ 26 = 263.07273… → rounds to 263.07
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.KS,
@@ -179,7 +179,7 @@ public class KansasWithholdingCalculatorTest
         // Annual = 6,000 × 12 = 72,000 − 8,240 − 4,500 = 59,260.
         // Lower: 46,000 × 5.20% = 2,392.00; Upper: 13,260 × 5.58% = 739.908
         // Annual tax = 3,131.908 ÷ 12 = 260.99233… → rounds to 260.99
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.KS,
@@ -205,7 +205,7 @@ public class KansasWithholdingCalculatorTest
         // Annual wages = 80,000 − 3,605 = 76,395.
         // Lower: 23,000 × 5.20% = 1,196.00; Upper: 53,395 × 5.58% = 2,979.441
         // Annual tax = 4,175.441 ÷ 1 = 4,175.441 → rounds to 4,175.44
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.KS,
@@ -231,7 +231,7 @@ public class KansasWithholdingCalculatorTest
         // Lower: 46,000 × 5.20% = 2,392; Upper: 29,760 × 5.58% = 1,660.608
         // Annual tax = 4,052.608 ÷ 24 = 168.858666… → rounds to 168.86
         // Total = 168.86 + 30 = 198.86
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.KS,
@@ -254,7 +254,7 @@ public class KansasWithholdingCalculatorTest
     [Fact]
     public void PreTaxDeductionsExceedGross_TaxableWagesFloorAtZero()
     {
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.KS,
@@ -278,7 +278,7 @@ public class KansasWithholdingCalculatorTest
         // $5,000 biweekly, Single, no allow, $50 extra.
         // Base = 267.90 (from Biweekly_Single_NoAllowances_IncomeBothBrackets).
         // Total = 267.90 + 50 = 317.90
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.KS,
@@ -304,7 +304,7 @@ public class KansasWithholdingCalculatorTest
         // $100 weekly, Married, 10 allowances.
         // Annual = 100 × 52 = 5,200 − 8,240 = negative → 0.
         // Also subtract 10 × 2,250 = 22,500 (already zero anyway).
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.KS,
@@ -326,7 +326,7 @@ public class KansasWithholdingCalculatorTest
     [Fact]
     public void ZeroGrossWages_ReturnsZeroWithholding()
     {
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.KS,
@@ -346,7 +346,7 @@ public class KansasWithholdingCalculatorTest
     [Fact]
     public void NoDisabilityInsurance()
     {
-        var calc = new KansasWithholdingCalculator();
+        var calc = new KansasWithholdingCalculator(TestSchemas.Provider);
 
         var context = new CommonWithholdingContext(
             UsState.KS,

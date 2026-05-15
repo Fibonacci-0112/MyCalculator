@@ -36,7 +36,7 @@ public class VermontWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsVermont()
     {
-        var calc = new VermontWithholdingCalculator();
+        var calc = new VermontWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.VT, calc.State);
     }
 
@@ -45,7 +45,7 @@ public class VermontWithholdingCalculatorTest
     [Fact]
     public void Schema_ContainsFilingStatus_Allowances_AdditionalWithholding()
     {
-        var calc = new VermontWithholdingCalculator();
+        var calc = new VermontWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -57,7 +57,7 @@ public class VermontWithholdingCalculatorTest
     [Fact]
     public void Schema_FilingStatus_DefaultsSingle_OptionsIncludeHeadOfHousehold()
     {
-        var calc = new VermontWithholdingCalculator();
+        var calc = new VermontWithholdingCalculator(TestSchemas.Provider);
         var field = Assert.Single(calc.GetInputSchema(), f => f.Key == "FilingStatus");
 
         Assert.Equal("Single", field.DefaultValue);
@@ -73,7 +73,7 @@ public class VermontWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidFilingStatus_ReturnsNoErrors()
     {
-        var calc = new VermontWithholdingCalculator();
+        var calc = new VermontWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Single" });
         Assert.Empty(errors);
     }
@@ -81,7 +81,7 @@ public class VermontWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new VermontWithholdingCalculator();
+        var calc = new VermontWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Invalid" });
         Assert.Single(errors);
     }
@@ -89,7 +89,7 @@ public class VermontWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAllowances_ReturnsError()
     {
-        var calc = new VermontWithholdingCalculator();
+        var calc = new VermontWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -101,7 +101,7 @@ public class VermontWithholdingCalculatorTest
     [Fact]
     public void Validate_NegativeAdditionalWithholding_ReturnsError()
     {
-        var calc = new VermontWithholdingCalculator();
+        var calc = new VermontWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -362,7 +362,7 @@ public class VermontWithholdingCalculatorTest
         decimal additionalWithholding = 0m,
         decimal preTaxDeductions = 0m)
     {
-        var calc = new VermontWithholdingCalculator();
+        var calc = new VermontWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(
             UsState.VT,
             GrossWages: GrossWages,

@@ -228,7 +228,7 @@ public class PercentageMethodWithholdingAdapterTest
     [Fact]
     public void NorthCarolina_Married_DedicatedCalculator()
     {
-        var calc = new NorthCarolinaWithholdingCalculator();
+        var calc = new NorthCarolinaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(UsState.NC, 6000m, PayFrequency.Monthly, 2026);
         var values = new StateInputValues
         {
@@ -289,7 +289,7 @@ public class PercentageMethodWithholdingAdapterTest
     {
         foreach (var (state, config) in StateTaxConfigs2026.Configs)
         {
-            var adapter = new PercentageMethodWithholdingAdapter(state, config);
+            var adapter = new PercentageMethodWithholdingAdapter(state, config, TestSchemas.Provider);
             var context = new CommonWithholdingContext(state, 5000m, PayFrequency.Biweekly, 2026);
             var values = new StateInputValues
             {
@@ -308,7 +308,7 @@ public class PercentageMethodWithholdingAdapterTest
     private static PercentageMethodWithholdingAdapter CreateAdapter(UsState state)
     {
         var config = StateTaxConfigs2026.Configs[state];
-        return new PercentageMethodWithholdingAdapter(state, config);
+        return new PercentageMethodWithholdingAdapter(state, config, TestSchemas.Provider);
     }
 }
 
@@ -319,14 +319,14 @@ public class AlabamaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsAlabama()
     {
-        var calc = new AlabamaWithholdingCalculator();
+        var calc = new AlabamaWithholdingCalculator(TestSchemas.Provider);
         Assert.Equal(UsState.AL, calc.State);
     }
 
     [Fact]
     public void Schema_HasThreeFields()
     {
-        var calc = new AlabamaWithholdingCalculator();
+        var calc = new AlabamaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -341,7 +341,7 @@ public class AlabamaWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidFilingStatus_ReturnsNoErrors()
     {
-        var calc = new AlabamaWithholdingCalculator();
+        var calc = new AlabamaWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Single" });
         Assert.Empty(errors);
     }
@@ -349,7 +349,7 @@ public class AlabamaWithholdingCalculatorTest
     [Fact]
     public void Validate_InvalidFilingStatus_ReturnsError()
     {
-        var calc = new AlabamaWithholdingCalculator();
+        var calc = new AlabamaWithholdingCalculator(TestSchemas.Provider);
         var errors = calc.Validate(new StateInputValues { ["FilingStatus"] = "Invalid" });
         Assert.Single(errors);
     }
@@ -357,7 +357,7 @@ public class AlabamaWithholdingCalculatorTest
     [Fact]
     public void SingleFiling_ProducesPositiveWithholding()
     {
-        var calc = new AlabamaWithholdingCalculator();
+        var calc = new AlabamaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(UsState.AL, 3000m, PayFrequency.Biweekly, 2026,
             FederalWithholdingPerPeriod: 200m);
         var values = new StateInputValues
@@ -376,7 +376,7 @@ public class AlabamaWithholdingCalculatorTest
     [Fact]
     public void ZeroFiling_ProducesWithholding()
     {
-        var calc = new AlabamaWithholdingCalculator();
+        var calc = new AlabamaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(UsState.AL, 3000m, PayFrequency.Biweekly, 2026);
         var values = new StateInputValues
         {
@@ -393,7 +393,7 @@ public class AlabamaWithholdingCalculatorTest
     [Fact]
     public void MarriedFilingJointly_WithDependents_ReducesTax()
     {
-        var calc = new AlabamaWithholdingCalculator();
+        var calc = new AlabamaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(UsState.AL, 3000m, PayFrequency.Biweekly, 2026);
 
         var withoutDeps = calc.Calculate(context, new StateInputValues
@@ -417,7 +417,7 @@ public class AlabamaWithholdingCalculatorTest
     [Fact]
     public void AdditionalWithholding_IsAdded()
     {
-        var calc = new AlabamaWithholdingCalculator();
+        var calc = new AlabamaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(UsState.AL, 3000m, PayFrequency.Biweekly, 2026);
         var baseValues = new StateInputValues
         {
@@ -441,7 +441,7 @@ public class AlabamaWithholdingCalculatorTest
     [Fact]
     public void AllFiveFilingStatuses_ProduceResults()
     {
-        var calc = new AlabamaWithholdingCalculator();
+        var calc = new AlabamaWithholdingCalculator(TestSchemas.Provider);
         var context = new CommonWithholdingContext(UsState.AL, 3000m, PayFrequency.Monthly, 2026);
 
         string[] statuses = ["0", "Single", "Married Filing Jointly", "Married Filing Separately", "Head of Family"];
@@ -460,7 +460,7 @@ public class AlabamaWithholdingCalculatorTest
     [Fact]
     public void FederalWithholding_ReadFromContext_ReducesStateTax()
     {
-        var calc = new AlabamaWithholdingCalculator();
+        var calc = new AlabamaWithholdingCalculator(TestSchemas.Provider);
         var values = new StateInputValues
         {
             ["FilingStatus"] = "Single",
@@ -483,7 +483,7 @@ public class AlabamaWithholdingCalculatorTest
     [Fact]
     public void Schema_DoesNotIncludeFederalWithholding()
     {
-        var calc = new AlabamaWithholdingCalculator();
+        var calc = new AlabamaWithholdingCalculator(TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.DoesNotContain(schema, f => f.Key == "FederalWithholding");
@@ -502,14 +502,14 @@ public class OklahomaWithholdingCalculatorTest
     [Fact]
     public void State_ReturnsOklahoma()
     {
-        var calc = new OklahomaWithholdingCalculator(LoadOkCalculator());
+        var calc = new OklahomaWithholdingCalculator(LoadOkCalculator(), TestSchemas.Provider);
         Assert.Equal(UsState.OK, calc.State);
     }
 
     [Fact]
     public void Schema_HasThreeFields()
     {
-        var calc = new OklahomaWithholdingCalculator(LoadOkCalculator());
+        var calc = new OklahomaWithholdingCalculator(LoadOkCalculator(), TestSchemas.Provider);
         var schema = calc.GetInputSchema();
 
         Assert.Equal(3, schema.Count);
@@ -521,7 +521,7 @@ public class OklahomaWithholdingCalculatorTest
     [Fact]
     public void SemiMonthly_Married_TwoAllowances_MatchesLegacy()
     {
-        var calc = new OklahomaWithholdingCalculator(LoadOkCalculator());
+        var calc = new OklahomaWithholdingCalculator(LoadOkCalculator(), TestSchemas.Provider);
         var context = new CommonWithholdingContext(UsState.OK, 1825m, PayFrequency.Semimonthly, 2026);
         var values = new StateInputValues
         {
@@ -538,14 +538,14 @@ public class OklahomaWithholdingCalculatorTest
     [Fact]
     public void Validate_ValidStatus_ReturnsNoErrors()
     {
-        var calc = new OklahomaWithholdingCalculator(LoadOkCalculator());
+        var calc = new OklahomaWithholdingCalculator(LoadOkCalculator(), TestSchemas.Provider);
         Assert.Empty(calc.Validate(new StateInputValues { ["FilingStatus"] = "Married" }));
     }
 
     [Fact]
     public void Validate_InvalidStatus_ReturnsError()
     {
-        var calc = new OklahomaWithholdingCalculator(LoadOkCalculator());
+        var calc = new OklahomaWithholdingCalculator(LoadOkCalculator(), TestSchemas.Provider);
         Assert.Single(calc.Validate(new StateInputValues { ["FilingStatus"] = "Bad" }));
     }
 }
@@ -720,7 +720,7 @@ public class FullRegistryIntegrationTest
     {
         var registry = new StateCalculatorRegistry();
 
-        registry.Register(new AlabamaWithholdingCalculator());
+        registry.Register(new AlabamaWithholdingCalculator(TestSchemas.Provider));
 
         registry.Register(new ArizonaWithholdingCalculator());
 
@@ -730,11 +730,11 @@ public class FullRegistryIntegrationTest
 
         var caDataPath = Path.Combine(AppContext.BaseDirectory, "ca_method_b_2026.json");
         var caJson = File.ReadAllText(caDataPath);
-        registry.Register(new CaliforniaWithholdingCalculator(new CaliforniaPercentageCalculator(caJson)));
+        registry.Register(new CaliforniaWithholdingCalculator(new CaliforniaPercentageCalculator(caJson), TestSchemas.Provider));
 
         var okDataPath = Path.Combine(AppContext.BaseDirectory, "ok_ow2_2026_percentage.json");
         var okJson = File.ReadAllText(okDataPath);
-        registry.Register(new OklahomaWithholdingCalculator(new OklahomaOw2PercentageCalculator(okJson)));
+        registry.Register(new OklahomaWithholdingCalculator(new OklahomaOw2PercentageCalculator(okJson), TestSchemas.Provider));
 
         registry.Register(new PennsylvaniaWithholdingCalculator());
 
@@ -744,50 +744,50 @@ public class FullRegistryIntegrationTest
 
         var coDataPath = Path.Combine(AppContext.BaseDirectory, "co_dr0004_2026.json");
         var coJson = File.ReadAllText(coDataPath);
-        registry.Register(new ColoradoWithholdingCalculator(coJson));
+        registry.Register(new ColoradoWithholdingCalculator(coJson, TestSchemas.Provider));
 
         var ctDataPath = Path.Combine(AppContext.BaseDirectory, "connecticut_withholding_2026.json");
         var ctJson = File.ReadAllText(ctDataPath);
-        registry.Register(new ConnecticutWithholdingCalculator(ctJson));
+        registry.Register(new ConnecticutWithholdingCalculator(ctJson, TestSchemas.Provider));
 
-        registry.Register(new DelawareWithholdingCalculator());
+        registry.Register(new DelawareWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new DistrictOfColumbiaWithholdingCalculator());
+        registry.Register(new DistrictOfColumbiaWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new GeorgiaWithholdingCalculator());
+        registry.Register(new GeorgiaWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new HawaiiWithholdingCalculator());
+        registry.Register(new HawaiiWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new IdahoWithholdingCalculator());
+        registry.Register(new IdahoWithholdingCalculator(TestSchemas.Provider));
 
         registry.Register(new IowaWithholdingCalculator());
 
-        registry.Register(new KansasWithholdingCalculator());
+        registry.Register(new KansasWithholdingCalculator(TestSchemas.Provider));
 
         registry.Register(new KentuckyWithholdingCalculator());
-        registry.Register(new LouisianaWithholdingCalculator());
+        registry.Register(new LouisianaWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new MaineWithholdingCalculator());
+        registry.Register(new MaineWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new MarylandWithholdingCalculator());
+        registry.Register(new MarylandWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new MassachusettsWithholdingCalculator());
+        registry.Register(new MassachusettsWithholdingCalculator(TestSchemas.Provider));
 
         registry.Register(new MichiganWithholdingCalculator());
 
-        registry.Register(new MinnesotaWithholdingCalculator());
+        registry.Register(new MinnesotaWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new MississippiWithholdingCalculator());
+        registry.Register(new MississippiWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new MissouriWithholdingCalculator());
+        registry.Register(new MissouriWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new MontanaWithholdingCalculator());
+        registry.Register(new MontanaWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new NebraskaWithholdingCalculator());
+        registry.Register(new NebraskaWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new NewJerseyWithholdingCalculator());
+        registry.Register(new NewJerseyWithholdingCalculator(TestSchemas.Provider));
 
-        registry.Register(new NewMexicoWithholdingCalculator());
+        registry.Register(new NewMexicoWithholdingCalculator(TestSchemas.Provider));
 
         registry.Register(new WashingtonWithholdingCalculator());
 
@@ -798,7 +798,7 @@ public class FullRegistryIntegrationTest
             registry.Register(new NoIncomeTaxWithholdingAdapter(state));
 
         foreach (var (state, config) in StateTaxConfigs2026.Configs)
-            registry.Register(new PercentageMethodWithholdingAdapter(state, config));
+            registry.Register(new PercentageMethodWithholdingAdapter(state, config, TestSchemas.Provider));
 
         return registry;
     }

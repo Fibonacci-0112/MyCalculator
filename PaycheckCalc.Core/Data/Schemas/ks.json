@@ -1,0 +1,15 @@
+{
+  "state": "KS",
+  "fields": [
+    {
+      "key": "FilingStatus",
+      "label": "Filing Status",
+      "type": "Picker",
+      "required": true,
+      "default": "Single",
+      "options": ["Single", "Married"]
+    },
+    { "key": "Allowances", "label": "K-4 Allowances", "type": "Integer", "default": 0 },
+    { "key": "AdditionalWithholding", "label": "Extra Withholding", "type": "Decimal", "default": 0 }
+  ]
+}
