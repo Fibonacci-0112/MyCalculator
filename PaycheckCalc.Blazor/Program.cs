@@ -17,11 +17,13 @@ builder.Services.AddPaycheckCalcCore(new WwwrootTaxDataReader());
 // ── Per-user (per-circuit) in-memory calculator session shared by pages ─────
 builder.Services.AddScoped<CalculatorSessionState>();
 builder.Services.AddScoped<SelfEmploymentSessionState>();
+builder.Services.AddScoped<AnnualTaxSessionState>();
 
 // ── Saved-paychecks persistence backed by browser localStorage via JS interop ─
 // Scoped because IJSRuntime is scoped per circuit; the repository's in-memory
 // cache must match a single browser's localStorage view.
 builder.Services.AddScoped<IPaycheckRepository, LocalStoragePaycheckRepository>();
+builder.Services.AddScoped<IAnnualScenarioRepository, LocalStorageAnnualScenarioRepository>();
 
 var app = builder.Build();
 
