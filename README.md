@@ -20,7 +20,7 @@ A cross-platform paycheck calculator that computes net pay, tax withholdings, an
 - **Annual Form 1040 Estimation** — Orchestrates full-year federal tax estimates using 2026 Rev. Proc. 2025-32 brackets and standard deductions, Schedule 1 adjustments, Child Tax Credit, Form 8863 education credits, Form 8880 saver's credit, and Form 8960 Net Investment Income Tax.
 - **Quarterly Estimated Taxes** — Form 1040-ES quarterly estimate calculator and a per-period withholding-suggestion calculator for closing projected year-end balances.
 - **Address & Jurisdiction Lookup** — Optional Google Maps geocoding + jurisdiction resolver maps a home/work address to the applicable state and local tax jurisdictions.
-- **Export Results** — Exports per-period paycheck results to CSV or PDF (powered by QuestPDF) and shares via the native OS share sheet.
+- **Export Results** — Exports per-period paycheck results and self-employment / Schedule SE results to CSV or PDF (PDF powered by QuestPDF) and shares via the native OS share sheet.
 - **Results Visualization** — Doughnut chart breakdown of gross pay by category (federal tax, state tax, Social Security, Medicare, net pay).
 - **Side-by-Side Comparison** — Save a snapshot of one calculation and compare it against the current inputs.
 - **Saved Paychecks** — Persist named paycheck calculations to local JSON (MAUI) or browser `localStorage` (Blazor), reload them into the calculator, and manage saved entries from a dedicated page.
@@ -31,18 +31,29 @@ A cross-platform paycheck calculator that computes net pay, tax withholdings, an
 ```
 PaycheckCalc.slnx
 ├── PaycheckCalc.App/          # .NET MAUI frontend (Android & Windows)
-│   ├── Views/                 # XAML pages (Inputs, Results, Compare, Saved Paychecks, Self-Employment,
-│   │                          #   Annual Projection, Jobs & YTD, Other Income & Adjustments,
-│   │                          #   Credits, Quarterly Estimates, What-If, Annual Results)
-│   ├── ViewModels/            # MVVM view models (Calculator, Compare, SavedPaychecks, SelfEmployment,
-│   │                          #   AnnualTax, AnnualProjection, JobsAndYtd, OtherIncomeAdjustments,
-│   │                          #   Credits, QuarterlyEstimates, WhatIf, StateField, DeductionItem)
+│   ├── Views/                 # XAML pages (Dashboard, Inputs and its per-tab pages
+│   │                          #   PayHours/Federal/State/Deductions, Results, Compare,
+│   │                          #   SavedPaychecks, SelfEmployment, SelfEmploymentResults,
+│   │                          #   AnnualProjection, JobsAndYtd, OtherIncomeAdjustments,
+│   │                          #   Credits, QuarterlyEstimates, WhatIf, AnnualTaxResults)
+│   ├── ViewModels/            # MVVM view models (Dashboard, Calculator, Compare, SavedPaycheck,
+│   │                          #   SavedPaychecks, SelfEmployment, AnnualTax, AnnualProjection,
+│   │                          #   JobsAndYtd, W2JobItem, OtherIncomeAdjustments, Credits,
+│   │                          #   QuarterlyEstimates, WhatIf, StateField, DeductionItem)
 │   ├── Mappers/               # Domain-to-UI mappers (ResultCard, AnnualProjection, Scenario,
-│   │                          #   SavedPaycheck, PaycheckInput, AnnualTaxInput, SelfEmployment)
-│   ├── Models/                # UI presentation models (ResultCardModel, AnnualProjectionModel, ScenarioSnapshot)
+│   │                          #   SavedPaycheck, PaycheckInput, PaycheckInputRestorer,
+│   │                          #   AnnualTaxInput, AnnualTaxResult, AnnualScenario,
+│   │                          #   JobsAndYtd, OtherIncomeAdjustments, Credits,
+│   │                          #   QuarterlyEstimatesInput, QuarterlyEstimatesResult,
+│   │                          #   SelfEmploymentInput, SelfEmploymentResult)
+│   ├── Models/                # UI presentation models (ResultCardModel, AnnualProjectionModel,
+│   │                          #   AnnualTaxResultModel, ScenarioSnapshot, JobsYtdSummaryModel,
+│   │                          #   QuarterlyEstimatesCardModel, SelfEmploymentResultModel,
+│   │                          #   WhatIfComparisonModel, SavedAnnualScenarioItemViewModel)
 │   ├── Controls/              # Custom controls (DoughnutChartDrawable)
 │   ├── Behaviors/             # Input formatting behaviors
-│   ├── Helpers/               # Enum display helpers
+│   ├── Helpers/               # Enum display helpers and XAML value converters
+│   │                          #   (GreaterThanZero, InvertBool, NonEmptyString)
 │   ├── Services/              # AnnualTaxSession, ComparisonSession, geocoding/jurisdiction services
 │   ├── Storage/               # JsonPaycheckRepository, JsonAnnualScenarioRepository (local JSON persistence)
 │   └── MauiProgram.cs         # DI configuration & app startup
@@ -60,12 +71,19 @@ PaycheckCalc.slnx
 │   │                          #   CalculationScenario, SavedPaycheck, SelfEmploymentInput,
 │   │                          #   TaxYearProfile, AnnualTaxResult, W2JobInput, Credits & other-income inputs,
 │   │                          #   WithholdingSuggestion*, QuarterlyEstimatesResult, SavedAnnualScenario
-│   ├── Pay/                   # PayCalculator (main orchestrator), AnnualProjectionCalculator
-│   ├── Export/                # CsvPaycheckExporter, PdfPaycheckExporter (QuestPDF)
+│   ├── Pay/                   # PayCalculator (main orchestrator), AnnualProjectionCalculator,
+│   │                          #   YtdSummaryCalculator
+│   ├── Explanation/           # "Show Your Work" engine (PaycheckExplanation, LineExplanation,
+│   │                          #   ExplanationStep, ExplanationLineKey) — step-by-step
+│   │                          #   walkthroughs of every line on a paycheck
+│   ├── Export/                # CsvPaycheckExporter, PdfPaycheckExporter (QuestPDF),
+│   │                          #   CsvSelfEmploymentExporter, PdfSelfEmploymentExporter (QuestPDF)
 │   ├── Geocoding/             # Address input, IGeocodingService, GeocodeResult
 │   ├── Storage/               # IPaycheckRepository, IAnnualScenarioRepository
 │   ├── Data/                  # JSON tax tables (IRS 15-T, Federal 1040, OK OW-2, CA Method B, AR,
 │   │                          #   CO DR 0004, CT TPG-211, PA EIT, NYC, OH RITA/CCA, MD county surtax)
+│   │   └── Schemas/           # One JSON file per state (al.json … wy.json) declaring that
+│   │                          #   state's input schema for the schema-driven UI
 │   └── Tax/
 │       ├── Federal/           # IRS 15-T percentage calculator
 │       │   └── Annual/        # Form 1040 orchestrator, Federal 1040 brackets, Schedule 1,
@@ -77,12 +95,13 @@ PaycheckCalc.slnx
 │       ├── Local/             # Local (city/county/school district) plugin model + registry
 │       │   ├── Maryland/      # County surtax (JSON-backed)
 │       │   ├── NewYork/       # NYC withholding (JSON-backed)
-│       │   ├── Ohio/          # RITA + CCA (JSON-backed)
+│       │   ├── Ohio/          # OhioMunicipalCalculator covering RITA + CCA (JSON-backed)
 │       │   └── Pennsylvania/  # Act 32 EIT (JSON-backed) + LST flat head tax
 │       └── <State>/           # One folder per state (Alabama, Alaska, Arizona, … Wyoming)
 │                              #   each containing a dedicated IStateWithholdingCalculator
 │                              #   implementation for that state's withholding rules
 ├── PaycheckCalc.Tests/        # xUnit test suite
+│   └── Local/                 # Local-tax calculator and geocoding integration tests
 └── docs/                      # Class diagrams and documentation
 ```
 
@@ -186,15 +205,15 @@ PaycheckCalc also models a growing set of local / sub-state payroll taxes via an
 | Pennsylvania (Act 32) | `PaEitCalculator` | Earned Income Tax by municipality, JSON-backed rate table |
 | Pennsylvania LST | `PaLstCalculator` | Flat per-pay-period Local Services Tax (head tax) |
 | New York City | `NycWithholdingCalculator` | NYC resident personal income tax, JSON-backed |
-| Ohio (RITA) | `OhRitaCalculator` | Regional Income Tax Agency municipal rates, JSON-backed |
-| Ohio (CCA) | `OhCcaCalculator` | Central Collection Agency municipal rates, JSON-backed |
+| Ohio (RITA) | `OhioMunicipalCalculator` | Regional Income Tax Agency municipal rates, JSON-backed |
+| Ohio (CCA) | `OhioMunicipalCalculator` | Central Collection Agency municipal rates, JSON-backed (same calculator handles both rate tables) |
 | Maryland county surtax | `MdCountyCalculator` | County-level surtax paired with the MD state calculator, JSON-backed |
 
 Local taxes are additive: they subtract from net pay but do **not** reduce federal or state taxable wages.
 
 ## UI Overview
 
-The MAUI app groups its features under three flyout hubs. Each hub opens to a top tab strip containing its sub-pages, so end-of-year 1040 features stay hidden until the user explicitly opens the Annual Tax Planner.
+The MAUI app groups its features under four flyout hubs — **Dashboard** (a landing page with quick-action tiles for New Paycheck, Saved Paychecks, Self-Employment, and Annual Tax Planner), **Paycheck Calculator**, **Self-Employment**, and **Annual Tax Planner**. Each hub (except Dashboard, which is a single page) opens to a top tab strip containing its sub-pages, so end-of-year 1040 features stay hidden until the user explicitly opens the Annual Tax Planner.
 
 ### Paycheck Calculator
 
@@ -210,7 +229,7 @@ The MAUI app groups its features under three flyout hubs. Each hub opens to a to
 
 ### Annual Tax Planner
 
-Wizard-style sequence of Phase 8 tabs that share a single `AnnualTaxSession` and persist saved annual scenarios via `JsonAnnualScenarioRepository`:
+A top tab strip whose tabs share a single `AnnualTaxSession` and persist saved annual scenarios via `JsonAnnualScenarioRepository`:
 
 - **Jobs & YTD** — Multi-job income and year-to-date withholding inputs.
 - **Adjustments** — Other Income & Adjustments to gross income (Schedule 1).
