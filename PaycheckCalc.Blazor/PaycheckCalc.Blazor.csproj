@@ -18,6 +18,24 @@
   </ItemGroup>
 
   <!--
+    EF Core + ASP.NET Core Identity packages. Versions are pinned to the
+    .NET 11 preview that matches global.json's SDK pin
+    (11.0.100-preview.4.26230.115). If a build error reports that one of
+    these versions is not on NuGet, bump every entry below to the next
+    available preview/RC; they all version together.
+  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="11.0.0-preview.4.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="11.0.0-preview.4.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="11.0.0-preview.4.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="11.0.0-preview.4.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0-preview.4.*">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!--
     Link Core's JSON tax data tables into wwwroot/data/ so the server process
     can read them from a stable, framework-agnostic relative path at startup.
   -->

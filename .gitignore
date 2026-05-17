@@ -416,3 +416,9 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# SQLite database files created by the Blazor dev server at runtime
+PaycheckCalc.Blazor/*.db
+PaycheckCalc.Blazor/*.db-journal
+PaycheckCalc.Blazor/*.db-shm
+PaycheckCalc.Blazor/*.db-wal
