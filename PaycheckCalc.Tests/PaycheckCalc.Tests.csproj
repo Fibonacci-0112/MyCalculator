@@ -14,10 +14,23 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!--
+      EF Core + SQLite for the EfPaycheckRepository / EfAnnualScenarioRepository
+      tests. Pinned to the same preview as the rest of the EF/Identity stack
+      pulled in transitively from PaycheckCalc.Blazor.
+    -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="11.0.0-preview.4.*" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PaycheckCalc.Core\PaycheckCalc.Core.csproj" />
+    <!--
+      Tests reference Blazor to exercise EfPaycheckRepository, EfAnnualScenarioRepository,
+      EfSessionStateRepository, EfUserPreferencesRepository, and AppDbContext directly
+      against an in-memory SQLite database. This pulls in the Identity + ASP.NET Core
+      web dependencies, which is fine for testing.
+    -->
+    <ProjectReference Include="..\PaycheckCalc.Blazor\PaycheckCalc.Blazor.csproj" />
   </ItemGroup>
 
   <ItemGroup>
