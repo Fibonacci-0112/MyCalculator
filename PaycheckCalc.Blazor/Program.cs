@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PaycheckCalc.Blazor.Auth;
 using PaycheckCalc.Blazor.Components;
+using PaycheckCalc.Blazor.Components.Account;
 using PaycheckCalc.Blazor.Data;
 using PaycheckCalc.Blazor.Endpoints;
 using PaycheckCalc.Blazor.Services;
@@ -14,6 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 // ── Blazor Web App: Razor Components with interactive Server rendering ──────
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Surfaces the AuthenticationState cascade to every component so
+// <AuthorizeView> and [Authorize] work everywhere without per-page wiring.
+builder.Services.AddCascadingAuthenticationState();
 
 // ── PaycheckCalc.Core wiring (state/local/federal calculators, registries,
 //    schema provider, tax JSON tables). The JSON files live in wwwroot/data/,
@@ -90,32 +96,36 @@ builder.Services.AddAuthorization(options =>
 });
 
 // ── User-context resolution.
-//    HttpContextUserContext is the default (used by API endpoints).
-//    Blazor scoped components/services can request CircuitUserContext
-//    explicitly when they need it; in Phase 2 we'll wire CircuitUserContext
-//    as the IUserContext for component-side EF access.
+//    CompositeUserContext works in both Blazor circuit scopes (via
+//    AuthenticationStateProvider) and API endpoint scopes (via
+//    HttpContext.User). One implementation for both surfaces.
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<CircuitUserContext>();
-builder.Services.AddScoped<IUserContext, HttpContextUserContext>();
+builder.Services.AddScoped<IUserContext, CompositeUserContext>();
+
+// Replace Blazor Server's default AuthenticationStateProvider with one that
+// revalidates the cached identity against the Identity store every 30 min
+// — disabled / deleted users get signed out automatically.
+builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
 // ── Per-user (per-circuit) in-memory calculator session shared by pages ─────
 builder.Services.AddScoped<CalculatorSessionState>();
 builder.Services.AddScoped<SelfEmploymentSessionState>();
 builder.Services.AddScoped<AnnualTaxSessionState>();
 
-// ── Saved-paychecks persistence backed by browser localStorage via JS interop.
-//    Phase 1 leaves this in place; Phase 2 will swap to the EF repo and remove
-//    the LocalStorage* classes after the import flow ships.
-builder.Services.AddScoped<IPaycheckRepository, LocalStoragePaycheckRepository>();
-builder.Services.AddScoped<IAnnualScenarioRepository, LocalStorageAnnualScenarioRepository>();
+// Subscribes to AuthenticationStateChanged for the circuit and resets all
+// three session states when the authenticated user changes. Injected into
+// MainLayout to force instantiation on every circuit. The class for the
+// legacy browser-localStorage repos remains in Services/ until the Phase 5
+// importer ships — it's just not DI-registered anymore.
+builder.Services.AddScoped<SessionStateLifecycle>();
 
-// ── EF-backed repositories — registered as concrete types in Phase 1 so the
-//    new API endpoints can use them without disturbing the Blazor UI's
-//    existing IPaycheckRepository wiring.
-builder.Services.AddScoped<EfPaycheckRepository>();
-builder.Services.AddScoped<EfAnnualScenarioRepository>();
-builder.Services.AddScoped<EfSessionStateRepository>();
-builder.Services.AddScoped<EfUserPreferencesRepository>();
+// ── Per-user persistence (database is the source of truth). The
+//    LocalStorage* classes stay in Services/ until Phase 5's import flow
+//    has run; they're no longer DI-registered.
+builder.Services.AddScoped<IPaycheckRepository, EfPaycheckRepository>();
+builder.Services.AddScoped<IAnnualScenarioRepository, EfAnnualScenarioRepository>();
+builder.Services.AddScoped<ISessionStateRepository, EfSessionStateRepository>();
+builder.Services.AddScoped<IUserPreferencesRepository, EfUserPreferencesRepository>();
 
 var app = builder.Build();
 
@@ -148,6 +158,10 @@ app.MapPaycheckEndpoints();
 app.MapAnnualScenarioEndpoints();
 app.MapSessionEndpoints();
 app.MapPreferencesEndpoints();
+
+// ── Form-bound cookie auth handlers for the Blazor /account/login,
+//    /account/register, /account/logout, and external-provider buttons.
+app.MapAccountEndpoints();
 
 // ── Apply migrations on startup in development so the SQLite file is
 //    created and up to date without a manual `dotnet ef database update`.

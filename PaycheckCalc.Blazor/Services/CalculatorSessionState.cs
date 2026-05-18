@@ -115,6 +115,32 @@ public sealed class CalculatorSessionState
             .Select(d => d.ToDomain())
             .ToList(),
     };
+
+    /// <summary>
+    /// Clears all session fields back to defaults. Called by
+    /// <c>SessionStateLifecycle</c> when the authenticated user changes
+    /// inside a circuit so the previous user's W-4 / hourly rate / state
+    /// fields can never leak into the next user's view.
+    /// </summary>
+    public void Reset()
+    {
+        HourlyRate                    = 25m;
+        RegularHours                  = 80m;
+        OvertimeHours                 = 0m;
+        OvertimeMultiplier            = 1.5m;
+        Frequency                     = PayFrequency.Biweekly;
+        PaycheckNumber                = 1;
+        FederalFilingStatus           = FederalFilingStatus.SingleOrMarriedSeparately;
+        FederalStep2Checked           = false;
+        FederalStep3Credits           = 0m;
+        FederalStep4aOtherIncome      = 0m;
+        FederalStep4bDeductions       = 0m;
+        FederalStep4cExtraWithholding = 0m;
+        State                         = UsState.TX;
+        StateInputValues              = new StateInputValues();
+        Deductions.Clear();
+        LastResult                    = null;
+    }
 }
 
 /// <summary>

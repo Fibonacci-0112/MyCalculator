@@ -300,31 +300,42 @@ else
 }
 
 <!-- Save / Load -->
-<div class="card mb-3">
-    <div class="card-header"><strong>Save Scenario</strong></div>
-    <div class="card-body">
-        <div class="d-flex gap-2 align-items-center flex-wrap">
-            <input class="form-control" style="max-width: 280px;"
-                   placeholder="Scenario name"
-                   @bind="_saveName" />
-            <button class="btn btn-success" @onclick="SaveAsync" disabled="@_saving">
-                💾 @(_saving ? "Saving…" : (Session.LoadedScenarioId is null ? "Save as new" : "Overwrite"))
-            </button>
-            @if (_saveMessage is not null)
-            {
-                <span class="text-success small">@_saveMessage</span>
-            }
-        </div>
-        @if (Session.LoadedScenarioId is not null)
-        {
-            <div class="form-text mt-2">
-                Loaded scenario: <strong>@Session.LoadedScenarioName</strong>.
-                Save will overwrite this scenario; click "New Scenario" above to start fresh.
+<AuthorizeView>
+    <Authorized Context="auth">
+        <div class="card mb-3">
+            <div class="card-header"><strong>Save Scenario</strong></div>
+            <div class="card-body">
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <input class="form-control" style="max-width: 280px;"
+                           placeholder="Scenario name"
+                           @bind="_saveName" />
+                    <button class="btn btn-success" @onclick="SaveAsync" disabled="@_saving">
+                        💾 @(_saving ? "Saving…" : (Session.LoadedScenarioId is null ? "Save as new" : "Overwrite"))
+                    </button>
+                    @if (_saveMessage is not null)
+                    {
+                        <span class="text-success small">@_saveMessage</span>
+                    }
+                </div>
+                @if (Session.LoadedScenarioId is not null)
+                {
+                    <div class="form-text mt-2">
+                        Loaded scenario: <strong>@Session.LoadedScenarioName</strong>.
+                        Save will overwrite this scenario; click "New Scenario" above to start fresh.
+                    </div>
+                }
             </div>
-        }
-    </div>
-</div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="alert alert-info">
+            <a href="/account/login?returnUrl=/annual/results">Sign in</a> to save and reload this scenario across devices.
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
 
+<AuthorizeView>
+    <Authorized Context="auth">
 <div class="card mb-3">
     <div class="card-header"><strong>Saved Scenarios</strong></div>
     <div class="card-body p-0">
@@ -375,6 +386,8 @@ else
         }
     </div>
 </div>
+    </Authorized>
+</AuthorizeView>
 
 @code {
     private string _saveName = "";

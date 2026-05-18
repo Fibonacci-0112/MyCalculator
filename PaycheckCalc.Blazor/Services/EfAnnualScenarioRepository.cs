@@ -25,7 +25,12 @@ public sealed class EfAnnualScenarioRepository : IAnnualScenarioRepository
 
     public async Task<IReadOnlyList<SavedAnnualScenario>> GetAllAsync()
     {
-        var userId = await RequireUserIdAsync();
+        // Anonymous users get an empty list rather than an exception so the
+        // Annual Results page renders gracefully when logged out.
+        var userId = await _userContext.GetUserIdAsync();
+        if (string.IsNullOrEmpty(userId))
+            return Array.Empty<SavedAnnualScenario>();
+
         var entities = await _db.AnnualScenarios
             .AsNoTracking()
             .Where(s => s.UserId == userId)
@@ -36,7 +41,10 @@ public sealed class EfAnnualScenarioRepository : IAnnualScenarioRepository
 
     public async Task<SavedAnnualScenario?> GetByIdAsync(Guid id)
     {
-        var userId = await RequireUserIdAsync();
+        var userId = await _userContext.GetUserIdAsync();
+        if (string.IsNullOrEmpty(userId))
+            return null;
+
         var entity = await _db.AnnualScenarios
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.UserId == userId && s.Id == id);

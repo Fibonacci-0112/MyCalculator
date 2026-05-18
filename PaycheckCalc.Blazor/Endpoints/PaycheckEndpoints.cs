@@ -1,13 +1,12 @@
-using PaycheckCalc.Blazor.Services;
 using PaycheckCalc.Core.Models;
+using PaycheckCalc.Core.Storage;
 
 namespace PaycheckCalc.Blazor.Endpoints;
 
 /// <summary>
 /// Minimal API endpoints for saved-paycheck CRUD. Bound to
-/// <see cref="EfPaycheckRepository"/> explicitly (not <c>IPaycheckRepository</c>)
-/// because Phase 1 leaves the Blazor UI on the legacy localStorage repo —
-/// these endpoints are the API the MAUI client will consume.
+/// <see cref="IPaycheckRepository"/>; the Phase 2 DI swap points that at
+/// <c>EfPaycheckRepository</c>. The MAUI client consumes this surface.
 /// </summary>
 public static class PaycheckEndpoints
 {
@@ -17,16 +16,16 @@ public static class PaycheckEndpoints
             .WithTags("Paychecks")
             .RequireAuthorization();
 
-        group.MapGet("/", async (EfPaycheckRepository repo) =>
+        group.MapGet("/", async (IPaycheckRepository repo) =>
             Results.Ok(await repo.GetAllAsync()));
 
-        group.MapGet("/{id:guid}", async (Guid id, EfPaycheckRepository repo) =>
+        group.MapGet("/{id:guid}", async (Guid id, IPaycheckRepository repo) =>
         {
             var paycheck = await repo.GetByIdAsync(id);
             return paycheck is null ? Results.NotFound() : Results.Ok(paycheck);
         });
 
-        group.MapPut("/{id:guid}", async (Guid id, SavedPaycheck paycheck, EfPaycheckRepository repo) =>
+        group.MapPut("/{id:guid}", async (Guid id, SavedPaycheck paycheck, IPaycheckRepository repo) =>
         {
             if (paycheck.Id != id)
                 return Results.BadRequest("Body id does not match URL id.");
@@ -34,7 +33,7 @@ public static class PaycheckEndpoints
             return Results.NoContent();
         });
 
-        group.MapDelete("/{id:guid}", async (Guid id, EfPaycheckRepository repo) =>
+        group.MapDelete("/{id:guid}", async (Guid id, IPaycheckRepository repo) =>
         {
             await repo.DeleteAsync(id);
             return Results.NoContent();

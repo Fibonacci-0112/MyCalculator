@@ -277,13 +277,41 @@ public sealed class EfPaycheckRepositoryTest : IDisposable
         Assert.NotNull(stillThere);
     }
 
-    // ── Anonymous user is rejected ─────────────────────────────────────
+    // ── Anonymous user is read-only-empty, write-throws ─────────────────
 
     [Fact]
-    public async Task GetAllAsync_Throws_WhenAnonymous()
+    public async Task GetAllAsync_ReturnsEmpty_WhenAnonymous()
+    {
+        // Anonymous users see an empty list rather than an exception so the
+        // Home / Saved Paychecks pages render gracefully when logged out.
+        var repo = CreateRepo(userId: null);
+        var all = await repo.GetAllAsync();
+        Assert.Empty(all);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ReturnsNull_WhenAnonymous()
     {
         var repo = CreateRepo(userId: null);
-        await Assert.ThrowsAsync<InvalidOperationException>(() => repo.GetAllAsync());
+        var found = await repo.GetByIdAsync(Guid.NewGuid());
+        Assert.Null(found);
+    }
+
+    [Fact]
+    public async Task SaveAsync_Throws_WhenAnonymous()
+    {
+        // Writes still require auth — Save Paycheck in the UI must be gated.
+        var repo = CreateRepo(userId: null);
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => repo.SaveAsync(CreateSample("anon")));
+    }
+
+    [Fact]
+    public async Task DeleteAsync_Throws_WhenAnonymous()
+    {
+        var repo = CreateRepo(userId: null);
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => repo.DeleteAsync(Guid.NewGuid()));
     }
 
     // ── Helpers ────────────────────────────────────────────────

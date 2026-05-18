@@ -223,16 +223,26 @@ else
         <button class="btn btn-outline-secondary" @onclick='() => Nav.NavigateTo("inputs")'>
             ← Edit Inputs
         </button>
-        <input class="form-control" style="max-width: 220px;" placeholder="Paycheck name"
-               @bind="_saveName" />
-        <button class="btn btn-success" @onclick="SaveAsync" disabled="@_saving">
-            💾 @(_saving ? "Saving…" : "Save Paycheck")
-        </button>
-        @if (_saveMessage is not null)
-        {
-            <span class="text-success small">@_saveMessage</span>
-        }
-        <a class="btn btn-link" href="saved">View saved →</a>
+        <AuthorizeView>
+            <Authorized>
+                <input class="form-control" style="max-width: 220px;" placeholder="Paycheck name"
+                       @bind="_saveName" />
+                <button class="btn btn-success" @onclick="SaveAsync" disabled="@_saving">
+                    💾 @(_saving ? "Saving…" : "Save Paycheck")
+                </button>
+                @if (_saveMessage is not null)
+                {
+                    <span class="text-success small">@_saveMessage</span>
+                }
+                <a class="btn btn-link" href="saved">View saved →</a>
+            </Authorized>
+            <NotAuthorized>
+                <a class="btn btn-outline-primary" href="/account/login?returnUrl=/results">
+                    Sign in to save
+                </a>
+                <span class="text-muted small">— accounts let you save calculations across devices.</span>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 
     <ExplanationModal Explanation="_selectedExplanation" OnClose="CloseExplanation" />

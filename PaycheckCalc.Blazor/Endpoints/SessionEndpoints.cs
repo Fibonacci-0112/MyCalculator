@@ -1,5 +1,5 @@
-using PaycheckCalc.Blazor.Services;
 using PaycheckCalc.Core.Models;
+using PaycheckCalc.Core.Storage;
 
 namespace PaycheckCalc.Blazor.Endpoints;
 
@@ -17,13 +17,13 @@ public static class SessionEndpoints
             .WithTags("Session")
             .RequireAuthorization();
 
-        group.MapGet("/", async (EfSessionStateRepository repo) =>
+        group.MapGet("/", async (ISessionStateRepository repo) =>
         {
             var snapshot = await repo.GetAsync();
             return snapshot is null ? Results.NoContent() : Results.Ok(snapshot);
         });
 
-        group.MapPut("/", async (SessionStateSnapshot snapshot, EfSessionStateRepository repo) =>
+        group.MapPut("/", async (SessionStateSnapshot snapshot, ISessionStateRepository repo) =>
         {
             await repo.SaveAsync(snapshot);
             return Results.NoContent();
