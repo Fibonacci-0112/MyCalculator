@@ -16,7 +16,7 @@
                        TextColor="#78909C" FontSize="13" LineBreakMode="WordWrap" />
             </VerticalStackLayout>
 
-            <!-- Sync status banner -->
+            <!-- Sync status banners -->
             <Border BackgroundColor="#FFF8E1" StrokeThickness="0"
                     StrokeShape="RoundRectangle 8" Padding="12,8"
                     IsVisible="{Binding SyncStatus.IsOffline}">
@@ -52,6 +52,35 @@
                     <Label Text="{Binding StatusMessage}"
                            TextColor="#388E3C" FontSize="12"
                            IsVisible="{Binding HasStatus}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Legacy import card — appears only when signed in AND legacy data exists on this device -->
+            <Border BackgroundColor="White" StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12" Padding="20"
+                    IsVisible="{Binding CanImportLegacyData}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Import on-device data"
+                           TextColor="#37474F" FontSize="16" FontAttributes="Bold" />
+                    <Label TextColor="#78909C" FontSize="13" LineBreakMode="WordWrap">
+                        <Label.Text>
+                            <Binding Path="LegacyDataSummary"
+                                     StringFormat="We found {0} on this device from before account-based sync. Import them into your account?" />
+                        </Label.Text>
+                    </Label>
+                    <Button Text="Import to my account"
+                            Command="{Binding ImportLegacyDataCommand}"
+                            BackgroundColor="#1976D2"
+                            TextColor="White"
+                            IsEnabled="{Binding IsNotImporting}" />
+                    <Label Text="Importing…"
+                           TextColor="#78909C" FontSize="12"
+                           IsVisible="{Binding IsImporting}"
+                           HorizontalOptions="Center" />
+                    <Label Text="{Binding ImportResultMessage}"
+                           TextColor="#388E3C" FontSize="13"
+                           IsVisible="{Binding HasImportResult}"
+                           LineBreakMode="WordWrap" />
                 </VerticalStackLayout>
             </Border>
 

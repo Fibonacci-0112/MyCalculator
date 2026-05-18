@@ -88,6 +88,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<SyncStatus>();
         builder.Services.AddSingleton<ConnectivityWatcher>();
 
+        // Phase 5: one-shot importer for pre-user-scoping JSON files at the
+        // FileSystem.AppDataDirectory root. Surfaced on the Account page
+        // when the legacy files exist on the current device.
+        builder.Services.AddSingleton<LegacyDataImporter>();
+
         // Shared annual state consumed by every Phase 8 flyout view-model.
         builder.Services.AddSingleton<AnnualTaxSession>();
 

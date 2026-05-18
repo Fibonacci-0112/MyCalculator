@@ -119,13 +119,18 @@ builder.Services.AddScoped<AnnualTaxSessionState>();
 // importer ships — it's just not DI-registered anymore.
 builder.Services.AddScoped<SessionStateLifecycle>();
 
-// ── Per-user persistence (database is the source of truth). The
-//    LocalStorage* classes stay in Services/ until Phase 5's import flow
-//    has run; they're no longer DI-registered.
+// ── Per-user persistence (database is the source of truth).
 builder.Services.AddScoped<IPaycheckRepository, EfPaycheckRepository>();
 builder.Services.AddScoped<IAnnualScenarioRepository, EfAnnualScenarioRepository>();
 builder.Services.AddScoped<ISessionStateRepository, EfSessionStateRepository>();
 builder.Services.AddScoped<IUserPreferencesRepository, EfUserPreferencesRepository>();
+
+// Phase 5: one-shot importer that copies pre-account browser localStorage
+// data into the signed-in user's account. The LocalStorage* classes were
+// kept across Phase 2 specifically so this importer can read the legacy
+// keys via the same JsonSerializerOptions they wrote with. Surfaced on
+// SavedPaychecks.razor via <LegacyImportBanner />.
+builder.Services.AddScoped<LegacyDataImporter>();
 
 var app = builder.Build();
 
