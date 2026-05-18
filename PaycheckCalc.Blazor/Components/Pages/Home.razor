@@ -229,7 +229,8 @@
     private bool _loading = true;
     private SavedPaycheck? _latest;
     private YtdSummary? _ytd;
-    private AnnualProjection? _projection;
+    // Fully qualified: sibling page AnnualProjection.razor declares a class of the same name in this namespace.
+    private PaycheckCalc.Core.Models.AnnualProjection? _projection;
 
     private double YearProgressPercent =>
         _projection is null || _projection.PayPeriodsPerYear == 0
