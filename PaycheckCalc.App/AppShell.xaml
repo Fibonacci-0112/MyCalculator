@@ -75,4 +75,15 @@
                           ContentTemplate="{DataTemplate views:AnnualTaxResultsPage}" />
         </Tab>
     </FlyoutItem>
+
+    <!-- Account hub: signed-in users see their email + sign-out; anonymous
+         users see a "sign in to sync" CTA. The Login route is targeted by
+         GoToAsync("//Login") from the Account page and after sign-out. -->
+    <FlyoutItem Title="Account" Route="AccountHub">
+        <ShellContent Route="Account"
+                      ContentTemplate="{DataTemplate views:AccountPage}" />
+    </FlyoutItem>
+    <ShellContent Title="Sign in" Route="Login"
+                  FlyoutItemIsVisible="False"
+                  ContentTemplate="{DataTemplate views:LoginPage}" />
 </Shell>

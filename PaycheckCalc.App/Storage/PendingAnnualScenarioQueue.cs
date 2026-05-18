@@ -1,30 +1,25 @@
 using PaycheckCalc.App.Auth;
 using PaycheckCalc.Core.Models;
-using PaycheckCalc.Core.Storage;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace PaycheckCalc.App.Storage;
 
+public sealed record PendingAnnualScenarioOp(
+    PendingOpType OpType,
+    Guid Id,
+    DateTimeOffset QueuedAt,
+    SavedAnnualScenario? Payload);
+
 /// <summary>
-/// JSON-file-backed implementation of <see cref="IPaycheckRepository"/>.
-/// Stores saved paychecks in a per-user JSON file under
-/// <c>{baseDirectory}/users/{userId}/saved_paychecks.json</c> (or
-/// <c>{baseDirectory}/anonymous/saved_paychecks.json</c> when no user is
-/// signed in, e.g. for the Phase 5 importer to read pre-account data).
-///
-/// In Phase 3 this is wrapped by <see cref="SyncingPaycheckRepository"/>
-/// to serve as the offline cache layer behind <see cref="HttpPaycheckRepository"/>.
-/// The cache invalidates on <see cref="MauiUserContext.UserChanged"/> so a
-/// sign-in/sign-out within one app session never leaks the previous user's
-/// data into the next user's view.
+/// Annual-scenario peer to <see cref="PendingPaycheckQueue"/>.
 /// </summary>
-public sealed class JsonPaycheckRepository : IPaycheckRepository
+public sealed class PendingAnnualScenarioQueue
 {
     private readonly string _baseDirectory;
     private readonly MauiUserContext _userContext;
     private readonly SemaphoreSlim _lock = new(1, 1);
-    private List<SavedPaycheck>? _cache;
+    private List<PendingAnnualScenarioOp>? _cache;
     private string? _cachedUserId;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -34,65 +29,70 @@ public sealed class JsonPaycheckRepository : IPaycheckRepository
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public JsonPaycheckRepository(string baseDirectory, MauiUserContext userContext)
+    public PendingAnnualScenarioQueue(string baseDirectory, MauiUserContext userContext)
     {
         _baseDirectory = baseDirectory;
         _userContext = userContext;
         _userContext.UserChanged += () => _cache = null;
     }
 
-    public async Task<IReadOnlyList<SavedPaycheck>> GetAllAsync()
-    {
-        await EnsureLoadedAsync();
-        return _cache!.AsReadOnly();
-    }
-
-    public async Task<SavedPaycheck?> GetByIdAsync(Guid id)
-    {
-        await EnsureLoadedAsync();
-        return _cache!.FirstOrDefault(p => p.Id == id);
-    }
-
-    public async Task SaveAsync(SavedPaycheck paycheck)
+    public async Task EnqueueSaveAsync(SavedAnnualScenario scenario)
     {
         await _lock.WaitAsync();
         try
         {
             await EnsureLoadedAsync_NoLock();
-
-            var index = _cache!.FindIndex(p => p.Id == paycheck.Id);
-            if (index >= 0)
-                _cache[index] = paycheck;
-            else
-                _cache.Add(paycheck);
-
+            _cache!.RemoveAll(op => op.Id == scenario.Id);
+            _cache.Add(new PendingAnnualScenarioOp(PendingOpType.Save, scenario.Id, DateTimeOffset.UtcNow, scenario));
             await PersistAsync();
         }
-        finally
-        {
-            _lock.Release();
-        }
+        finally { _lock.Release(); }
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task EnqueueDeleteAsync(Guid id)
     {
         await _lock.WaitAsync();
         try
         {
             await EnsureLoadedAsync_NoLock();
-            _cache!.RemoveAll(p => p.Id == id);
+            _cache!.RemoveAll(op => op.Id == id);
+            _cache.Add(new PendingAnnualScenarioOp(PendingOpType.Delete, id, DateTimeOffset.UtcNow, null));
             await PersistAsync();
         }
-        finally
-        {
-            _lock.Release();
-        }
+        finally { _lock.Release(); }
     }
 
-    private async Task EnsureLoadedAsync()
+    public async Task<int> CountAsync()
     {
         await _lock.WaitAsync();
-        try { await EnsureLoadedAsync_NoLock(); }
+        try
+        {
+            await EnsureLoadedAsync_NoLock();
+            return _cache!.Count;
+        }
+        finally { _lock.Release(); }
+    }
+
+    public async Task<IReadOnlyList<PendingAnnualScenarioOp>> SnapshotAsync()
+    {
+        await _lock.WaitAsync();
+        try
+        {
+            await EnsureLoadedAsync_NoLock();
+            return _cache!.ToList().AsReadOnly();
+        }
+        finally { _lock.Release(); }
+    }
+
+    public async Task RemoveAsync(Guid id)
+    {
+        await _lock.WaitAsync();
+        try
+        {
+            await EnsureLoadedAsync_NoLock();
+            if (_cache!.RemoveAll(op => op.Id == id) > 0)
+                await PersistAsync();
+        }
         finally { _lock.Release(); }
     }
 
@@ -108,7 +108,7 @@ public sealed class JsonPaycheckRepository : IPaycheckRepository
             try
             {
                 var json = await File.ReadAllTextAsync(filePath);
-                _cache = JsonSerializer.Deserialize<List<SavedPaycheck>>(json, JsonOptions) ?? [];
+                _cache = JsonSerializer.Deserialize<List<PendingAnnualScenarioOp>>(json, JsonOptions) ?? [];
             }
             catch (JsonException)
             {
@@ -135,20 +135,13 @@ public sealed class JsonPaycheckRepository : IPaycheckRepository
     private string GetFilePath(string? userId)
     {
         var folder = SanitizeUserFolder(userId);
-        return Path.Combine(_baseDirectory, "users", folder, "saved_paychecks.json");
+        return Path.Combine(_baseDirectory, "users", folder, "pending_scenario_ops.json");
     }
 
-    /// <summary>
-    /// Email addresses (which double as the user id since Identity bearer
-    /// tokens are opaque — see <c>AuthApiClient</c>) contain '@', which is
-    /// fine on Linux/Android but awkward on Windows file paths. Normalize
-    /// to a filesystem-safe form.
-    /// </summary>
     private static string SanitizeUserFolder(string? userId)
     {
         if (string.IsNullOrEmpty(userId)) return "anonymous";
         var invalid = Path.GetInvalidFileNameChars();
-        var sanitized = string.Concat(userId.Select(c => invalid.Contains(c) || c == '@' ? '_' : c));
-        return sanitized;
+        return string.Concat(userId.Select(c => invalid.Contains(c) || c == '@' ? '_' : c));
     }
 }

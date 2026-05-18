@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
+using PaycheckCalc.App.Auth;
 using PaycheckCalc.App.Services;
 using PaycheckCalc.App.Storage;
 using PaycheckCalc.App.ViewModels;
@@ -37,12 +38,55 @@ public static class MauiProgram
         builder.Services.AddSingleton<IGeocodingService, GoogleMapsGeocodingService>();
         builder.Services.AddSingleton<IJurisdictionService, JurisdictionResolver>();
 
-        builder.Services.AddSingleton<IPaycheckRepository>(
-            new JsonPaycheckRepository(FileSystem.AppDataDirectory));
+        // ── Auth: SecureStorage-backed token store + user context, plus
+        //    typed API/auth HttpClients. The "api" client carries the bearer
+        //    token via AuthenticatingHttpHandler; the "auth" client is plain
+        //    so login/register/refresh aren't circular.
+        builder.Services.AddSingleton<AuthTokenStore>();
+        builder.Services.AddSingleton<MauiUserContext>();
+        builder.Services.AddTransient<AuthenticatingHttpHandler>();
+        builder.Services.AddSingleton<AuthApiClient>();
+        builder.Services.AddHttpClient(ApiConfiguration.AuthHttpClientName, client =>
+        {
+            client.BaseAddress = new Uri(ApiConfiguration.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(20);
+        });
+        builder.Services.AddHttpClient(ApiConfiguration.ApiHttpClientName, client =>
+        {
+            client.BaseAddress = new Uri(ApiConfiguration.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(20);
+        })
+        .AddHttpMessageHandler<AuthenticatingHttpHandler>();
 
-        // Phase-8 annual-scenario persistence.
-        builder.Services.AddSingleton<IAnnualScenarioRepository>(
-            new JsonAnnualScenarioRepository(FileSystem.AppDataDirectory));
+        // ── Per-user persistence. The IPaycheckRepository / IAnnualScenarioRepository
+        //    interfaces resolve to the syncing wrappers, which compose the
+        //    HTTP repos with user-scoped JSON file caches plus an
+        //    offline-write pending-ops queue. Reads prefer remote; writes
+        //    go cache-first then push; failed pushes are queued for replay
+        //    by the ConnectivityWatcher when network is restored.
+        builder.Services.AddSingleton(sp =>
+            new JsonPaycheckRepository(FileSystem.AppDataDirectory, sp.GetRequiredService<MauiUserContext>()));
+        builder.Services.AddSingleton(sp =>
+            new JsonAnnualScenarioRepository(FileSystem.AppDataDirectory, sp.GetRequiredService<MauiUserContext>()));
+        builder.Services.AddSingleton(sp =>
+            new PendingPaycheckQueue(FileSystem.AppDataDirectory, sp.GetRequiredService<MauiUserContext>()));
+        builder.Services.AddSingleton(sp =>
+            new PendingAnnualScenarioQueue(FileSystem.AppDataDirectory, sp.GetRequiredService<MauiUserContext>()));
+        builder.Services.AddSingleton<HttpPaycheckRepository>();
+        builder.Services.AddSingleton<HttpAnnualScenarioRepository>();
+        builder.Services.AddSingleton<SyncingPaycheckRepository>();
+        builder.Services.AddSingleton<SyncingAnnualScenarioRepository>();
+        builder.Services.AddSingleton<IPaycheckRepository>(sp => sp.GetRequiredService<SyncingPaycheckRepository>());
+        builder.Services.AddSingleton<IAnnualScenarioRepository>(sp => sp.GetRequiredService<SyncingAnnualScenarioRepository>());
+
+        // ── Sync UX: SyncStatus is the live observable bound by AccountPage
+        //    to render "Working offline" / "N changes pending" banners.
+        //    ConnectivityWatcher mirrors network state into SyncStatus and
+        //    drains the pending queues when the network is restored. It is
+        //    held by AppShell so the subscription stays alive for the
+        //    process lifetime.
+        builder.Services.AddSingleton<SyncStatus>();
+        builder.Services.AddSingleton<ConnectivityWatcher>();
 
         // Shared annual state consumed by every Phase 8 flyout view-model.
         builder.Services.AddSingleton<AnnualTaxSession>();
@@ -62,6 +106,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<CreditsViewModel>();
         builder.Services.AddSingleton<QuarterlyEstimatesViewModel>();
         builder.Services.AddSingleton<WhatIfViewModel>();
+        builder.Services.AddSingleton<LoginViewModel>();
+        builder.Services.AddSingleton<AccountViewModel>();
         builder.Services.AddSingleton<DashboardPage>();
         builder.Services.AddSingleton<InputsPage>();
         builder.Services.AddSingleton<PayHoursPage>();
@@ -80,6 +126,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<QuarterlyEstimatesPage>();
         builder.Services.AddSingleton<WhatIfPage>();
         builder.Services.AddSingleton<AnnualTaxResultsPage>();
+        builder.Services.AddSingleton<LoginPage>();
+        builder.Services.AddSingleton<AccountPage>();
         builder.Services.AddSingleton<AppShell>();
 
         return builder.Build();

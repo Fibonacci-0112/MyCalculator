@@ -1,3 +1,4 @@
+using PaycheckCalc.App.Auth;
 using PaycheckCalc.Core.Models;
 using PaycheckCalc.Core.Storage;
 using System.Text.Json;
@@ -7,15 +8,16 @@ namespace PaycheckCalc.App.Storage;
 
 /// <summary>
 /// JSON-file-backed implementation of <see cref="IAnnualScenarioRepository"/>.
-/// Stores all saved annual scenarios in a single JSON file under
-/// <see cref="FileSystem.AppDataDirectory"/> (or a caller-supplied directory
-/// for tests). Mirrors <see cref="JsonPaycheckRepository"/>.
+/// Per-user file at <c>{baseDirectory}/users/{userId}/saved_annual_scenarios.json</c>.
+/// Peer to <see cref="JsonPaycheckRepository"/>.
 /// </summary>
 public sealed class JsonAnnualScenarioRepository : IAnnualScenarioRepository
 {
-    private readonly string _filePath;
+    private readonly string _baseDirectory;
+    private readonly MauiUserContext _userContext;
     private readonly SemaphoreSlim _lock = new(1, 1);
     private List<SavedAnnualScenario>? _cache;
+    private string? _cachedUserId;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -24,9 +26,11 @@ public sealed class JsonAnnualScenarioRepository : IAnnualScenarioRepository
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public JsonAnnualScenarioRepository(string dataDirectory)
+    public JsonAnnualScenarioRepository(string baseDirectory, MauiUserContext userContext)
     {
-        _filePath = Path.Combine(dataDirectory, "saved_annual_scenarios.json");
+        _baseDirectory = baseDirectory;
+        _userContext = userContext;
+        _userContext.UserChanged += () => _cache = null;
     }
 
     public async Task<IReadOnlyList<SavedAnnualScenario>> GetAllAsync()
@@ -46,14 +50,12 @@ public sealed class JsonAnnualScenarioRepository : IAnnualScenarioRepository
         await _lock.WaitAsync();
         try
         {
-            await EnsureLoadedAsync();
-
+            await EnsureLoadedAsync_NoLock();
             var index = _cache!.FindIndex(s => s.Id == scenario.Id);
             if (index >= 0)
                 _cache[index] = scenario;
             else
                 _cache.Add(scenario);
-
             await PersistAsync();
         }
         finally
@@ -67,7 +69,7 @@ public sealed class JsonAnnualScenarioRepository : IAnnualScenarioRepository
         await _lock.WaitAsync();
         try
         {
-            await EnsureLoadedAsync();
+            await EnsureLoadedAsync_NoLock();
             _cache!.RemoveAll(s => s.Id == id);
             await PersistAsync();
         }
@@ -79,18 +81,27 @@ public sealed class JsonAnnualScenarioRepository : IAnnualScenarioRepository
 
     private async Task EnsureLoadedAsync()
     {
-        if (_cache is not null) return;
+        await _lock.WaitAsync();
+        try { await EnsureLoadedAsync_NoLock(); }
+        finally { _lock.Release(); }
+    }
 
-        if (File.Exists(_filePath))
+    private async Task EnsureLoadedAsync_NoLock()
+    {
+        var currentUserId = await _userContext.GetCurrentUserIdAsync();
+        if (_cache is not null && _cachedUserId == currentUserId) return;
+        _cachedUserId = currentUserId;
+
+        var filePath = GetFilePath(currentUserId);
+        if (File.Exists(filePath))
         {
             try
             {
-                var json = await File.ReadAllTextAsync(_filePath);
+                var json = await File.ReadAllTextAsync(filePath);
                 _cache = JsonSerializer.Deserialize<List<SavedAnnualScenario>>(json, JsonOptions) ?? [];
             }
             catch (JsonException)
             {
-                // Corrupted file — start fresh, matching JsonPaycheckRepository.
                 _cache = [];
             }
         }
@@ -102,11 +113,26 @@ public sealed class JsonAnnualScenarioRepository : IAnnualScenarioRepository
 
     private async Task PersistAsync()
     {
-        var directory = Path.GetDirectoryName(_filePath);
+        var filePath = GetFilePath(_cachedUserId);
+        var directory = Path.GetDirectoryName(filePath);
         if (directory is not null && !Directory.Exists(directory))
             Directory.CreateDirectory(directory);
 
         var json = JsonSerializer.Serialize(_cache, JsonOptions);
-        await File.WriteAllTextAsync(_filePath, json);
+        await File.WriteAllTextAsync(filePath, json);
+    }
+
+    private string GetFilePath(string? userId)
+    {
+        var folder = SanitizeUserFolder(userId);
+        return Path.Combine(_baseDirectory, "users", folder, "saved_annual_scenarios.json");
+    }
+
+    private static string SanitizeUserFolder(string? userId)
+    {
+        if (string.IsNullOrEmpty(userId)) return "anonymous";
+        var invalid = Path.GetInvalidFileNameChars();
+        var sanitized = string.Concat(userId.Select(c => invalid.Contains(c) || c == '@' ? '_' : c));
+        return sanitized;
     }
 }

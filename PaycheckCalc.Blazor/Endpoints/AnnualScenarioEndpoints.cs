@@ -1,5 +1,5 @@
-using PaycheckCalc.Blazor.Services;
 using PaycheckCalc.Core.Models;
+using PaycheckCalc.Core.Storage;
 
 namespace PaycheckCalc.Blazor.Endpoints;
 
@@ -15,16 +15,16 @@ public static class AnnualScenarioEndpoints
             .WithTags("AnnualScenarios")
             .RequireAuthorization();
 
-        group.MapGet("/", async (EfAnnualScenarioRepository repo) =>
+        group.MapGet("/", async (IAnnualScenarioRepository repo) =>
             Results.Ok(await repo.GetAllAsync()));
 
-        group.MapGet("/{id:guid}", async (Guid id, EfAnnualScenarioRepository repo) =>
+        group.MapGet("/{id:guid}", async (Guid id, IAnnualScenarioRepository repo) =>
         {
             var scenario = await repo.GetByIdAsync(id);
             return scenario is null ? Results.NotFound() : Results.Ok(scenario);
         });
 
-        group.MapPut("/{id:guid}", async (Guid id, SavedAnnualScenario scenario, EfAnnualScenarioRepository repo) =>
+        group.MapPut("/{id:guid}", async (Guid id, SavedAnnualScenario scenario, IAnnualScenarioRepository repo) =>
         {
             if (scenario.Id != id)
                 return Results.BadRequest("Body id does not match URL id.");
@@ -32,7 +32,7 @@ public static class AnnualScenarioEndpoints
             return Results.NoContent();
         });
 
-        group.MapDelete("/{id:guid}", async (Guid id, EfAnnualScenarioRepository repo) =>
+        group.MapDelete("/{id:guid}", async (Guid id, IAnnualScenarioRepository repo) =>
         {
             await repo.DeleteAsync(id);
             return Results.NoContent();

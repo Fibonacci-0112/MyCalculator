@@ -1,5 +1,5 @@
-using PaycheckCalc.Blazor.Services;
 using PaycheckCalc.Core.Models;
+using PaycheckCalc.Core.Storage;
 
 namespace PaycheckCalc.Blazor.Endpoints;
 
@@ -14,13 +14,13 @@ public static class PreferencesEndpoints
             .WithTags("Preferences")
             .RequireAuthorization();
 
-        group.MapGet("/", async (EfUserPreferencesRepository repo) =>
+        group.MapGet("/", async (IUserPreferencesRepository repo) =>
         {
             var prefs = await repo.GetAsync();
             return prefs is null ? Results.NoContent() : Results.Ok(prefs);
         });
 
-        group.MapPut("/", async (UserPreferences prefs, EfUserPreferencesRepository repo) =>
+        group.MapPut("/", async (UserPreferences prefs, IUserPreferencesRepository repo) =>
         {
             await repo.SaveAsync(prefs);
             return Results.NoContent();

@@ -64,4 +64,28 @@ public sealed class SelfEmploymentSessionState
         QualifiedPropertyUbia         = QualifiedPropertyUbia,
         EstimatedTaxPayments          = EstimatedTaxPayments,
     };
+
+    /// <summary>
+    /// Clears all session fields back to defaults. Called by
+    /// <c>SessionStateLifecycle</c> when the authenticated user changes
+    /// inside a circuit.
+    /// </summary>
+    public void Reset()
+    {
+        GrossRevenue                   = 0m;
+        CostOfGoodsSold                = 0m;
+        TotalBusinessExpenses          = 0m;
+        OtherIncome                    = 0m;
+        W2SocialSecurityWages          = 0m;
+        W2MedicareWages                = 0m;
+        FilingStatus                   = FederalFilingStatus.SingleOrMarriedSeparately;
+        State                          = UsState.TX;
+        StateInputValues               = new StateInputValues();
+        ItemizedDeductionsOverStandard = 0m;
+        IsSpecifiedServiceBusiness     = false;
+        QualifiedBusinessW2Wages       = 0m;
+        QualifiedPropertyUbia          = 0m;
+        EstimatedTaxPayments           = 0m;
+        LastResult                     = null;
+    }
 }

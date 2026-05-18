@@ -43,6 +43,13 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0-preview.4.26230.115" />
+    <!--
+      Microsoft.Extensions.Http provides IHttpClientFactory + AddHttpClient(),
+      which the Phase 3 auth + repo wiring uses to compose AuthenticatingHttpHandler
+      onto the named "api" client. System.Net.Http.Json is built into the BCL
+      since .NET 5, so no package is needed for PostAsJsonAsync/ReadFromJsonAsync.
+    -->
+    <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0-preview.4.26230.115" />
 	<PackageReference Include="Microsoft.Maui.Controls" Version="11.0.0-preview.4.26230.3" />
   </ItemGroup>
 

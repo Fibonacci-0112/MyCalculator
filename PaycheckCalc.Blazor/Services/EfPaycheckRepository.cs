@@ -27,7 +27,12 @@ public sealed class EfPaycheckRepository : IPaycheckRepository
 
     public async Task<IReadOnlyList<SavedPaycheck>> GetAllAsync()
     {
-        var userId = await RequireUserIdAsync();
+        // Anonymous users get an empty list rather than an exception so the
+        // Home / Saved Paychecks pages render gracefully when logged out.
+        var userId = await _userContext.GetUserIdAsync();
+        if (string.IsNullOrEmpty(userId))
+            return Array.Empty<SavedPaycheck>();
+
         var entities = await _db.Paychecks
             .AsNoTracking()
             .Where(p => p.UserId == userId)
@@ -38,7 +43,10 @@ public sealed class EfPaycheckRepository : IPaycheckRepository
 
     public async Task<SavedPaycheck?> GetByIdAsync(Guid id)
     {
-        var userId = await RequireUserIdAsync();
+        var userId = await _userContext.GetUserIdAsync();
+        if (string.IsNullOrEmpty(userId))
+            return null;
+
         var entity = await _db.Paychecks
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.UserId == userId && p.Id == id);
