@@ -1,25 +1,36 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PaycheckCalc.App.Auth;
+using PaycheckCalc.Core.Storage;
 
 namespace PaycheckCalc.App.ViewModels;
 
 /// <summary>
-/// View model for <c>LoginPage</c>. Handles sign-in and one-tap registration
-/// against the Identity API endpoints on the Blazor server. On success,
-/// stores tokens in <see cref="AuthTokenStore"/> (which raises
-/// <c>UserChanged</c>, invalidating per-user repository caches) and
-/// navigates back to the Dashboard.
+/// View model for <c>LoginPage</c>. Handles sign-in and one-tap
+/// registration against the Identity API endpoints on the Blazor server.
+/// On success, stores tokens in <see cref="AuthTokenStore"/> (which raises
+/// <c>UserChanged</c>, invalidating per-user repository caches), kicks
+/// off an auto-sync that pulls the server's saved-paychecks /
+/// annual-scenarios into the local cache, and navigates to the
+/// Dashboard.
 /// </summary>
 public partial class LoginViewModel : ObservableObject
 {
     private readonly AuthApiClient _api;
     private readonly AuthTokenStore _tokens;
+    private readonly IPaycheckRepository _paycheckRepo;
+    private readonly IAnnualScenarioRepository _scenarioRepo;
 
-    public LoginViewModel(AuthApiClient api, AuthTokenStore tokens)
+    public LoginViewModel(
+        AuthApiClient api,
+        AuthTokenStore tokens,
+        IPaycheckRepository paycheckRepo,
+        IAnnualScenarioRepository scenarioRepo)
     {
         _api = api;
         _tokens = tokens;
+        _paycheckRepo = paycheckRepo;
+        _scenarioRepo = scenarioRepo;
     }
 
     [ObservableProperty] public partial string Email { get; set; } = "";
@@ -70,6 +81,13 @@ public partial class LoginViewModel : ObservableObject
 
             await _tokens.SaveAsync(result.Tokens);
             Password = "";
+
+            // Auto-sync in the background — pulls server state into the
+            // local cache and flushes any pending ops. Fire-and-forget so
+            // the user lands on the Dashboard immediately; failures are
+            // retried on the next read.
+            _ = AutoSyncAsync();
+
             await Shell.Current.GoToAsync("//Dashboard");
         }
         catch (HttpRequestException ex)
@@ -88,5 +106,11 @@ public partial class LoginViewModel : ObservableObject
         {
             IsBusy = false;
         }
+    }
+
+    private async Task AutoSyncAsync()
+    {
+        try { await _paycheckRepo.GetAllAsync(); } catch { }
+        try { await _scenarioRepo.GetAllAsync(); } catch { }
     }
 }

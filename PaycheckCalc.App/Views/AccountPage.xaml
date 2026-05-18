@@ -16,6 +16,25 @@
                        TextColor="#78909C" FontSize="13" LineBreakMode="WordWrap" />
             </VerticalStackLayout>
 
+            <!-- Sync status banner -->
+            <Border BackgroundColor="#FFF8E1" StrokeThickness="0"
+                    StrokeShape="RoundRectangle 8" Padding="12,8"
+                    IsVisible="{Binding SyncStatus.IsOffline}">
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="⚠️ Working offline"
+                           TextColor="#E65100" FontSize="13" FontAttributes="Bold" />
+                    <Label Text="Your changes are saved locally and will sync when you reconnect."
+                           TextColor="#78909C" FontSize="12" LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border BackgroundColor="#E3F2FD" StrokeThickness="0"
+                    StrokeShape="RoundRectangle 8" Padding="12,8"
+                    IsVisible="{Binding SyncStatus.HasPending}">
+                <Label Text="{Binding SyncStatus.PendingSummary}"
+                       TextColor="#0D47A1" FontSize="13" />
+            </Border>
+
             <!-- Signed-in card -->
             <Border BackgroundColor="White" StrokeThickness="0"
                     StrokeShape="RoundRectangle 12" Padding="20"

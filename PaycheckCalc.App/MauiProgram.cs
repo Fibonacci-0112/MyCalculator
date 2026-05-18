@@ -60,18 +60,33 @@ public static class MauiProgram
 
         // ── Per-user persistence. The IPaycheckRepository / IAnnualScenarioRepository
         //    interfaces resolve to the syncing wrappers, which compose the
-        //    HTTP repos with user-scoped JSON file caches. Anonymous reads
-        //    fall back to the local cache only; writes go cache-first.
+        //    HTTP repos with user-scoped JSON file caches plus an
+        //    offline-write pending-ops queue. Reads prefer remote; writes
+        //    go cache-first then push; failed pushes are queued for replay
+        //    by the ConnectivityWatcher when network is restored.
         builder.Services.AddSingleton(sp =>
             new JsonPaycheckRepository(FileSystem.AppDataDirectory, sp.GetRequiredService<MauiUserContext>()));
         builder.Services.AddSingleton(sp =>
             new JsonAnnualScenarioRepository(FileSystem.AppDataDirectory, sp.GetRequiredService<MauiUserContext>()));
+        builder.Services.AddSingleton(sp =>
+            new PendingPaycheckQueue(FileSystem.AppDataDirectory, sp.GetRequiredService<MauiUserContext>()));
+        builder.Services.AddSingleton(sp =>
+            new PendingAnnualScenarioQueue(FileSystem.AppDataDirectory, sp.GetRequiredService<MauiUserContext>()));
         builder.Services.AddSingleton<HttpPaycheckRepository>();
         builder.Services.AddSingleton<HttpAnnualScenarioRepository>();
         builder.Services.AddSingleton<SyncingPaycheckRepository>();
         builder.Services.AddSingleton<SyncingAnnualScenarioRepository>();
         builder.Services.AddSingleton<IPaycheckRepository>(sp => sp.GetRequiredService<SyncingPaycheckRepository>());
         builder.Services.AddSingleton<IAnnualScenarioRepository>(sp => sp.GetRequiredService<SyncingAnnualScenarioRepository>());
+
+        // ── Sync UX: SyncStatus is the live observable bound by AccountPage
+        //    to render "Working offline" / "N changes pending" banners.
+        //    ConnectivityWatcher mirrors network state into SyncStatus and
+        //    drains the pending queues when the network is restored. It is
+        //    held by AppShell so the subscription stays alive for the
+        //    process lifetime.
+        builder.Services.AddSingleton<SyncStatus>();
+        builder.Services.AddSingleton<ConnectivityWatcher>();
 
         // Shared annual state consumed by every Phase 8 flyout view-model.
         builder.Services.AddSingleton<AnnualTaxSession>();

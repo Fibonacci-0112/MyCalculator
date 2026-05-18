@@ -1,26 +1,29 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PaycheckCalc.App.Auth;
+using PaycheckCalc.App.Services;
 
 namespace PaycheckCalc.App.ViewModels;
 
 /// <summary>
-/// View model for <c>AccountPage</c>. Shows the signed-in user and offers
-/// a Sign Out button. When the user signs out, <see cref="AuthTokenStore.ClearAsync"/>
-/// fires <c>UserChanged</c>, which invalidates per-user repository caches
-/// so the next saved-paychecks read returns the anonymous folder's
-/// contents (typically empty).
+/// View model for <c>AccountPage</c>. Shows the signed-in user, a Sign
+/// Out button, and the live <see cref="SyncStatus"/> (online state +
+/// count of operations waiting to sync). The SyncStatus instance is
+/// exposed directly so the XAML can bind to its observable properties.
 /// </summary>
 public partial class AccountViewModel : ObservableObject
 {
     private readonly AuthTokenStore _tokens;
     private readonly MauiUserContext _userContext;
 
-    public AccountViewModel(AuthTokenStore tokens, MauiUserContext userContext)
+    public AccountViewModel(AuthTokenStore tokens, MauiUserContext userContext, SyncStatus syncStatus)
     {
         _tokens = tokens;
         _userContext = userContext;
+        SyncStatus = syncStatus;
     }
+
+    public SyncStatus SyncStatus { get; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsSignedOut))]
