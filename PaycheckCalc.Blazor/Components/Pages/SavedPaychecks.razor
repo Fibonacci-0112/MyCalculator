@@ -1,5 +1,6 @@
 @page "/saved"
 @attribute [Authorize]
+@using PaycheckCalc.Blazor.Components.Shared
 @using PaycheckCalc.Core.Storage
 @inject IPaycheckRepository Repo
 @inject CalculatorSessionState Session
@@ -8,6 +9,8 @@
 <PageTitle>Saved Paychecks — PaycheckCalc</PageTitle>
 
 <h1>Saved Paychecks</h1>
+
+<LegacyImportBanner OnImported="ReloadAfterImportAsync" />
 
 @if (_loading)
 {
@@ -80,6 +83,8 @@ else
         _loading = false;
         StateHasChanged();
     }
+
+    private Task ReloadAfterImportAsync() => ReloadAsync();
 
     private async Task LoadAsync(Guid id)
     {
