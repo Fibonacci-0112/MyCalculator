@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PaycheckCalc.App.Views.AccountPage"
+             Title="Account"
+             BackgroundColor="#F0F4FF">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="24" MaximumWidthRequest="480"
+                             HorizontalOptions="Center">
+
+            <VerticalStackLayout Spacing="4">
+                <Label Text="👤 Account"
+                       TextColor="#0D47A1" FontSize="26" FontAttributes="Bold" />
+                <Label Text="Your saved paychecks and annual scenarios are linked to this account and sync to every device you sign in on."
+                       TextColor="#78909C" FontSize="13" LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+
+            <!-- Signed-in card -->
+            <Border BackgroundColor="White" StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12" Padding="20"
+                    IsVisible="{Binding IsSignedIn}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Signed in as" TextColor="#78909C" FontSize="12" />
+                    <Label Text="{Binding CurrentEmail}"
+                           TextColor="#0D47A1" FontSize="18" FontAttributes="Bold" />
+
+                    <Button Text="Sign out"
+                            Command="{Binding SignOutCommand}"
+                            BackgroundColor="#D32F2F"
+                            TextColor="White" />
+
+                    <Label Text="{Binding StatusMessage}"
+                           TextColor="#388E3C" FontSize="12"
+                           IsVisible="{Binding HasStatus}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Signed-out card -->
+            <Border BackgroundColor="White" StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12" Padding="20"
+                    IsVisible="{Binding IsSignedOut}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Not signed in"
+                           TextColor="#37474F" FontSize="16" FontAttributes="Bold" />
+                    <Label Text="You can still use the calculator. Sign in to save paychecks across devices."
+                           TextColor="#78909C" FontSize="13" LineBreakMode="WordWrap" />
+                    <Button Text="Sign in"
+                            Command="{Binding GoToSignInCommand}"
+                            BackgroundColor="#1976D2"
+                            TextColor="White" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
